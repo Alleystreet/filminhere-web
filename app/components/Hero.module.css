@@ -68,20 +68,24 @@
 }
 
 .content h1 {
-  font-size: clamp(2.25rem, 5vw, 4rem);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  margin: 0 0 1rem;
+  font-size: clamp(2.35rem, 5.2vw, 4.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.9rem;
+  text-shadow: 0 3px 18px rgba(0,0,0,0.55);
 }
 
 .content p {
-  font-size: 1.25rem;   /* ← this is your “+2 steps” */
-  font-weight: 500;     /* ← semi-bold, clean */
-  line-height: 1.6;
+  font-size: clamp(1.125rem, 1.1vw + 0.9rem, 1.5rem); /* +2-ish steps, responsive */
+  line-height: 1.55;
+  font-weight: 600; /* bolder but not shouting */
   opacity: 0.95;
-  margin: 0 0 2.5rem;
+  margin: 0 0 2.25rem;
   text-align: center;
-  max-width: 720px;
+  max-width: 760px;
+
+  /* helps readability on bright frames */
+  text-shadow: 0 2px 12px rgba(0,0,0,0.45);
 }
 
 .heroOverlay h1 {
@@ -106,51 +110,68 @@
 }
 
 /* Optional button styling starter */
-.primaryBtn {
-  border: 1px solid #f5f5f5;
-  background: #f5f5f5;
-  color: #0b0b0b;
-  padding: 0.75rem 1.25rem;
-  cursor: pointer;
-}
-
-.secondaryBtn {
-  border: 1px solid #f5f5f5;
-  background: transparent;
-  color: #f5f5f5;
-  padding: 0.75rem 1.25rem;
-  cursor: pointer;
-}
-
-.heroVideo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-}
-
-.videoShade {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: rgba(0, 0, 0, 0.55); /* keeps text readable */
-}
-@media (prefers-reduced-motion: reduce) {
-  .primaryBtn,
-  .secondaryBtn {
-    transition: none;
-  }
-
-  .primaryBtn:hover,
-  .secondaryBtn:hover {
-    transform: none;
-  }
-}
-
+/* shared glass surface */
 .primaryBtn,
 .secondaryBtn {
-  display: inline-block;
-  text-decoration: none;
+  background: rgba(0, 0, 0, 0.28);          /* readable at rest */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  border-radius: 12px;
+  padding: 0.9rem 1.35rem;
+  font-weight: 600;
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.28),
+    inset 0 0 0 1px rgba(255,255,255,0.12);
+
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+/* primary = stronger edge + clarity */
+.primaryBtn {
+  border: 1px solid rgba(255,255,255,0.45);
+  color: #fff;
+}
+
+/* secondary = softer */
+.secondaryBtn {
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #f5f5f5;
+}
+
+.primaryBtn:hover,
+.secondaryBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.36);
+
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.18);
+}
+
+.primaryBtn:focus-visible,
+.secondaryBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,0.45),
+    0 12px 32px rgba(0,0,0,0.45);
+}
+
+/* keep your existing colors; just add subtle glass option if you want */
+.secondaryBtn {
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: 110px 18px 44px; /* slightly less top padding on mobile */
+  }
+  .content p {
+    margin-bottom: 1.75rem;
+  }
 }
