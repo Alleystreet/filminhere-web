@@ -1,0 +1,156 @@
+.hero {
+  position: relative;
+  min-height: 88vh;
+  overflow: hidden;
+  background: #000; /* prevents white flash */
+}
+
+/* poster paints instantly */
+.poster {
+  position: absolute;
+  inset: 0;
+  background: url("/media/filminhere-poster.jpg") center/cover no-repeat;
+  z-index: 0;
+}
+
+.logo {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  z-index: 2;
+  width: 96px;
+  opacity: 0.95;
+}
+
+.logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* video fades in on ready */
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  opacity: 0;
+  transition: opacity 1200ms ease;
+  will-change: opacity;
+
+  z-index: 0;
+}
+
+.videoOn {
+  opacity: 1;
+}
+
+/* overlay guarantees readability */
+.overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.7) 0%,
+    rgba(0,0,0,0.45) 45%,
+    rgba(0,0,0,0.8) 100%
+  );
+}
+
+/* content sits on top */
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 140px 20px 48px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.content h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.content p {
+  font-size: 1.25rem;   /* ← this is your “+2 steps” */
+  font-weight: 500;     /* ← semi-bold, clean */
+  line-height: 1.6;
+  opacity: 0.95;
+  margin: 0 0 2.5rem;
+  text-align: center;
+  max-width: 720px;
+}
+
+.heroOverlay h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.heroOverlay p {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin: 0 0 2rem;
+}
+
+.heroCta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Optional button styling starter */
+.primaryBtn {
+  border: 1px solid #f5f5f5;
+  background: #f5f5f5;
+  color: #0b0b0b;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+}
+
+.secondaryBtn {
+  border: 1px solid #f5f5f5;
+  background: transparent;
+  color: #f5f5f5;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+}
+
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.videoShade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.55); /* keeps text readable */
+}
+@media (prefers-reduced-motion: reduce) {
+  .primaryBtn,
+  .secondaryBtn {
+    transition: none;
+  }
+
+  .primaryBtn:hover,
+  .secondaryBtn:hover {
+    transform: none;
+  }
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: inline-block;
+  text-decoration: none;
+}
