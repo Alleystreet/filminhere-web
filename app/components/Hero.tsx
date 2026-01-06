@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import styles from "./Hero.module.css";
 
@@ -27,6 +27,15 @@ export default function Hero() {
 
   const canAutoPlay = useMemo(() => !prefersReducedMotion, [prefersReducedMotion]);
 
+  // ✅ Keep this HERE (after hooks, before useEffect/return)
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const q = String(fd.get("q") || "").trim();
+    const url = q ? `/locations?query=${encodeURIComponent(q)}` : `/locations`;
+    window.location.href = url;
+  };
+
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -50,10 +59,8 @@ export default function Hero() {
 
   return (
     <section className={styles.hero} aria-label="FilmInHere hero">
-      {/* Poster always visible */}
       <div className={styles.poster} aria-hidden="true" />
 
-      {/* Video fades in only when ready */}
       {!videoError && (
         <video
           ref={videoRef}
@@ -69,24 +76,57 @@ export default function Hero() {
         </video>
       )}
 
-      {/* Readability overlay */}
       <div className={styles.overlay} />
 
-      {/* Content */}
-      
       <div className={styles.content}>
-          <h1>Find the space your story needs.</h1>
-          <p>Connecting people and spaces so stories can happen.</p>
-      
-      <div className={styles.heroCta}>
+        <h1>Find the space your story needs.</h1>
+        <p>Connecting people and spaces so stories can happen.</p>
+
+        <div className={styles.heroCta}>
           <Link className={styles.primaryBtn} href="/producer/intake">
             Find Film Locations
           </Link>
-
           <Link className={styles.secondaryBtn} href="/host/intake">
             List My Property
           </Link>
-      </div>
+        </div>
+
+        {/* ✅ INSERT SEARCH DOCK HERE (after CTAs, still inside .content) */}
+        <div className={styles.searchDock} role="search" aria-label="Search film locations">
+          <form className={styles.searchForm} onSubmit={onSubmit}>
+            <span className={styles.searchIcon} aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" focusable="false" aria-hidden="true">
+                <path
+                  d="M10 18a8 8 0 1 1 5.293-14.01A8 8 0 0 1 10 18Zm11 3-5.2-5.2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+
+            <label className={styles.srOnly} htmlFor="heroSearch">
+              Search film-ready locations
+            </label>
+
+            <input
+              id="heroSearch"
+              name="q"
+              className={styles.searchInput}
+              type="search"
+              placeholder="Search film-ready locations"
+              autoComplete="off"
+              inputMode="search"
+            />
+
+            <button className={styles.searchBtn} type="submit">
+              Find Locations
+            </button>
+          </form>
+
+          <div className={styles.searchHint}>Homes • Studios • Warehouses • Outdoor spaces</div>
+        </div>
       </div>
     </section>
   );
