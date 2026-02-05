@@ -1,0 +1,65 @@
+.topRow { display:flex; justify-content:space-between; align-items:baseline; gap: 12px; margin-bottom: 14px; }
+.h1 { margin: 0; font-size: 30px; }
+.link { opacity:.85; text-decoration: underline; }
+
+.empty {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+  opacity: .9;
+}
+
+.list { display:grid; gap: 12px; }
+
+/* Card becomes a container with two areas */
+.card {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  overflow: hidden;
+}
+
+.cardMain {
+  display: block;
+  padding: 14px;
+  text-decoration: none;
+}
+
+.card:hover { border-color: rgba(255,255,255,0.2); }
+
+.row { display:flex; justify-content:space-between; gap: 10px; align-items:baseline; }
+.title { font-size: 15px; }
+
+.status {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  opacity: .95;
+}
+
+.status[data-status="PENDING"] { background: rgba(255,255,255,0.06); }
+.status[data-status="ACCEPTED"] { background: rgba(120,255,160,0.10); border-color: rgba(120,255,160,0.18); }
+.status[data-status="DECLINED"] { background: rgba(255,120,120,0.10); border-color: rgba(255,120,120,0.18); }
+
+.meta { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 8px; }
+.muted { font-size: 12px; opacity: .75; }
+
+/* Bottom action bar inside the card */
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.16);
+}
+
+.smallLink {
+  font-size: 12px;
+  opacity: .85;
+  text-decoration: underline;
+}
+.smallLink:hover { opacity: 1; }

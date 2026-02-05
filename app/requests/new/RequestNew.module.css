@@ -1,0 +1,118 @@
+.wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 44px; }
+.topRow { display:flex; justify-content:space-between; gap:12px; margin-bottom: 14px; }
+.back, .link { opacity: .85; text-decoration: underline; }
+.h1 { margin: 0 0 14px; font-size: 30px; }
+
+.listingCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.titleRow { display:flex; justify-content:space-between; gap:10px; align-items: baseline; }
+.title { font-size: 16px; }
+.price { opacity: .95; }
+.mutedInline { font-size: 12px; opacity: .75; margin-left: 6px; }
+
+.meta { display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; align-items:center; }
+.pill { font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); }
+.muted { font-size:12px; opacity:.75; }
+
+.feesRow { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; }
+.feePill { font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.18); opacity: .9; }
+
+.notice { opacity:.85; padding: 10px 0 14px; }
+
+.form {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+  display:grid;
+  gap: 12px;
+}
+
+.row { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 900px){ .row { grid-template-columns: 1fr; } }
+
+.label { display:grid; gap:6px; font-size:12px; opacity:.9; }
+
+.input, .textarea {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.25);
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
+}
+.textarea { min-height: 110px; resize: vertical; }
+
+.error{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,80,80,0.25);
+  background: rgba(255,80,80,0.08);
+  opacity: 0.95;
+}
+
+.btn {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn:hover:enabled { background: rgba(255,255,255,0.13); }
+
+/* ✅ Offer card */
+.offerCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,0.18);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+.offerTitle { font-size: 13px; opacity: .9; }
+.offerSub { font-size: 12px; opacity: .75; line-height: 1.5; }
+.offerGrid { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px){ .offerGrid { grid-template-columns: 1fr; } }
+
+/* ✅ Compliance card */
+.complianceCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,0.18);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+.complianceTitle { font-size: 13px; opacity: .9; }
+.complianceSub { font-size: 12px; opacity: .75; line-height: 1.5; }
+
+.checkRow, .ackRow {
+  display:flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12px;
+  opacity: .9;
+  line-height: 1.5;
+}
+.checkRow input, .ackRow input { margin-top: 2px; }
+
+.guidance { margin-top: 6px; }
+.guidance a { text-decoration: underline; opacity: .9; }
+.guidance a:hover { opacity: 1; }
+.guidanceNote {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  opacity: .85;
+  line-height: 1.6;
+}

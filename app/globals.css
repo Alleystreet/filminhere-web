@@ -25,3 +25,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Make native form controls (select dropdown) render in dark mode */
+:root {
+  color-scheme: dark;
+}
+
+

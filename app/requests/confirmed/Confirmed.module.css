@@ -1,0 +1,15 @@
+.wrap { max-width: 900px; margin: 0 auto; padding: 38px 16px 44px; text-align: center; }
+.h1 { margin: 0 0 10px; font-size: 34px; }
+.p { margin: 0 auto 18px; max-width: 560px; opacity: .85; line-height: 1.6; }
+.actions { display:flex; gap: 14px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.btn { border-radius: 12px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.10); padding: 12px 14px; text-decoration:none; }
+.btn:hover { background: rgba(255,255,255,0.13); }
+.link { text-decoration: underline; opacity: .85; }
+.code {
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+}
+.code:hover { opacity: 0.9; }

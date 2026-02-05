@@ -1,0 +1,429 @@
+.wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 44px; }
+.topRow { display:flex; justify-content:space-between; gap:12px; margin-bottom: 14px; }
+.back, .link { opacity:.85; text-decoration: underline; }
+.h1 { margin: 0 0 14px; font-size: 28px; display:flex; gap:10px; align-items: baseline; flex-wrap: wrap; }
+
+.notice, .card, .thread {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+}
+
+.kv { display:grid; gap:10px; }
+.k {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+}
+.kLabel { font-size:12px; opacity:.75; }
+.kVal { font-size:13px; opacity:.9; text-align:right; }
+
+/* View toggle bar */
+.viewBar {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+}
+.viewLabel { font-size: 12px; opacity: .85; }
+.viewRole { opacity: 0.95; }
+.viewLinks { display:flex; gap: 12px; flex-wrap: wrap; }
+
+.smallLink { text-decoration: underline; opacity: .9; }
+.smallLink:hover { opacity: 1; }
+
+/* Status pill */
+.statusPill {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  opacity: .95;
+}
+.statusPill[data-status="PENDING"] { background: rgba(255,255,255,0.06); }
+.statusPill[data-status="ACCEPTED"] { background: rgba(120,255,160,0.10); border-color: rgba(120,255,160,0.18); }
+.statusPill[data-status="DECLINED"] { background: rgba(255,120,120,0.10); border-color: rgba(255,120,120,0.18); }
+
+/* ===== Deal Summary / Confirmed Terms ===== */
+.dealCard, .confirmedCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,0.18);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.dealTitle, .confirmedTitle { font-size: 13px; opacity: .92; }
+.confirmedSub { font-size: 12px; opacity: .75; margin-top: 4px; line-height: 1.5; }
+
+.dealGrid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 900px){ .dealGrid { grid-template-columns: 1fr; } }
+
+.dealItem {
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+}
+.dealLabel { font-size: 12px; opacity: .75; }
+.dealVal { font-size: 13px; opacity: .92; margin-top: 4px; }
+.dealValBig { font-size: 18px; opacity: .95; margin-top: 6px; }
+
+.dealTag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  opacity: .9;
+  margin-left: 6px;
+}
+
+.dealTotal {
+  grid-column: span 3;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  padding: 12px;
+}
+@media (max-width: 900px){ .dealTotal { grid-column: auto; } }
+
+.dealNote {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  opacity: .9;
+  line-height: 1.6;
+}
+
+/* ===== Sections ===== */
+.section { margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.10); padding-top: 12px; }
+.sectionTitle {
+  font-size: 12px;
+  opacity: .75;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.rowItem {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  margin-bottom: 10px;
+}
+.rowLabel { font-size:12px; opacity:.75; }
+.rowVal { font-size:13px; opacity:.9; text-align:right; }
+
+.guidanceNote {
+  margin-top: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  opacity: .9;
+  line-height: 1.6;
+}
+
+/* Offer display */
+.offerBox {
+  margin: 8px 0 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.16);
+}
+.offerLine { display:flex; gap: 10px; flex-wrap: wrap; }
+.offerPill {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  opacity: .95;
+}
+.offerNote { margin-top: 8px; opacity: .88; line-height: 1.6; font-size: 12px; }
+
+/* Counter-offer card (host) */
+.counterCard {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  display: grid;
+  gap: 10px;
+}
+.counterTitle { font-size: 12px; opacity: .85; letter-spacing: .08em; text-transform: uppercase; }
+
+.counterGrid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 900px){ .counterGrid { grid-template-columns: 1fr; } }
+
+.smallLabel { display:grid; gap:6px; font-size:12px; opacity:.9; }
+.smallInput, .smallTextarea {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.25);
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
+}
+.smallTextarea { min-height: 90px; resize: vertical; }
+
+.actionBtn {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  padding: 10px 12px;
+  cursor: pointer;
+  justify-self: start;
+}
+.actionBtn:hover:enabled { background: rgba(255,255,255,0.13); }
+.actionBtn:disabled { opacity: .55; cursor: not-allowed; }
+
+.hostBtns { display:flex; gap: 10px; flex-wrap: wrap; }
+.acceptBtn { border-color: rgba(120,255,160,0.22); background: rgba(120,255,160,0.08); }
+.declineBtn { border-color: rgba(255,120,120,0.22); background: rgba(255,120,120,0.08); }
+
+/* Thread */
+.thread { margin-top: 14px; }
+.h2 { margin: 0 0 10px; font-size: 16px; }
+.empty { opacity:.8; }
+
+.msgList { display:grid; gap: 10px; margin-bottom: 12px; }
+
+.msg {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(0,0,0,0.18);
+
+  display: grid;
+  gap: 6px;
+  max-width: 720px;
+}
+.msgTop { display:flex; justify-content:space-between; gap:10px; margin-bottom: 6px; opacity: 0.95; }
+
+.msg[data-sender="FILMMAKER"] { border-left: 3px solid rgba(255,255,255,0.22); justify-self: start; }
+.msg[data-sender="HOST"] { border-left: 3px solid rgba(120,200,255,0.35); justify-self: end; text-align: left; background: rgba(120,200,255,0.08); }
+
+.sender { font-size: 12px; opacity: .8; }
+.time { font-size: 12px; opacity: .6; }
+.body { opacity: .92; line-height: 1.6; }
+
+.composer { display:grid; gap: 10px; }
+.textarea {
+  min-height: 90px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.25);
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+}
+.btn {
+  justify-self: start;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.btn:hover { background: rgba(255,255,255,0.13); }
+
+.actions { display:flex; align-items:center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.resetBtn { border:none; background:transparent; cursor:pointer; opacity:.7; text-decoration: underline; padding:0; }
+.resetBtn:hover { opacity:.9; }
+
+.lockBanner {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10,10,10,0.35);
+  opacity: 0.95;
+}
+
+.lockBanner[data-status="ACCEPTED"] {
+  border-color: rgba(120,255,160,0.25);
+  background: rgba(120,255,160,0.08);
+}
+
+.lockBanner[data-status="DECLINED"] {
+  border-color: rgba(255,100,100,0.25);
+  background: rgba(255,100,100,0.08);
+}
+
+.viewBar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin: 6px 0 12px;
+  opacity: 0.9;
+}
+.viewRole { opacity: 0.95; }
+.viewLinks { display: flex; gap: 10px; flex-wrap: wrap; }
+.smallLink { text-decoration: underline; opacity: 0.85; font-size: 12px; }
+
+.statusPill {
+  margin-left: 10px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  vertical-align: middle;
+}
+.statusPill[data-status="ACCEPTED"] { border-color: rgba(120,255,160,0.25); background: rgba(120,255,160,0.10); }
+.statusPill[data-status="DECLINED"] { border-color: rgba(255,120,120,0.25); background: rgba(255,120,120,0.10); }
+
+.lockBanner {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10,10,10,0.35);
+  opacity: 0.95;
+}
+.lockBanner[data-status="ACCEPTED"] { border-color: rgba(120,255,160,0.25); background: rgba(120,255,160,0.08); }
+.lockBanner[data-status="DECLINED"] { border-color: rgba(255,100,100,0.25); background: rgba(255,100,100,0.08); }
+
+.section { margin-top: 14px; }
+.sectionTitle { font-size: 13px; opacity: 0.85; margin-bottom: 8px; }
+
+.rowItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  margin-bottom: 10px;
+}
+.rowLabel { font-size: 12px; opacity: 0.75; }
+.rowVal { font-size: 12px; opacity: 0.9; text-align: right; }
+
+.offerBox {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.18);
+  border-radius: 14px;
+  padding: 10px;
+  margin: 0 0 10px;
+}
+.offerLine { display: flex; flex-wrap: wrap; gap: 8px; }
+.offerPill {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+}
+.offerNote { margin-top: 8px; opacity: 0.88; line-height: 1.6; }
+
+.counterCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 12px;
+  margin-top: 10px;
+}
+.counterTitle { font-size: 13px; opacity: 0.9; margin-bottom: 10px; }
+.counterGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 900px) { .counterGrid { grid-template-columns: 1fr; } }
+
+.smallLabel { display: grid; gap: 6px; font-size: 12px; opacity: 0.9; }
+.smallInput, .smallTextarea {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.25);
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
+}
+.smallTextarea { min-height: 90px; resize: vertical; }
+
+.checkRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 8px 0;
+}
+.checkRow input { margin-top: 2px; }
+
+.actionBtn {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.actionBtn:hover { background: rgba(255,255,255,0.13); }
+
+.hostBtns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.acceptBtn { border-color: rgba(120,255,160,0.25); }
+.declineBtn { border-color: rgba(255,120,120,0.25); }
+
+.dealCard, .confirmedCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.dealTitle, .confirmedTitle { font-size: 14px; opacity: 0.9; margin-bottom: 8px; }
+.confirmedSub { font-size: 12px; opacity: 0.75; margin-bottom: 10px; }
+.dealGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 900px) { .dealGrid { grid-template-columns: 1fr; } }
+
+.dealItem {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+}
+.dealLabel { font-size: 12px; opacity: 0.75; margin-bottom: 4px; }
+.dealVal { font-size: 13px; opacity: 0.92; }
+
+.dealTotal {
+  grid-column: span 3;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  padding: 12px;
+}
+@media (max-width: 900px) { .dealTotal { grid-column: span 1; } }
+.dealValBig { font-size: 18px; opacity: 0.96; }
+.dealTag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  margin-left: 6px;
+}

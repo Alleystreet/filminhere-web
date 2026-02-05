@@ -79,17 +79,34 @@ export default function Hero() {
       <div className={styles.overlay} />
 
       <div className={styles.content}>
+<header className={styles.topHeader} aria-label="Primary">
+  <Link href="/" className={styles.brand}>
+    <span className={styles.brandMark} aria-hidden="true">📍</span>
+    <span className={styles.brandText}>FilmInHere</span>
+  </Link>
+
+  <nav className={styles.topNav} aria-label="Main navigation">
+    <Link href="/producer/intake" className={styles.navLink}>Explore</Link>
+    <Link href="/host/intake" className={styles.navLink}>List a Space</Link>
+    <Link href="/signin" className={styles.navLink}>Sign in</Link>
+  </nav>
+
+  <button className={styles.menuBtn} type="button" aria-label="Open menu">
+    ☰
+  </button>
+</header>
+
         <h1>Find the space your story needs.</h1>
         <p>Connecting people and spaces so stories can happen.</p>
 
-        <div className={styles.heroCta}>
-          <Link className={styles.primaryBtn} href="/producer/intake">
+      <div className={styles.heroCta}>
+     <Link className={styles.primaryBtn} href="/producer/intake">
             Find Film Locations
-          </Link>
-          <Link className={styles.secondaryBtn} href="/host/intake">
+     </Link>
+     <Link className={styles.secondaryBtn} href="/host/intake">
             List My Property
-          </Link>
-        </div>
+     </Link>
+      </div>
 
         {/* ✅ INSERT SEARCH DOCK HERE (after CTAs, still inside .content) */}
         <div className={styles.searchDock} role="search" aria-label="Search film locations">

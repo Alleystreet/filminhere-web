@@ -5,6 +5,41 @@
   background: #000; /* prevents white flash */
 }
 
+/* Top header inside hero */
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.92);
+}
+
+.brandText {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.brandMark {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.10);
+}
+
+.navLink {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: rgba(255,255,255,1);
+}
+
 /* poster paints instantly */
 .poster {
   position: absolute;
@@ -13,14 +48,15 @@
   z-index: 0;
 }
 
-.logo {
-  position: absolute;
+.logo { display: none; }
+
+ /* was position: absolute;
   top: 28px;
   left: 28px;
   z-index: 2;
   width: 96px;
   opacity: 0.95;
-}
+} */
 
 .logo img {
   display: block;
@@ -61,31 +97,27 @@
 .content {
   position: relative;
   z-index: 2;
-  padding: 140px 20px 48px;
-  display: grid;
-  place-items: center;
+  padding-top: 110px; /* was 160px */
   text-align: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .content h1 {
-  font-size: clamp(2.35rem, 5.2vw, 4.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  margin: 0 0 0.9rem;
-  text-shadow: 0 3px 18px rgba(0,0,0,0.55);
+  font-size: clamp(2.25rem, 4.2vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
 }
 
 .content p {
-  font-size: clamp(1.125rem, 1.1vw + 0.9rem, 1.5rem); /* +2-ish steps, responsive */
-  line-height: 1.55;
-  font-weight: 600; /* bolder but not shouting */
-  opacity: 0.95;
-  margin: 0 0 2.25rem;
-  text-align: center;
-  max-width: 760px;
-
-  /* helps readability on bright frames */
-  text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 1.35;
+  opacity: 0.9;
+  max-width: 42rem;
+  margin: 0 auto;
 }
 
 .heroOverlay h1 {
@@ -103,6 +135,10 @@
 }
 
 .heroCta {
+  width: 100%;
+  max-width: 980px;
+  margin: 18px auto;
+
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -177,11 +213,12 @@
 }
 
 .searchDock {
-  margin-top: 26px;
-  width: min(820px, 100%);
-  padding: 12px 12px 10px;
+  max-width: 980px;
+  margin: 18px auto 0; /* was 26px */
+  width: 100%;
+  padding: 10px 12px 10px; /* slightly tighter */
   border-radius: 14px;
-  background: rgba(10, 10, 10, 0.55);
+  background: rgba(10, 10, 10, 0.50);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
@@ -240,3 +277,27 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Desktop: use SiteHeader only. Hide Hero’s internal header elements */
+@media (min-width: 768px) {
+  .topNav {
+    display: none !important;
+  }
+
+  .menuBtn {
+    display: none !important;
+  }
+
+  .brandText {
+    display: none !important;
+  }
+
+  .brandMark {
+    display: none !important;
+  }
+
+  .brand {
+    display: none !important;
+  }
+}
+

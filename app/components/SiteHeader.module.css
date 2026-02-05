@@ -1,10 +1,10 @@
 .header{
-  position: sticky;
+  position: sticky;   /* NOT fixed */
   top: 0;
   z-index: 50;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.85);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255,255,255,0.10);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .shell{
