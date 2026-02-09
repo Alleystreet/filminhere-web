@@ -34,6 +34,10 @@
   margin-bottom: 14px;
 }
 
+.head {
+  margin-bottom: 14px;
+}
+
 .h1 {
   margin: 0 0 8px;
   font-size: 30px;
@@ -43,6 +47,86 @@
 .sub {
   margin: 0;
   opacity: 0.75;
+}
+
+.filters {
+  display: grid;
+  gap: 16px;
+  margin: 14px 0 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.row:last-child {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+}
+
+.label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.05);
+  color: var(--foreground);
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.input::placeholder,
+textarea::placeholder {
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(255,255,255,0.78);
+  opacity: 0.62;
+}
+
+select.input {
+  color: rgba(255,255,255,0.92);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  padding: 10px 14px;
+  color: var(--foreground);
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.13);
+}
+
+.link {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.meta {
+  opacity: 0.7;
+  margin: 6px 0 14px;
 }
 
 .gallery {
@@ -80,12 +164,15 @@
 
 .grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
 }
 
 @media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
+  .row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row:last-child { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actions { grid-column: 1 / -1; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 
 .section {
@@ -135,12 +222,66 @@
 }
 
 .card {
+  display: grid;
+  grid-template-rows: 140px 1fr;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   background: rgba(10,10,10,0.35);
-  padding: 14px;
-  position: sticky;
-  top: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+.thumb {
+  background-size: cover;
+  background-position: center;
+  min-height: 140px;
+}
+
+.cardBody {
+  padding: 12px 14px 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.price {
+  font-size: 13px;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+}
+
+.muted {
+  opacity: 0.75;
+  font-size: 12px;
 }
 
 .priceRow {

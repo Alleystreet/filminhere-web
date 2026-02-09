@@ -100,8 +100,14 @@ export default async function LocationsPage({
           </label>
 
           <label className={styles.label}>
-            Min Capacity
-            <input name="cap" defaultValue={first(sp.cap) ?? ""} inputMode="numeric" className={styles.input} />
+            Crew size
+            <input
+              name="cap"
+              defaultValue={first(sp.cap) ?? ""}
+              placeholder="Minimum number of people"
+              inputMode="numeric"
+              className={styles.input}
+            />
           </label>
 
           <div className={styles.actions}>
