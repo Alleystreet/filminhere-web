@@ -339,3 +339,21 @@ select.input {
 .ctaFull:hover {
   background: rgba(255,255,255,0.13);
 }
+.zipBar {
+  margin: 12px 0;
+  margin-bottom: 6px;
+  opacity: 1;
+}
+
+.zipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.pillActive {
+  border-color: currentColor;
+  font-weight: 600;
+}

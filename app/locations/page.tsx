@@ -15,6 +15,21 @@ function toNum(v: string | string[] | undefined) {
   return Number.isFinite(n) ? n : undefined;
 }
 
+function locationsHref(sp: SearchParams, zip?: string) {
+  const params = new URLSearchParams();
+  const preserved = ["q", "city", "type", "min", "max", "cap"] as const;
+
+  for (const key of preserved) {
+    const value = first(sp[key]);
+    if (value && value.trim() !== "") {
+      params.set(key, value);
+    }
+  }
+
+  if (zip) params.set("zip", zip);
+  return params.size ? `/locations?${params.toString()}` : "/locations";
+}
+
 export default async function LocationsPage({
   searchParams,
 }: {
@@ -28,6 +43,7 @@ export default async function LocationsPage({
   const min = toNum(sp.min);
   const max = toNum(sp.max);
   const cap = toNum(sp.cap);
+  const zip = (first(sp.zip) ?? "").trim();
 
   const filtered = (listings as Listing[]).filter((l) => {
     const title = l.title.toLowerCase();
@@ -40,9 +56,19 @@ export default async function LocationsPage({
     if (min != null && l.pricePerHour < min) return false;
     if (max != null && l.pricePerHour > max) return false;
     if (cap != null && l.capacity < cap) return false;
+    if (zip && l.zip !== zip) return false;
 
     return true;
   });
+
+  const zipCounts = Array.from(
+    (listings as Listing[]).reduce((acc, l) => {
+      acc.set(l.zip, (acc.get(l.zip) ?? 0) + 1);
+      return acc;
+    }, new Map<string, number>()),
+  )
+    .map(([zipValue, count]) => ({ zip: zipValue, count }))
+    .sort((a, b) => b.count - a.count || a.zip.localeCompare(b.zip));
 
   return (
     <div className={styles.wrap}>
@@ -58,7 +84,7 @@ export default async function LocationsPage({
             <input
               name="q"
               defaultValue={first(sp.q) ?? ""}
-              placeholder="Brownstone, studio, warehouse…"
+              placeholder="e.g., brownstone, studio, warehouse"
               className={styles.input}
             />
           </label>
@@ -68,7 +94,7 @@ export default async function LocationsPage({
             <input
               name="city"
               defaultValue={first(sp.city) ?? ""}
-              placeholder="Brooklyn, 11211…"
+              placeholder="e.g., Brooklyn or 11211"
               className={styles.input}
             />
           </label>
@@ -91,12 +117,12 @@ export default async function LocationsPage({
         <div className={styles.row}>
           <label className={styles.label}>
             Min $/hr
-            <input name="min" defaultValue={first(sp.min) ?? ""} inputMode="numeric" className={styles.input} />
+            <input name="min" defaultValue={first(sp.min) ?? ""} placeholder="e.g., 50" inputMode="numeric" className={styles.input} />
           </label>
 
           <label className={styles.label}>
             Max $/hr
-            <input name="max" defaultValue={first(sp.max) ?? ""} inputMode="numeric" className={styles.input} />
+            <input name="max" defaultValue={first(sp.max) ?? ""} placeholder="e.g., 250" inputMode="numeric" className={styles.input} />
           </label>
 
           <label className={styles.label}>
@@ -116,6 +142,31 @@ export default async function LocationsPage({
           </div>
         </div>
       </form>
+
+      <div className={styles.zipBar}>
+        <div className={styles.zipRow}>
+          <Link
+            href={locationsHref(sp)}
+            className={[styles.pill, !zip ? styles.pillActive : ""].filter(Boolean).join(" ")}
+            aria-current={!zip ? "true" : undefined}
+          >
+            All ZIPs
+          </Link>
+          {zipCounts.map((item) => (
+            <Link
+              key={item.zip}
+              href={locationsHref(sp, item.zip)}
+              className={[
+                styles.pill,
+                zip === item.zip ? styles.pillActive : "",
+              ].filter(Boolean).join(" ")}
+              aria-current={zip === item.zip ? "true" : undefined}
+            >
+              {item.zip} ({item.count})
+            </Link>
+          ))}
+        </div>
+      </div>
 
       <div className={styles.meta}>
         <span>{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>

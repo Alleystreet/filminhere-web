@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SiteHeader />
-        {children}</main>
+        <main className="appMain">{children}</main>
       </body>
     </html>
   );
