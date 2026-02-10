@@ -33,6 +33,9 @@ export type Listing = {
 };
 
 export type BookingStatus = "PENDING" | "ACCEPTED" | "DECLINED";
+export type RequestThreadStatus = "draft" | "sent" | "negotiating" | "locked" | "declined";
+export type MessageKind = "message" | "offer" | "system";
+export type MessageSender = "producer" | "host" | "system";
 
 export type ImpactChecklist = {
   publicSpace: boolean;
@@ -100,6 +103,10 @@ export type BookingRequest = {
   message: string;
   status: BookingStatus;
   createdISO: string;
+  threadStatus?: RequestThreadStatus;
+  proposedHourly?: number;
+  lockedHourly?: number;
+  messages?: Message[];
 
   // Compliance / impact (already in your build)
   impact?: ImpactChecklist;
@@ -117,10 +124,22 @@ export type BookingRequest = {
   hostConstraints?: HostConstraints;
 };
 
+export type Message = {
+  id: string;
+  createdAtISO: string;
+  sender: MessageSender;
+  text: string;
+  kind?: MessageKind;
+};
+
 export type RequestMessage = {
   id: string;
   requestId: string;
-  sender: "FILMMAKER" | "HOST";
+  sender: "FILMMAKER" | "HOST" | "SYSTEM";
   body: string;
   createdISO: string;
+  // Compatibility fields for thread hydration
+  createdAtISO?: string;
+  text?: string;
+  kind?: MessageKind;
 };
