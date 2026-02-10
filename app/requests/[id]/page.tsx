@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "../Requests.module.css";
-import { listings } from "../../../lib/mock/listings";
+import { listings } from "../../lib/mock/listings";
 import type { BookingRequest, Message, RequestThreadStatus } from "../../lib/types";
 import { appendMessage, getRequest, lockOffer, saveRequest, updateOffer } from "../../lib/store/requests";
 
