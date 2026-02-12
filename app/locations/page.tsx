@@ -173,10 +173,10 @@ export default async function LocationsPage({
       </div>
 
       <div className={styles.grid}>
-        {filtered.map((l) => {
+        {filtered.map((l, idx) => {
           const thumb = l.photos[0] ?? "";
           return (
-            <Link key={l.id} href={`/locations/${l.slug}`} className={styles.card}>
+            <Link key={l.id ?? l.slug ?? `${l.zip}-${idx}`} href={`/locations/${l.slug}`} className={styles.card}>
               <div
                 className={styles.thumb}
                 style={thumb ? { backgroundImage: `url(${thumb})` } : undefined}
