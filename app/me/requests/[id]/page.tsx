@@ -26,7 +26,6 @@ import { listings } from "@/lib/mock/listings";
 
 function safeUUID(prefix: string) {
   const c = typeof crypto !== "undefined" ? crypto : null;
-  // @ts-expect-error randomUUID exists in modern browsers
   const uuid: string | undefined = c?.randomUUID?.();
   return uuid ?? `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
