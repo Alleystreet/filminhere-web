@@ -7,6 +7,7 @@ export const listings: Listing[] = [
     title: "Brooklyn Brownstone w/ Natural Light",
     city: "Brooklyn",
     state: "NY",
+    zip: "11211",
     country: "US",
     type: "House",
 

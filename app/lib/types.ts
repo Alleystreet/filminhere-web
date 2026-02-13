@@ -6,7 +6,7 @@ export type Listing = {
   title: string;
   city: string;
   state?: string;
-  zip?: string;
+  zip: string;
   country?: string; // ISO2 like "US" (freeform ok for MVP)
 
   type: "House" | "Apartment" | "Warehouse" | "Studio" | "Office" | "Outdoor" | "Other";
