@@ -14,6 +14,10 @@ export type Listing = {
   pricePerHour: number;
   minHours: number;
 
+  // Host controls (MVP)
+  rateMode?: NegotiationMode; // FIXED or NEGOTIABLE
+  minHoursMode?: NegotiationMode; // FIXED or NEGOTIABLE
+
   // Optional add-ons (MVP-safe; can ignore until you use them)
   currency?: string; // "USD"
   cleaningFee?: number;
