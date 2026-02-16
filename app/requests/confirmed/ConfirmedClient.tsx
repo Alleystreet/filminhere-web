@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import styles from "./Confirmed.module.css"; // keep your real css module name
+import styles from "./Confirmed.module.css";
 
 export default function ConfirmedClient() {
   const sp = useSearchParams();
