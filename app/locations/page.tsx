@@ -61,13 +61,15 @@ export default async function LocationsPage({
     return true;
   });
 
-  const zipCounts = Array.from(
+    const zipCounts = Array.from(
     (listings as Listing[]).reduce((acc, l) => {
-      acc.set(l.zip, (acc.get(l.zip) ?? 0) + 1);
+      const z = l.zip;
+      if (!z) return acc; // skip listings without zips
+      acc.set(z, (acc.get(z) ?? 0) + 1);
       return acc;
-    }, new Map<string, number>()),
+    }, new Map<string, number>())
   )
-    .map(([zipValue, count]) => ({ zip: zipValue, count }))
+    .map(([zip, count]) => ({ zip, count }))
     .sort((a, b) => b.count - a.count || a.zip.localeCompare(b.zip));
 
   return (
