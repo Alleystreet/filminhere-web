@@ -15,8 +15,10 @@ export const listings: Listing[] = [
     minHours: 3,
 
     // ✅ Host controls
-    rateMode: "FIXED",        // FIXED or NEGOTIABLE
-    minHoursMode: "NEGOTIABLE", // FIXED or NEGOTIABLE
+    rateMode: "FIXED",
+    minHoursMode: "NEGOTIABLE",
+    overtimeRatePerHour: 0,
+
 
     currency: "USD",
     cleaningFee: 75,
