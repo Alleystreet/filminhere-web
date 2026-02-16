@@ -22,7 +22,7 @@ export type Listing = {
   currency?: string; // "USD"
   cleaningFee?: number;
   securityDeposit?: number;
-
+  overtimeRatePerHour?: number;
   capacity: number;
   description: string;
 
