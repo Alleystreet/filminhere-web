@@ -3,6 +3,16 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import styles from "./Confirmed.module.css";
+import { Suspense } from "react";
+import ConfirmedClient from "./ConfirmedClient";
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div style={{ padding: 24 }}>Loading…</div>}>
+      <ConfirmedClient />
+    </Suspense>
+  );
+}
 
 export default function ConfirmedPage() {
   const sp = useSearchParams();
