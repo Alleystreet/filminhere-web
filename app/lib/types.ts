@@ -6,10 +6,17 @@ export type Listing = {
   title: string;
   city: string;
   state?: string;
-  zip: string;
+  zip?: string;
   country?: string; // ISO2 like "US" (freeform ok for MVP)
 
-  type: "House" | "Apartment" | "Warehouse" | "Studio" | "Office" | "Outdoor" | "Other";
+  type:
+    | "House"
+    | "Apartment"
+    | "Warehouse"
+    | "Studio"
+    | "Office"
+    | "Outdoor"
+    | "Other";
 
   pricePerHour: number;
   minHours: number;
@@ -17,12 +24,13 @@ export type Listing = {
   // Host controls (MVP)
   rateMode?: NegotiationMode; // FIXED or NEGOTIABLE
   minHoursMode?: NegotiationMode; // FIXED or NEGOTIABLE
+  overtimeRatePerHour?: number;
 
-  // Optional add-ons (MVP-safe; can ignore until you use them)
+  // Optional add-ons (MVP-safe)
   currency?: string; // "USD"
   cleaningFee?: number;
   securityDeposit?: number;
-  overtimeRatePerHour?: number;
+
   capacity: number;
   description: string;
 
