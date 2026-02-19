@@ -1,62 +1,30 @@
 "use client";
 
-import styles from "./RequestDetail.module.css";
-import { getImpactGuidance } from "@/lib/compliance/impactGuidance";
+import Link from "next/link";
+import styles from "./RequestThread.module.css";
 
-export default function PermitsGuidance({
-  impactKeys,
-  stateCode,
-}: {
-  impactKeys: string[];
-  stateCode?: string;
-}) {
-  const guidance = getImpactGuidance(impactKeys ?? [], stateCode);
-  // ...rest stays the same, remove the "request" extraction block
-}
+type Props = {
+  listingTitle?: string;
+};
 
+export default function PermitsGuidance() {
   return (
-    <div className={styles.section}>
-      <div className={styles.sectionTitle}>Permits & insurance guidance</div>
+    <section style={{ marginTop: 16 }}>
+      <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+        Permits & Guidance
+      </h2>
 
-      <div
-        className={styles.lockBanner}
-        data-status={guidance.highImpact ? "DECLINED" : "ACCEPTED"}
-      >
-        <strong>{guidance.highImpact ? "High impact warning" : "Standard impact"}</strong>
-        <div style={{ marginTop: 6, opacity: 0.9 }}>
-          Guidance only (not legal advice). Requirements vary by city/venue—confirm with the host and your local film office.
-        </div>
+      <p style={{ opacity: 0.85, marginBottom: 8 }}>
+        This section will show location rules, permit reminders, and a checklist
+        based on the selected listing and dates.
+      </p>
 
-        {guidance.highImpact && guidance.reasons?.length > 0 && (
-          <div style={{ marginTop: 8, opacity: 0.9 }}>
-            Triggered by: <strong>{guidance.reasons.join(", ")}</strong>
-          </div>
-        )}
-      </div>
-
-      <div className={styles.offerBox}>
-        <div className={styles.offerLine}>
-          {(guidance.suggestions.length
-            ? guidance.suggestions
-            : [{ label: "No special flags detected", kind: "permit" as const }]
-          ).map((s) => (
-            <span key={s.label} className={styles.offerPill}>
-              {s.label}
-            </span>
-          ))}
-        </div>
-
-        <div className={styles.offerNote}>
-          <a
-            className={styles.smallLink}
-            href={guidance.filmOfficeUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open film commission / permitting guidance
-          </a>
-        </div>
-      </div>
-    </div>
+      <ul style={{ paddingLeft: 18, opacity: 0.85 }}>
+        <li>Parking / load-in notes</li>
+        <li>Noise / curfew reminders</li>
+        <li>Insurance requirements</li>
+        <li>Local permit links (when available)</li>
+      </ul>
+    </section>
   );
 }
