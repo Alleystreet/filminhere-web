@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import styles from "./RequestNew.module.css";
+import styles from "./NewRequest.module.css";
 import { listings } from "@/lib/mock/listings";
 import type { BookingRequest, Listing, ImpactChecklist } from "@/lib/types";
 import { getSavedEmail, saveEmail, saveRequest } from "@/lib/store/requests";
