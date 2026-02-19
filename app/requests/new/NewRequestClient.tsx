@@ -26,14 +26,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   const [message, setMessage] = useState("");
   const [startISO, setStartISO] = useState("");
   const [endISO, setEndISO] = useState("");
-  const [impact, setImpact] = useState<ImpactChecklist>({
-    crewSize: 5,
-    vehicles: 2,
-    sound: false,
-    smoke: false,
-    animals: false,
-    minors: false,
-  });
+  const [impact] = useState<ImpactChecklist>({} as ImpactChecklist);
 
   // optional: restore saved email if your store supports it
   // (wrap in try so build never breaks)
@@ -51,16 +44,18 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
 
     const req: BookingRequest = {
       id: `req_${Date.now()}`,
+      listingId: listing?.id ?? listingSlug,
       listingSlug,
+      listingTitle: listing?.title ?? listingSlug,
       email,
       message,
       startISO,
       endISO,
       impact,
-      status: "draft",
-      createdAtISO: new Date().toISOString(),
+      status: "PENDING",
+      threadStatus: "draft",
+      createdISO: new Date().toISOString(),
     };
-
     saveRequest(req);
 
     router.push(`/producer/intake`);
@@ -122,3 +117,5 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     </div>
   );
 }
+
+

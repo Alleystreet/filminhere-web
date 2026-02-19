@@ -54,6 +54,15 @@ export type ImpactChecklist = {
   parkingOrTrafficControl: boolean;
   stuntsWeaponsPyroDrones: boolean;
   loudNoiseAfterHours: boolean;
+
+  // Production sizing / special considerations (MVP)
+  // Optional to avoid ripples across existing saved requests/data.
+  crewSize?: number;
+  vehicles?: number;
+  sound?: boolean;
+  smoke?: boolean;
+  animals?: boolean;
+  minors?: boolean;
 };
 
 export type ComplianceAttestation = {

@@ -1,12 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import styles from "./RequestThread.module.css";
-
-type Props = {
-  listingTitle?: string;
-};
-
 export default function PermitsGuidance() {
   return (
     <section style={{ marginTop: 16 }}>
