@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -17,9 +17,20 @@ type Props = {
 export default function NewRequestClient({ listingSlug = "" }: Props) {
   const router = useRouter();
 
+  const slugFromUrl = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return new URLSearchParams(window.location.search).get("listing") ?? "";
+    } catch {
+      return "";
+    }
+  }, []);
+
+  const effectiveSlug = listingSlug || slugFromUrl;
+
   const listing: Listing | undefined = useMemo(
-    () => listings.find((l) => l.slug === listingSlug),
-    [listingSlug]
+    () => listings.find((l) => l.slug === effectiveSlug),
+    [effectiveSlug]
   );
 
   const [email, setEmail] = useState("");
@@ -28,15 +39,19 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   const [endISO, setEndISO] = useState("");
   const [impact] = useState<ImpactChecklist>({} as ImpactChecklist);
 
-  // optional: restore saved email if your store supports it
-  // (wrap in try so build never breaks)
-  try {
-    const saved = getSavedEmail?.();
-    if (saved && !email) setEmail(saved);
-  } catch {}
+  useEffect(() => {
+    try {
+      const saved = getSavedEmail?.();
+      if (saved) setEmail(saved);
+    } catch {}
+  }, []);
 
   function onSubmit() {
     if (!email) return;
+    if (!effectiveSlug) {
+      router.push("/locations");
+      return;
+    }
 
     try {
       saveEmail?.(email);
@@ -44,9 +59,9 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
 
     const req: BookingRequest = {
       id: `req_${Date.now()}`,
-      listingId: listing?.id ?? listingSlug,
-      listingSlug,
-      listingTitle: listing?.title ?? listingSlug,
+      listingId: listing?.id ?? effectiveSlug,
+      listingSlug: effectiveSlug,
+      listingTitle: listing?.title ?? effectiveSlug.replace(/-/g, " "),
       email,
       message,
       startISO,
@@ -58,7 +73,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     };
     saveRequest(req);
 
-    router.push(`/producer/intake`);
+    router.push(`/me/requests/${req.id}`);
   }
 
   return (
@@ -70,7 +85,9 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
         <div className={styles.titleBlock}>
           <h1 className={styles.h1}>New Request</h1>
           <p className={styles.sub}>
-            {listing ? `Requesting: ${listing.title}` : "Select a listing to request."}
+            {effectiveSlug
+              ? `Requesting: ${listing?.title ?? effectiveSlug.replace(/-/g, " ")}`
+              : "Select a listing to request."}
           </p>
         </div>
       </div>
