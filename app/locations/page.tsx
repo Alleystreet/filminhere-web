@@ -22,15 +22,24 @@ function toNum(v: string | string[] | undefined) {
 function locationsHref(sp: SearchParams, zip?: string) {
   const params = new URLSearchParams();
   const preserved = ["q", "city", "type", "min", "max", "cap"] as const;
+  const cityRaw = (first(sp.city) ?? "").trim();
+  const zipFromCity = /^\d{5}$/.test(cityRaw) ? cityRaw : "";
+  const zipFromSp = (first(sp.zip) ?? "").trim();
 
   for (const key of preserved) {
-    const value = key === "q" ? getQ(sp) : first(sp[key]);
+    const value =
+      key === "q"
+        ? getQ(sp)
+        : key === "city" && zipFromCity
+          ? ""
+          : first(sp[key]);
     if (value && value.trim() !== "") {
       params.set(key, value);
     }
   }
 
-  if (zip) params.set("zip", zip);
+  const finalZip = (zip ?? zipFromSp ?? zipFromCity).trim();
+  if (finalZip) params.set("zip", finalZip);
   return params.size ? `/locations?${params.toString()}` : "/locations";
 }
 
@@ -42,12 +51,18 @@ export default async function LocationsPage({
   const sp = await Promise.resolve(searchParams ?? {});
 
   const q = (getQ(sp) ?? "").trim().toLowerCase();
-  const city = (first(sp.city) ?? "").trim().toLowerCase();
+  const cityOrZipRaw = (first(sp.city) ?? "").trim();
+  const zip = (
+    (first(sp.zip) ?? "").trim() ||
+    (/^\d{5}$/.test(cityOrZipRaw) ? cityOrZipRaw : "")
+  ).trim();
+  const city = (/^\d{5}$/.test(cityOrZipRaw) ? "" : cityOrZipRaw)
+    .trim()
+    .toLowerCase();
   const type = (first(sp.type) ?? "").trim().toLowerCase();
   const min = toNum(sp.min);
   const max = toNum(sp.max);
   const cap = toNum(sp.cap);
-  const zip = (first(sp.zip) ?? "").trim();
 
   const filtered = (listings as Listing[]).filter((l) => {
     const title = l.title.toLowerCase();
@@ -99,7 +114,7 @@ export default async function LocationsPage({
             City / ZIP
             <input
               name="city"
-              defaultValue={first(sp.city) ?? ""}
+              defaultValue={first(sp.city) ?? first(sp.zip) ?? ""}
               placeholder="e.g., Brooklyn or 11211"
               className={styles.input}
             />
@@ -132,7 +147,7 @@ export default async function LocationsPage({
           </label>
 
           <label className={styles.label}>
-            Crew size
+            Minimum crew size
             <input
               name="cap"
               defaultValue={first(sp.cap) ?? ""}
@@ -178,34 +193,47 @@ export default async function LocationsPage({
         <span>{filtered.length} result{filtered.length === 1 ? "" : "s"}</span>
       </div>
 
-      <div className={styles.grid}>
-        {filtered.map((l) => {
-          const thumb = l.photos[0] ?? "";
-          return (
-            <Link key={l.id} href={`/locations/${l.slug}`} className={styles.card}>
-              <div
-                className={styles.thumb}
-                style={thumb ? { backgroundImage: `url(${thumb})` } : undefined}
-                aria-label={l.title}
-              />
-              <div className={styles.cardBody}>
-                <div className={styles.titleRow}>
-                  <h3 className={styles.title}>{l.title}</h3>
-                  <span className={styles.price}>${l.pricePerHour}/hr</span>
+      {!filtered.length ? (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyTitle}>No matches</div>
+          <div className={styles.emptySub}>
+            Try a broader search, remove filters, or browse all locations.
+          </div>
+          <div className={styles.emptyActions}>
+            <Link className={styles.emptyBtn} href="/locations">Reset filters</Link>
+            <Link className={styles.emptyLink} href="/locations">Browse all</Link>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {filtered.map((l) => {
+            const thumb = l.photos[0] ? l.photos[0] : "/placeholders/space1.jpg";
+            return (
+              <Link key={l.id} href={`/locations/${l.slug}`} className={styles.card}>
+                <div
+                  className={styles.thumb}
+                  style={{ backgroundImage: `url(${thumb})` }}
+                  aria-label={l.title}
+                />
+                <div className={styles.cardBody}>
+                  <div className={styles.titleRow}>
+                    <h3 className={styles.title}>{l.title}</h3>
+                    <span className={styles.price}>${l.pricePerHour}/hr</span>
+                  </div>
+                  <div className={styles.line}>
+                    <span className={styles.pill}>{l.type}</span>
+                    <span className={styles.muted}>{l.city}{l.state ? `, ${l.state}` : ""}</span>
+                  </div>
+                  <div className={styles.line}>
+                    <span className={styles.muted}>Capacity: {l.capacity}</span>
+                    <span className={styles.muted}>Min: {l.minHours} hrs</span>
+                  </div>
                 </div>
-                <div className={styles.line}>
-                  <span className={styles.pill}>{l.type}</span>
-                  <span className={styles.muted}>{l.city}{l.state ? `, ${l.state}` : ""}</span>
-                </div>
-                <div className={styles.line}>
-                  <span className={styles.muted}>Capacity: {l.capacity}</span>
-                  <span className={styles.muted}>Min: {l.minHours} hrs</span>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
