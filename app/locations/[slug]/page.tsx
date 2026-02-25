@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import styles from "./LocationDetail.module.css";
 import { listings } from "@/lib/mock/listings";
 import type { Listing } from "@/lib/types";
+
 export async function generateMetadata({
   params,
 }: {
@@ -22,6 +23,7 @@ export default async function LocationDetailPage({
   const listing = (listings as Listing[]).find((l) => l.slug === p.slug);
   if (!listing) return notFound();
 
+  const fallback = "/placeholders/space1.jpg";
   return (
     <div className={styles.wrap}>
       <div className={styles.topRow}>
@@ -39,14 +41,17 @@ export default async function LocationDetailPage({
       </div>
 
       <div className={styles.gallery}>
-        {listing.photos.slice(0, 4).map((src, i) => (
-          <div
-            key={i}
-            className={styles.photo}
-            style={src ? { backgroundImage: `url(${src})` } : undefined}
-            aria-label={`Photo ${i + 1}`}
-          />
-        ))}
+        {Array.from({ length: 4 }).map((_, i) => {
+          const src = listing.photos[i] || fallback;
+          return (
+            <div
+              key={i}
+              className={styles.photo}
+              style={{ backgroundImage: `url(${src})` }}
+              aria-label={`Photo ${i + 1}`}
+            />
+          );
+        })}
       </div>
 
       <div className={styles.grid}>
