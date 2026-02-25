@@ -10,10 +10,10 @@ export default function SiteHeader() {
           <span>Film In Here™</span>
         </Link>
 
-        <nav className={styles.nav}>
-          <Link href="/locations">Locations</Link>
+        <nav className={styles.nav} aria-label="Primary">
+          <Link href="/locations">Explore</Link>
           <Link href="/host/intake">Host</Link>
-          <Link href="/producer/intake">Producer</Link>
+          <Link href="/me/requests">My Requests</Link>
         </nav>
       </div>
     </header>

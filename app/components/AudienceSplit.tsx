@@ -16,8 +16,8 @@ export default function AudienceSplit() {
             <p className={styles.cardText}>
               Find locations that match your vision, schedule, and crew needs.
             </p>
-            <Link className={styles.cta} href="/producer/intake">
-              Producer Intake →
+            <Link className={styles.cta} href="/locations">
+              Explore locations
             </Link>
           </div>
 
