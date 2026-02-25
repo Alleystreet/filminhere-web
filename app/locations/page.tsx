@@ -8,6 +8,10 @@ function first(v: string | string[] | undefined) {
   return Array.isArray(v) ? v[0] : v;
 }
 
+function getQ(sp: SearchParams) {
+  return first(sp.q) ?? first(sp.query);
+}
+
 function toNum(v: string | string[] | undefined) {
   const s = first(v);
   if (!s) return undefined;
@@ -20,7 +24,7 @@ function locationsHref(sp: SearchParams, zip?: string) {
   const preserved = ["q", "city", "type", "min", "max", "cap"] as const;
 
   for (const key of preserved) {
-    const value = first(sp[key]);
+    const value = key === "q" ? getQ(sp) : first(sp[key]);
     if (value && value.trim() !== "") {
       params.set(key, value);
     }
@@ -37,7 +41,7 @@ export default async function LocationsPage({
 }) {
   const sp = await Promise.resolve(searchParams ?? {});
 
-  const q = (first(sp.q) ?? "").trim().toLowerCase();
+  const q = (getQ(sp) ?? "").trim().toLowerCase();
   const city = (first(sp.city) ?? "").trim().toLowerCase();
   const type = (first(sp.type) ?? "").trim().toLowerCase();
   const min = toNum(sp.min);
@@ -85,7 +89,7 @@ export default async function LocationsPage({
             Search
             <input
               name="q"
-              defaultValue={first(sp.q) ?? ""}
+              defaultValue={getQ(sp) ?? ""}
               placeholder="e.g., brownstone, studio, warehouse"
               className={styles.input}
             />

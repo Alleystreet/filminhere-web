@@ -32,7 +32,7 @@ export default function Hero() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const q = String(fd.get("q") || "").trim();
-    const url = q ? `/locations?query=${encodeURIComponent(q)}` : `/locations`;
+    const url = q ? `/locations?q=${encodeURIComponent(q)}` : `/locations`;
     window.location.href = url;
   };
 
@@ -86,9 +86,9 @@ export default function Hero() {
   </Link>
 
   <nav className={styles.topNav} aria-label="Main navigation">
-    <Link href="/producer/intake" className={styles.navLink}>Explore</Link>
+    <Link href="/locations" className={styles.navLink}>Explore</Link>
     <Link href="/host/intake" className={styles.navLink}>List a Space</Link>
-    <Link href="/signin" className={styles.navLink}>Sign in</Link>
+    <Link href="/me/requests" className={styles.navLink}>My Requests</Link>
   </nav>
 
   <button className={styles.menuBtn} type="button" aria-label="Open menu">
@@ -100,7 +100,7 @@ export default function Hero() {
         <p>Connecting people and spaces so stories can happen.</p>
 
       <div className={styles.heroCta}>
-     <Link className={styles.primaryBtn} href="/producer/intake">
+     <Link className={styles.primaryBtn} href="/locations">
             Find Film Locations
      </Link>
      <Link className={styles.secondaryBtn} href="/host/intake">
