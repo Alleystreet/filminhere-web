@@ -1,0 +1,75 @@
+.wrap {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 16px 44px;
+}
+
+.head {
+  margin-bottom: 14px;
+}
+
+.h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.sub {
+  margin: 0;
+  opacity: 0.75;
+  line-height: 1.5;
+}
+
+.card {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.p {
+  margin: 0;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.list {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  opacity: 0.9;
+  line-height: 1.65;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn {
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  padding: 10px 14px;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: rgba(255,255,255,0.13);
+}
+
+.link {
+  text-decoration: underline;
+  opacity: 0.85;
+}

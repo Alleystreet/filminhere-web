@@ -4,16 +4,16 @@ import styles from "./SiteHeader.module.css";
 export default function SiteHeader() {
   return (
     <header className={styles.header}>
-      <div className={styles.inner}>
+      <div className={styles.shell}>
         <Link href="/" className={styles.brand}>
-          <span className={styles.brandMark}>FH</span>
-          <span>Film In Here™</span>
+          <span className={styles.brandMark} aria-hidden="true">FH</span>
+          <span className={styles.brandText}>Film In Here™</span>
         </Link>
 
         <nav className={styles.nav} aria-label="Primary">
-          <Link href="/locations">Explore</Link>
-          <Link href="/locations">Host</Link>
-          <Link href="/me/requests">My Requests</Link>
+          <Link className={styles.navLink} href="/locations">Explore</Link>
+          <Link className={styles.navLink} href="/host">List a Space</Link>
+          <Link className={styles.navLink} href="/me/requests">My Requests</Link>
         </nav>
       </div>
     </header>

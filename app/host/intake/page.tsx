@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function HostIntake() {
+export default function HostIntakePage() {
   redirect("/host");
 }
