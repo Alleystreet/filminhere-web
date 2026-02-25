@@ -12,7 +12,7 @@ export default function SiteHeader() {
 
         <nav className={styles.nav} aria-label="Primary">
           <Link href="/locations">Explore</Link>
-          <Link href="/host/intake">Host</Link>
+          <Link href="/locations">Host</Link>
           <Link href="/me/requests">My Requests</Link>
         </nav>
       </div>

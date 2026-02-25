@@ -87,7 +87,7 @@ export default function Hero() {
 
   <nav className={styles.topNav} aria-label="Main navigation">
     <Link href="/locations" className={styles.navLink}>Explore</Link>
-    <Link href="/host/intake" className={styles.navLink}>List a Space</Link>
+    <Link href="/locations" className={styles.navLink}>List a Space</Link>
     <Link href="/me/requests" className={styles.navLink}>My Requests</Link>
   </nav>
 
@@ -103,7 +103,7 @@ export default function Hero() {
      <Link className={styles.primaryBtn} href="/locations">
             Find Film Locations
      </Link>
-     <Link className={styles.secondaryBtn} href="/host/intake">
+     <Link className={styles.secondaryBtn} href="/locations">
             List My Property
      </Link>
       </div>
