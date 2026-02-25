@@ -9,8 +9,8 @@ export default function ProducerPage() {
       </p>
 
       <div className="mt-6">
-        <Link href="/producer/intake" className="underline">
-          Go to Producer Intake →
+        <Link href="/locations" className="underline">
+          Browse locations
         </Link>
       </div>
     </main>
