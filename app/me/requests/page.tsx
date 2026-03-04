@@ -49,6 +49,16 @@ export default function MyRequestsPage() {
         </div>
       </div>
 
+      <div className={styles.listingCard} style={{ marginBottom: 12 }}>
+        <div className={styles.listingLabel}>How to use this page</div>
+        <div style={{ display: "grid", gap: 6 }}>
+          <div>Click any request to open the message thread and negotiate.</div>
+          <div style={{ marginTop: 6 }}>
+            <strong>Status guide:</strong> draft = started • sent = sent to host • negotiating = offer in play • locked = rate locked • declined = closed
+          </div>
+        </div>
+      </div>
+
       {!filtered.length ? (
         <div className={styles.empty}>
           No requests yet. <Link href="/locations">Browse locations</Link> and send a request.
