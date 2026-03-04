@@ -1,3 +1,23 @@
+.listingCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+  opacity: .95;
+}
+
+.listingLabel {
+  font-size: 12px;
+  opacity: .75;
+  margin-bottom: 6px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
 .topRow { display:flex; justify-content:space-between; align-items:baseline; gap: 12px; margin-bottom: 14px; }
 .h1 { margin: 0; font-size: 30px; }
 .link { opacity:.85; text-decoration: underline; }
