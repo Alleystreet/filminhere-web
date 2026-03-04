@@ -179,6 +179,19 @@ export default function RequestThreadPage() {
         </section>
 
         <aside className={styles.sideCol}>
+          <div className={styles.listingCard} style={{ marginBottom: 12 }}>
+            <div className={styles.listingLabel}>What happens next</div>
+            <div style={{ display: "grid", gap: 6 }}>
+              <div>1) Send details + questions in Messages.</div>
+              <div>2) Negotiate the hourly rate and any terms.</div>
+              <div>3) Accept Offer to lock the rate.</div>
+              <div style={{ marginTop: 6 }}>
+                {isLocked
+                  ? "Locked. Next: confirm logistics and show-up details."
+                  : "Once accepted, the hourly rate locks and this request becomes \"locked\"."}
+              </div>
+            </div>
+          </div>
           <h2 className={styles.h2}>Offer</h2>
 
           {isLocked ? (
