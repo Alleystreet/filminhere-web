@@ -3,8 +3,26 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import styles from "./Requests.module.css";
-import type { BookingRequest } from "../../lib/types";
+import type { BookingRequest, RequestThreadStatus } from "../../lib/types";
 import { getRequests, getSavedEmail, clearAllMvpData } from "../../lib/store/requests";
+
+function statusLabel(status: RequestThreadStatus) {
+  if (status === "sent") return "sent";
+  if (status === "negotiating") return "negotiating";
+  if (status === "locked") return "locked";
+  if (status === "declined") return "declined";
+  return "draft";
+}
+
+function resolveStatus(req: BookingRequest): RequestThreadStatus {
+  if (req.threadStatus) return req.threadStatus;
+  if (req.status === "DECLINED") return "declined";
+  if (req.status === "ACCEPTED") return "locked";
+  if ((req.lockedHourly ?? 0) > 0) return "locked";
+  if ((req.proposedHourly ?? 0) > 0) return "negotiating";
+  return "draft";
+}
+
 export default function MyRequestsPage() {
   const [items, setItems] = useState<BookingRequest[]>([]);
   const [email, setEmail] = useState("");
@@ -69,7 +87,14 @@ export default function MyRequestsPage() {
             <Link key={r.id} href={`/me/requests/${r.id}`} className={styles.card}>
               <div className={styles.row}>
                 <div className={styles.title}>{r.listingTitle}</div>
-                <div className={styles.status}>{r.status}</div>
+                {(() => {
+                  const s = resolveStatus(r);
+                  return (
+                    <div className={styles.status} data-status={s}>
+                      {statusLabel(s)}
+                    </div>
+                  );
+                })()}
               </div>
               <div className={styles.meta}>
                 <span className={styles.muted}>ID: {r.id}</span>
