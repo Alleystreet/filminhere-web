@@ -54,6 +54,11 @@
 .statusPill[data-status="PENDING"] { background: rgba(255,255,255,0.06); }
 .statusPill[data-status="ACCEPTED"] { background: rgba(120,255,160,0.10); border-color: rgba(120,255,160,0.18); }
 .statusPill[data-status="DECLINED"] { background: rgba(255,120,120,0.10); border-color: rgba(255,120,120,0.18); }
+.statusPill[data-thread-status="draft"] { background: rgba(255,255,255,0.06); }
+.statusPill[data-thread-status="sent"] { background: rgba(120,180,255,0.10); border-color: rgba(120,180,255,0.18); }
+.statusPill[data-thread-status="negotiating"] { background: rgba(255,210,120,0.10); border-color: rgba(255,210,120,0.18); }
+.statusPill[data-thread-status="locked"] { background: rgba(120,255,160,0.10); border-color: rgba(120,255,160,0.18); }
+.statusPill[data-thread-status="declined"] { background: rgba(255,120,120,0.10); border-color: rgba(255,120,120,0.18); }
 
 /* ===== Deal Summary / Confirmed Terms ===== */
 .dealCard, .confirmedCard {
