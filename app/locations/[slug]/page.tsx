@@ -108,6 +108,9 @@ export default async function LocationDetailPage({
             >
               Request to Book
             </Link>
+            <div className={styles.ctaHint}>
+              Starts a request thread. Negotiate details, then lock an hourly rate.
+            </div>
           </div>
         </aside>
       </div>

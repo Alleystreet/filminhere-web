@@ -200,3 +200,10 @@
 .ctaFull:hover {
   background: rgba(255,255,255,0.13);
 }
+
+.ctaHint {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.8;
+}
