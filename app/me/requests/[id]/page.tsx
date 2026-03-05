@@ -9,7 +9,6 @@ import styles from "./RequestDetail.module.css";
 import type {
   BookingRequest,
   RequestMessage,
-  BookingStatus,
   Listing,
   HostConstraints,
   ImpactChecklist,
@@ -39,10 +38,24 @@ function yesNo(v?: boolean) {
   return v ? "Yes" : "No";
 }
 
-function statusLabel(s: BookingStatus) {
-  if (s === "ACCEPTED") return "Accepted";
-  if (s === "DECLINED") return "Declined";
-  return "Pending";
+type ThreadStatus = "draft" | "sent" | "negotiating" | "locked" | "declined";
+
+function threadStatusLabel(s: ThreadStatus) {
+  if (s === "draft") return "Draft";
+  if (s === "sent") return "Sent";
+  if (s === "negotiating") return "Negotiating";
+  if (s === "locked") return "Locked";
+  return "Declined";
+}
+
+function resolveThreadStatus(req: BookingRequest, msgCount: number): ThreadStatus {
+  if (req.status === "DECLINED") return "declined";
+  if (req.status === "ACCEPTED") return "locked";
+
+  const hasNegotiation = Boolean(req.offer || req.counterOffer || req.filmmakerAccepted);
+  if (hasNegotiation) return "negotiating";
+
+  return msgCount > 0 ? "sent" : "draft";
 }
 
 function toNum(s: string) {
@@ -473,6 +486,8 @@ export default function RequestDetailPage() {
   const confirmed = req.confirmed;
 
   const filmmakerAcceptedCounter = req.filmmakerAccepted?.source === "COUNTER";
+  const threadStatus = resolveThreadStatus(req, msgs.length);
+  const threadStatusText = threadStatusLabel(threadStatus);
 
   return (
     <div className={styles.wrap}>
@@ -495,7 +510,9 @@ export default function RequestDetailPage() {
 
       <h1 className={styles.h1}>
         {req.listingTitle}
-        <span className={styles.statusPill} data-status={req.status}>{statusLabel(req.status)}</span>
+        <span className={styles.statusPill} data-status={req.status} data-thread-status={threadStatus}>
+          {threadStatusText}
+        </span>
       </h1>
 
       {isFinal ? (
@@ -627,7 +644,7 @@ export default function RequestDetailPage() {
         <div className={styles.kv}>
           <div className={styles.k}>
             <span className={styles.kLabel}>Status</span>
-            <span className={styles.kVal}>{req.status}</span>
+            <span className={styles.kVal}>{threadStatusText} ({req.status})</span>
           </div>
           <div className={styles.k}>
             <span className={styles.kLabel}>When</span>
