@@ -98,6 +98,15 @@ export default async function LocationsPage({
         <p className={styles.sub}>Browse film-ready spaces and request to book in minutes.</p>
       </div>
 
+      <div className={styles.helperCard}>
+        <div className={styles.helperLabel}>What you’re looking at</div>
+        <div className={styles.helperGrid}>
+          <div><strong>Browse:</strong> These are location options you can choose from.</div>
+          <div><strong>Choose:</strong> Click a card to view one location’s details.</div>
+          <div><strong>Request:</strong> On the detail page, “Request to Book” starts a message thread where you can negotiate and lock an hourly rate.</div>
+        </div>
+      </div>
+
       <form className={styles.filters} method="GET" action="/locations">
         <div className={styles.row}>
           <label className={styles.label}>
