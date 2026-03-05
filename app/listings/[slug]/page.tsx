@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 
-export default function ListingAliasDetail({
+export default async function ListingAliasDetail({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string } | Promise<{ slug: string }>;
 }) {
-  redirect(`/locations/${params.slug}`);
+  const p = await Promise.resolve(params);
+  redirect(`/locations/${encodeURIComponent(p.slug)}`);
 }
