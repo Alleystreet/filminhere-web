@@ -68,7 +68,6 @@
 .status[data-status="negotiating"] { background: rgba(255,210,120,0.10); border-color: rgba(255,210,120,0.18); }
 .status[data-status="locked"] { background: rgba(120,255,160,0.10); border-color: rgba(120,255,160,0.18); }
 .status[data-status="declined"] { background: rgba(255,120,120,0.10); border-color: rgba(255,120,120,0.18); }
-
 .meta { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 8px; }
 .muted { font-size: 12px; opacity: .75; }
 
