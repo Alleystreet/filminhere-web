@@ -49,6 +49,47 @@
   opacity: 0.75;
 }
 
+.typePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.05);
+}
+
+.typeRadio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.typePill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  font-size: 12px;
+  opacity: 0.92;
+  cursor: pointer;
+  user-select: none;
+}
+
+.typePill:hover {
+  background: rgba(255,255,255,0.10);
+}
+
+.typePillActive {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.32);
+  font-weight: 600;
+}
+
 .helperCard {
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px;

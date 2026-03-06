@@ -4,6 +4,22 @@ import { listings } from "../lib/mock/listings";
 import type { Listing } from "../lib/types";
 type SearchParams = Record<string, string | string[] | undefined>;
 
+function capWord(s: string) {
+  if (!s) return s;
+  return s[0].toUpperCase() + s.slice(1);
+}
+
+const TYPE_OPTIONS = [
+  "any",
+  "house",
+  "apartment",
+  "warehouse",
+  "studio",
+  "office",
+  "outdoor",
+  "other",
+] as const;
+
 function first(v: string | string[] | undefined) {
   return Array.isArray(v) ? v[0] : v;
 }
@@ -60,6 +76,8 @@ export default async function LocationsPage({
     .trim()
     .toLowerCase();
   const type = (first(sp.type) ?? "").trim().toLowerCase();
+  const uiTypeRaw = (first(sp.type) ?? "any").trim().toLowerCase();
+  const uiType = (uiTypeRaw && uiTypeRaw !== "") ? uiTypeRaw : "any";
   const min = toNum(sp.min);
   const max = toNum(sp.max);
   const cap = toNum(sp.cap);
@@ -131,16 +149,26 @@ export default async function LocationsPage({
 
           <label className={styles.label}>
             Type
-            <select name="type" defaultValue={first(sp.type) ?? "any"} className={styles.input}>
-              <option value="any">Any</option>
-              <option value="house">House</option>
-              <option value="apartment">Apartment</option>
-              <option value="warehouse">Warehouse</option>
-              <option value="studio">Studio</option>
-              <option value="office">Office</option>
-              <option value="outdoor">Outdoor</option>
-              <option value="other">Other</option>
-            </select>
+            <div className={styles.typePills}>
+              {TYPE_OPTIONS.map((v) => (
+                <label
+                  key={v}
+                  className={[
+                    styles.typePill,
+                    uiType === v ? styles.typePillActive : "",
+                  ].filter(Boolean).join(" ")}
+                >
+                  <input
+                    className={styles.typeRadio}
+                    type="radio"
+                    name="type"
+                    value={v}
+                    defaultChecked={uiType === v}
+                  />
+                  {v === "any" ? "Any" : capWord(v)}
+                </label>
+              ))}
+            </div>
           </label>
         </div>
 
