@@ -84,9 +84,15 @@
   background: rgba(255,255,255,0.10);
 }
 
+.typePill:focus-within {
+  outline: 2px solid rgba(255,255,255,0.22);
+  outline-offset: 2px;
+}
+
 .typePillActive {
   background: rgba(255,255,255,0.12);
   border-color: rgba(255,255,255,0.32);
+  opacity: 1;
   font-weight: 600;
 }
 
