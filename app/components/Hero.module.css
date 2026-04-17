@@ -278,26 +278,18 @@
   border-width: 0;
 }
 
-/* Desktop: use SiteHeader only. Hide Hero’s internal header elements */
+/* Mobile-only nav header inside hero */
+.topHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 20px;
+}
+
+/* Desktop: SiteHeader handles nav — hide the hero’s internal header entirely */
 @media (min-width: 768px) {
-  .topNav {
-    display: none !important;
-  }
-
-  .menuBtn {
-    display: none !important;
-  }
-
-  .brandText {
-    display: none !important;
-  }
-
-  .brandMark {
-    display: none !important;
-  }
-
-  .brand {
-    display: none !important;
+  .topHeader {
+    display: none;
   }
 }
 
