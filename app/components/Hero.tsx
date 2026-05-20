@@ -79,23 +79,6 @@ export default function Hero() {
       <div className={styles.overlay} />
 
       <div className={styles.content}>
-<header className={styles.topHeader} aria-label="Primary">
-  <Link href="/" className={styles.brand}>
-    <span className={styles.brandMark} aria-hidden="true">📍</span>
-    <span className={styles.brandText}>FilmInHere</span>
-  </Link>
-
-  <nav className={styles.topNav} aria-label="Main navigation">
-    <Link href="/locations" className={styles.navLink}>Explore</Link>
-    <Link href="/locations" className={styles.navLink}>List a Space</Link>
-    <Link href="/me/requests" className={styles.navLink}>My Requests</Link>
-  </nav>
-
-  <button className={styles.menuBtn} type="button" aria-label="Open menu">
-    ☰
-  </button>
-</header>
-
         <h1>Find the space your story needs.</h1>
         <p>Connecting people and spaces so stories can happen.</p>
 

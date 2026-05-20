@@ -5,40 +5,6 @@
   background: #000; /* prevents white flash */
 }
 
-/* Top header inside hero */
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: rgba(255,255,255,0.92);
-}
-
-.brandText {
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.brandMark {
-  display: inline-flex;
-  width: 28px;
-  height: 28px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.10);
-}
-
-.navLink {
-  font-size: 14px;
-  color: rgba(255,255,255,0.75);
-  text-decoration: none;
-}
-
-.navLink:hover {
-  color: rgba(255,255,255,1);
-}
 
 /* poster paints instantly */
 .poster {
@@ -278,18 +244,5 @@
   border-width: 0;
 }
 
-/* Mobile-only nav header inside hero */
-.topHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 0 20px;
-}
 
-/* Desktop: SiteHeader handles nav — hide the hero’s internal header entirely */
-@media (min-width: 768px) {
-  .topHeader {
-    display: none;
-  }
-}
 
