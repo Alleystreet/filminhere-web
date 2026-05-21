@@ -8,7 +8,8 @@ import styles from "./NewRequest.module.css";
 
 import type { BookingRequest, Listing, ImpactChecklist } from "@/lib/types";
 import { listings } from "@/lib/mock/listings";
-import { getSavedEmail, saveEmail, saveRequest } from "@/lib/store/requests";
+import { getSavedEmail, saveEmail } from "@/lib/store/requests";
+import { saveRequestToSupabase } from "@/lib/requests";
 
 type Props = {
   listingSlug?: string;
@@ -38,6 +39,8 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   const [startISO, setStartISO] = useState("");
   const [endISO, setEndISO] = useState("");
   const [impact] = useState<ImpactChecklist>({} as ImpactChecklist);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -46,7 +49,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     } catch {}
   }, []);
 
-  function onSubmit() {
+  async function onSubmit() {
     if (!email) return;
     if (!effectiveSlug) {
       router.push("/locations");
@@ -71,9 +74,16 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
       threadStatus: "draft",
       createdISO: new Date().toISOString(),
     };
-    saveRequest(req);
 
-    router.push(`/me/requests/${req.id}`);
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await saveRequestToSupabase(req);
+      router.push(`/me/requests/${req.id}`);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save request.");
+      setSaving(false);
+    }
   }
 
   return (
@@ -125,9 +135,11 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
           placeholder="Describe the shoot, crew, needs, timing…"
         />
 
+        {saveError && <p className={styles.error}>{saveError}</p>}
+
         <div className={styles.actions}>
-          <button className={styles.primary} onClick={onSubmit}>
-            Save Request
+          <button type="button" className={styles.primary} onClick={onSubmit} disabled={saving}>
+            {saving ? "Saving…" : "Save Request"}
           </button>
         </div>
       </div>
