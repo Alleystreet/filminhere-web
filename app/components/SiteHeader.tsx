@@ -14,6 +14,8 @@ export default function SiteHeader() {
           <Link className={styles.navLink} href="/locations">Explore</Link>
           <Link className={styles.navLink} href="/host">List a Space</Link>
           <Link className={styles.navLink} href="/me/requests">My Requests</Link>
+          <Link className={styles.navLink} href="/auth/login">Login</Link>
+          <Link className={styles.navLink} href="/auth/signup">Sign Up</Link>
         </nav>
       </div>
     </header>
