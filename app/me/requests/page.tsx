@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./Requests.module.css";
 import type { BookingRequest, RequestThreadStatus } from "../../lib/types";
-import { getRequests, getSavedEmail, clearAllMvpData } from "../../lib/store/requests";
+import { getRequestsFromSupabase } from "../../lib/requests";
 
 function statusLabel(status: RequestThreadStatus) {
   if (status === "sent") return "sent";
@@ -25,45 +25,26 @@ function resolveStatus(req: BookingRequest): RequestThreadStatus {
 
 export default function MyRequestsPage() {
   const [items, setItems] = useState<BookingRequest[]>([]);
-  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setEmail(getSavedEmail());
-    setItems(getRequests());
+    getRequestsFromSupabase()
+      .then(setItems)
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : "Failed to load requests.")
+      )
+      .finally(() => setLoading(false));
   }, []);
-
-  const filtered = useMemo(() => {
-    if (!email) return items;
-    const e = email.toLowerCase();
-    return items.filter((r) => r.email.toLowerCase() === e);
-  }, [items, email]);
-
-  const isDev = process.env.NODE_ENV !== "production";
 
   return (
     <div className={styles.wrap}>
       <div className={styles.topRow}>
         <h1 className={styles.h1}>My Requests</h1>
-
         <div className={styles.actions}>
           <Link className={styles.link} href="/locations">
             Browse Locations
           </Link>
-
-          {isDev ? (
-            <button
-              type="button"
-              className={styles.resetBtn}
-              onClick={() => {
-                clearAllMvpData();
-                setEmail("");
-                setItems([]);
-              }}
-              title="Dev only: clears local MVP data"
-            >
-              Reset MVP Data (dev)
-            </button>
-          ) : null}
         </div>
       </div>
 
@@ -77,13 +58,23 @@ export default function MyRequestsPage() {
         </div>
       </div>
 
-      {!filtered.length ? (
+      {loading ? (
+        <div className={styles.empty}>Loading…</div>
+      ) : error ? (
+        <div className={styles.empty}>
+          {error.toLowerCase().includes("sign in") ? (
+            <><Link href="/auth/login">Sign in</Link> to view your requests.</>
+          ) : (
+            error
+          )}
+        </div>
+      ) : !items.length ? (
         <div className={styles.empty}>
           No requests yet. <Link href="/locations">Browse locations</Link> and send a request.
         </div>
       ) : (
         <div className={styles.list}>
-          {filtered.map((r) => (
+          {items.map((r) => (
             <Link key={r.id} href={`/me/requests/${r.id}`} className={styles.card}>
               <div className={styles.row}>
                 <div className={styles.title}>{r.listingTitle}</div>

@@ -21,6 +21,7 @@ import {
   clearAllMvpData,
   saveRequest,
 } from "@/lib/store/requests";
+import { getRequestByIdFromSupabase } from "@/lib/requests";
 import { listings } from "@/lib/mock/listings";
 
 function safeUUID(prefix: string) {
@@ -106,6 +107,7 @@ export default function RequestDetailPage() {
 
   const [req, setReq] = useState<BookingRequest | null>(null);
   const [msgs, setMsgs] = useState<RequestMessage[]>([]);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [text, setText] = useState("");
 
   // Host counter-offer inputs
@@ -154,7 +156,21 @@ export default function RequestDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    reload();
+    // If already seeded in local store (e.g. after a write), use it directly.
+    if (getRequestById(id)) {
+      reload();
+      return;
+    }
+    // First visit: fetch from Supabase and seed local store so all write
+    // operations (offers, messages) continue to work through the local store.
+    getRequestByIdFromSupabase(id)
+      .then((row) => {
+        if (row) saveRequest(row);
+        reload();
+      })
+      .catch((err: unknown) => {
+        setPageError(err instanceof Error ? err.message : "Failed to load request.");
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -476,7 +492,7 @@ export default function RequestDetailPage() {
             </div>
           ) : null}
         </div>
-        <div className={styles.notice}>Request not found.</div>
+        <div className={styles.notice}>{pageError ?? "Request not found."}</div>
       </div>
     );
   }

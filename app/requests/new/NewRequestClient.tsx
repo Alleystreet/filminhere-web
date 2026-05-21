@@ -78,8 +78,8 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     setSaving(true);
     setSaveError(null);
     try {
-      await saveRequestToSupabase(req);
-      router.push(`/me/requests/${req.id}`);
+      const insertedId = await saveRequestToSupabase(req);
+      router.push(`/me/requests/${insertedId}`);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Failed to save request.");
       setSaving(false);
