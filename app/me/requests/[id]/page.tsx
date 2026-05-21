@@ -15,20 +15,17 @@ import type {
 } from "@/lib/types";
 import { getImpactGuidance } from "@/lib/compliance/impactGuidance";
 import {
-  addMessage,
-  getMessagesForRequest,
   getRequestById,
   clearAllMvpData,
   saveRequest,
 } from "@/lib/store/requests";
-import { getRequestByIdFromSupabase } from "@/lib/requests";
+import {
+  getRequestByIdFromSupabase,
+  getMessagesFromSupabase,
+  sendMessageToSupabase,
+  saveOfferToSupabase,
+} from "@/lib/requests";
 import { listings } from "@/lib/mock/listings";
-
-function safeUUID(prefix: string) {
-  const c = typeof crypto !== "undefined" ? crypto : null;
-  const uuid: string | undefined = c?.randomUUID?.();
-  return uuid ?? `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-}
 
 function getIdFromParams(p: Record<string, string | string[]>) {
   const v = p["id"];
@@ -133,7 +130,6 @@ export default function RequestDetailPage() {
   function reload() {
     const r = getRequestById(id);
     setReq(r ?? null);
-    setMsgs(getMessagesForRequest(id));
 
     const c = r?.counterOffer;
     setCoRate(c?.proposedRatePerHour ? String(c.proposedRatePerHour) : "");
@@ -154,19 +150,27 @@ export default function RequestDetailPage() {
     setHcNote(hc?.note ?? "");
   }
 
+  async function loadMsgs() {
+    try {
+      const messages = await getMessagesFromSupabase(id);
+      setMsgs(messages);
+    } catch {
+      // leave msgs empty; auth error already surfaced via pageError
+    }
+  }
+
   useEffect(() => {
     if (!id) return;
-    // If already seeded in local store (e.g. after a write), use it directly.
     if (getRequestById(id)) {
       reload();
+      loadMsgs();
       return;
     }
-    // First visit: fetch from Supabase and seed local store so all write
-    // operations (offers, messages) continue to work through the local store.
     getRequestByIdFromSupabase(id)
       .then((row) => {
         if (row) saveRequest(row);
         reload();
+        return loadMsgs();
       })
       .catch((err: unknown) => {
         setPageError(err instanceof Error ? err.message : "Failed to load request.");
@@ -209,24 +213,19 @@ export default function RequestDetailPage() {
   const billableHours = Math.max(shootHours, proposedMinHours || 0);
   const subtotal = billableHours * (proposedRate || 0) + (baseCleaning || 0);
 
-  function send() {
+  async function send() {
     const body = text.trim();
     if (!body || !id) return;
-
-    const msg: RequestMessage = {
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: isHostView ? "HOST" : "FILMMAKER",
-      body,
-      createdISO: new Date().toISOString(),
-    };
-
-    addMessage(msg);
-    setMsgs(getMessagesForRequest(id));
-    setText("");
+    try {
+      await sendMessageToSupabase(id, isHostView ? "HOST" : "FILMMAKER", body);
+      setText("");
+      await loadMsgs();
+    } catch {
+      // silent — auth errors already shown via pageError on load
+    }
   }
 
-  function saveOffer() {
+  async function saveOffer() {
     if (!req || !id) return;
     if (!canNegotiate) return;
 
@@ -266,19 +265,26 @@ export default function RequestDetailPage() {
     if (ofMinHours.trim()) parts.push(`min ${ofMinHours} hrs`);
     if (ofTotal.trim()) parts.push(`${currency} ${ofTotal} total`);
     const headline = parts.length ? `Offer: ${parts.join(" • ")}` : "Offer updated.";
+    const body = ofNote.trim() ? `${headline}\n\nNote: ${ofNote.trim()}` : headline;
 
-    addMessage({
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: "FILMMAKER",
-      body: ofNote.trim() ? `${headline}\n\nNote: ${ofNote.trim()}` : headline,
-      createdISO: new Date().toISOString(),
-    });
+    try {
+      await saveOfferToSupabase(
+        id,
+        ofRate.trim() ? rateN : undefined,
+        ofMinHours.trim() ? minHoursN : undefined,
+        ofTotal.trim() ? totalN : undefined,
+        ofNote.trim() || undefined,
+      );
+      await sendMessageToSupabase(id, "FILMMAKER", body);
+    } catch {
+      // silent
+    }
 
     reload();
+    await loadMsgs();
   }
 
-  function saveCounterOffer() {
+  async function saveCounterOffer() {
     if (!req || !id) return;
     if (!canNegotiate) return;
 
@@ -319,18 +325,18 @@ export default function RequestDetailPage() {
     if (coTotal.trim()) parts.push(`${currency} ${coTotal} total`);
     const headline = parts.length ? `Counter offer: ${parts.join(" • ")}` : "Counter offer updated.";
 
-    addMessage({
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: "HOST",
-      body: coNote.trim() ? `${headline}\n\nNote: ${coNote.trim()}` : headline,
-      createdISO: new Date().toISOString(),
-    });
+    try {
+      await sendMessageToSupabase(
+        id, "HOST",
+        coNote.trim() ? `${headline}\n\nNote: ${coNote.trim()}` : headline,
+      );
+    } catch { /* silent */ }
 
     reload();
+    await loadMsgs();
   }
 
-  function filmmakerAcceptCounter() {
+  async function filmmakerAcceptCounter() {
     if (!req || !id) return;
     if (!canNegotiate) return;
     if (!req.counterOffer) return;
@@ -347,18 +353,15 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
-    addMessage({
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: "FILMMAKER",
-      body: "✅ I accept your counter offer. Please confirm/approve to lock it in.",
-      createdISO: new Date().toISOString(),
-    });
+    try {
+      await sendMessageToSupabase(id, "FILMMAKER", "✅ I accept your counter offer. Please confirm/approve to lock it in.");
+    } catch { /* silent */ }
 
     reload();
+    await loadMsgs();
   }
 
-  function saveHostConstraints() {
+  async function saveHostConstraints() {
     if (!req || !id) return;
     if (!canNegotiate) return;
 
@@ -379,20 +382,20 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
-    addMessage({
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: "HOST",
-      body: empty
-        ? "Host availability cleared."
-        : `Host availability updated.${hc.note ? `\n\nNote: ${hc.note}` : ""}`,
-      createdISO: new Date().toISOString(),
-    });
+    try {
+      await sendMessageToSupabase(
+        id, "HOST",
+        empty
+          ? "Host availability cleared."
+          : `Host availability updated.${hc.note ? `\n\nNote: ${hc.note}` : ""}`,
+      );
+    } catch { /* silent */ }
 
     reload();
+    await loadMsgs();
   }
 
-  function accept() {
+  async function accept() {
     if (!req || !id) return;
     if (!canNegotiate) return;
 
@@ -423,18 +426,15 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
-    addMessage({
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: "HOST",
-      body: "✅ Host accepted. Confirmed terms saved.",
-      createdISO: new Date().toISOString(),
-    });
+    try {
+      await sendMessageToSupabase(id, "HOST", "✅ Host accepted. Confirmed terms saved.");
+    } catch { /* silent */ }
 
     reload();
+    await loadMsgs();
   }
 
-  function decline() {
+  async function decline() {
     if (!req || !id) return;
 
     const nextReq: BookingRequest = {
@@ -445,15 +445,12 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
-    addMessage({
-      id: safeUUID("msg"),
-      requestId: id,
-      sender: "HOST",
-      body: "❌ Host declined this request.",
-      createdISO: new Date().toISOString(),
-    });
+    try {
+      await sendMessageToSupabase(id, "HOST", "❌ Host declined this request.");
+    } catch { /* silent */ }
 
     reload();
+    await loadMsgs();
   }
 
   if (!id) {

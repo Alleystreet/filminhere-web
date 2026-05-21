@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { BookingRequest } from "./types";
+import type { BookingRequest, RequestMessage } from "./types";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -77,4 +77,70 @@ export async function getRequestByIdFromSupabase(id: string): Promise<BookingReq
   if (error) throw error;
   if (!data) return null;
   return rowToBookingRequest(data as Record<string, unknown>);
+}
+
+export async function getMessagesFromSupabase(requestId: string): Promise<RequestMessage[]> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in to view messages.");
+
+  const { data, error } = await supabase
+    .from("booking_messages")
+    .select("*")
+    .eq("request_id", requestId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    id: row.id as string,
+    requestId: row.request_id as string,
+    sender: row.sender as RequestMessage["sender"],
+    body: (row.body as string) ?? "",
+    createdISO: (row.created_at as string) ?? new Date().toISOString(),
+  }));
+}
+
+export async function sendMessageToSupabase(
+  requestId: string,
+  sender: RequestMessage["sender"],
+  body: string,
+): Promise<void> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in to send messages.");
+
+  const { error } = await supabase.from("booking_messages").insert({
+    id: crypto.randomUUID(),
+    request_id: requestId,
+    user_id: user.id,
+    sender,
+    body,
+  });
+
+  if (error) throw error;
+}
+
+export async function saveOfferToSupabase(
+  requestId: string,
+  ratePerHour: number | undefined,
+  minHours: number | undefined,
+  total: number | undefined,
+  note: string | undefined,
+): Promise<void> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in to submit an offer.");
+
+  const { error } = await supabase.from("booking_offers").insert({
+    id: crypto.randomUUID(),
+    request_id: requestId,
+    user_id: user.id,
+    rate_per_hour: ratePerHour ?? null,
+    min_hours: minHours ?? null,
+    total: total ?? null,
+    note: note ?? null,
+    status: "pending",
+  });
+
+  if (error) throw error;
 }
