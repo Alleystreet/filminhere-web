@@ -24,6 +24,8 @@ import {
   getMessagesFromSupabase,
   sendMessageToSupabase,
   saveOfferToSupabase,
+  acceptLatestOfferInSupabase,
+  updateRequestStatusInSupabase,
 } from "@/lib/requests";
 import { listings } from "@/lib/mock/listings";
 
@@ -105,6 +107,7 @@ export default function RequestDetailPage() {
   const [req, setReq] = useState<BookingRequest | null>(null);
   const [msgs, setMsgs] = useState<RequestMessage[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [text, setText] = useState("");
 
   // Host counter-offer inputs
@@ -216,18 +219,20 @@ export default function RequestDetailPage() {
   async function send() {
     const body = text.trim();
     if (!body || !id) return;
+    setActionError(null);
     try {
       await sendMessageToSupabase(id, isHostView ? "HOST" : "FILMMAKER", body);
       setText("");
       await loadMsgs();
-    } catch {
-      // silent — auth errors already shown via pageError on load
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to send message.");
     }
   }
 
   async function saveOffer() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    setActionError(null);
 
     const currency = baseCurrency;
 
@@ -276,8 +281,8 @@ export default function RequestDetailPage() {
         ofNote.trim() || undefined,
       );
       await sendMessageToSupabase(id, "FILMMAKER", body);
-    } catch {
-      // silent
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to submit offer.");
     }
 
     reload();
@@ -287,6 +292,7 @@ export default function RequestDetailPage() {
   async function saveCounterOffer() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    setActionError(null);
 
     const currency = baseCurrency;
 
@@ -326,11 +332,21 @@ export default function RequestDetailPage() {
     const headline = parts.length ? `Counter offer: ${parts.join(" • ")}` : "Counter offer updated.";
 
     try {
+      await saveOfferToSupabase(
+        id,
+        coRate.trim() ? rateN : undefined,
+        coMinHours.trim() ? minHoursN : undefined,
+        coTotal.trim() ? totalN : undefined,
+        coNote.trim() || undefined,
+        "HOST_COUNTER_OFFER",
+      );
       await sendMessageToSupabase(
         id, "HOST",
         coNote.trim() ? `${headline}\n\nNote: ${coNote.trim()}` : headline,
       );
-    } catch { /* silent */ }
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to save counter offer.");
+    }
 
     reload();
     await loadMsgs();
@@ -340,6 +356,7 @@ export default function RequestDetailPage() {
     if (!req || !id) return;
     if (!canNegotiate) return;
     if (!req.counterOffer) return;
+    setActionError(null);
 
     const nextReq: BookingRequest = {
       ...req,
@@ -347,15 +364,19 @@ export default function RequestDetailPage() {
         acceptedISO: new Date().toISOString(),
         source: "COUNTER",
       },
-      status: "PENDING",
+      status: "ACCEPTED",
       confirmed: undefined,
     };
 
     saveRequest(nextReq);
 
     try {
+      await acceptLatestOfferInSupabase(id);
+      await updateRequestStatusInSupabase(id, "ACCEPTED");
       await sendMessageToSupabase(id, "FILMMAKER", "✅ I accept your counter offer. Please confirm/approve to lock it in.");
-    } catch { /* silent */ }
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to accept counter offer.");
+    }
 
     reload();
     await loadMsgs();
@@ -364,6 +385,7 @@ export default function RequestDetailPage() {
   async function saveHostConstraints() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    setActionError(null);
 
     const hc: HostConstraints = {
       weekendOnly: hcWeekendOnly || undefined,
@@ -389,7 +411,9 @@ export default function RequestDetailPage() {
           ? "Host availability cleared."
           : `Host availability updated.${hc.note ? `\n\nNote: ${hc.note}` : ""}`,
       );
-    } catch { /* silent */ }
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to save availability.");
+    }
 
     reload();
     await loadMsgs();
@@ -398,6 +422,7 @@ export default function RequestDetailPage() {
   async function accept() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    setActionError(null);
 
     const requirementsSnapshot = buildRequirementsSnapshot(req.impact, listing?.state);
     const currency = baseCurrency;
@@ -427,8 +452,11 @@ export default function RequestDetailPage() {
     saveRequest(nextReq);
 
     try {
+      await updateRequestStatusInSupabase(id, "ACCEPTED");
       await sendMessageToSupabase(id, "HOST", "✅ Host accepted. Confirmed terms saved.");
-    } catch { /* silent */ }
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to accept request.");
+    }
 
     reload();
     await loadMsgs();
@@ -436,6 +464,7 @@ export default function RequestDetailPage() {
 
   async function decline() {
     if (!req || !id) return;
+    setActionError(null);
 
     const nextReq: BookingRequest = {
       ...req,
@@ -446,8 +475,11 @@ export default function RequestDetailPage() {
     saveRequest(nextReq);
 
     try {
+      await updateRequestStatusInSupabase(id, "DECLINED");
       await sendMessageToSupabase(id, "HOST", "❌ Host declined this request.");
-    } catch { /* silent */ }
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to decline request.");
+    }
 
     reload();
     await loadMsgs();
@@ -651,6 +683,10 @@ export default function RequestDetailPage() {
           </div>
         </div>
       ) : null}
+
+      {actionError && (
+        <div className={styles.notice}>{actionError}</div>
+      )}
 
       {/* Core card */}
       <div className={styles.card}>

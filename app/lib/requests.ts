@@ -126,6 +126,7 @@ export async function saveOfferToSupabase(
   minHours: number | undefined,
   total: number | undefined,
   note: string | undefined,
+  offerType = "FILMMAKER_OFFER",
 ): Promise<void> {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
@@ -135,12 +136,54 @@ export async function saveOfferToSupabase(
     id: crypto.randomUUID(),
     request_id: requestId,
     user_id: user.id,
+    offer_type: offerType,
     rate_per_hour: ratePerHour ?? null,
     min_hours: minHours ?? null,
     total: total ?? null,
     note: note ?? null,
-    status: "pending",
+    status: "PENDING",
   });
+
+  if (error) throw error;
+}
+
+export async function acceptLatestOfferInSupabase(requestId: string): Promise<void> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in.");
+
+  const { data: offer, error: fetchErr } = await supabase
+    .from("booking_offers")
+    .select("id")
+    .eq("request_id", requestId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchErr) throw fetchErr;
+  if (!offer) return;
+
+  const { error: updateErr } = await supabase
+    .from("booking_offers")
+    .update({ status: "ACCEPTED" })
+    .eq("id", (offer as Record<string, unknown>).id as string);
+
+  if (updateErr) throw updateErr;
+}
+
+export async function updateRequestStatusInSupabase(
+  requestId: string,
+  status: "ACCEPTED" | "DECLINED",
+): Promise<void> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in.");
+
+  const { error } = await supabase
+    .from("booking_requests")
+    .update({ status })
+    .eq("id", requestId)
+    .eq("user_id", user.id);
 
   if (error) throw error;
 }
