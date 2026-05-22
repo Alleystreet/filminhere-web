@@ -122,6 +122,8 @@ export default function RequestDetailPage() {
   const [ofTotal, setOfTotal] = useState("");
   const [ofNote, setOfNote] = useState("");
 
+  const [submittingOffer, setSubmittingOffer] = useState(false);
+
   // Host availability/constraints
   const [hcWeekendOnly, setHcWeekendOnly] = useState(false);
   const [hcNoNights, setHcNoNights] = useState(false);
@@ -232,7 +234,9 @@ export default function RequestDetailPage() {
   async function saveOffer() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    if (submittingOffer) return;
     setActionError(null);
+    setSubmittingOffer(true);
 
     const currency = baseCurrency;
 
@@ -283,6 +287,8 @@ export default function RequestDetailPage() {
       await sendMessageToSupabase(id, "FILMMAKER", body);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to submit offer.");
+    } finally {
+      setSubmittingOffer(false);
     }
 
     reload();
@@ -821,8 +827,8 @@ export default function RequestDetailPage() {
                 <textarea className={styles.smallTextarea} value={ofNote} onChange={(e) => setOfNote(e.target.value)} placeholder="Ex: small footprint, flexible schedule..." />
               </label>
 
-              <button type="button" className={styles.actionBtn} onClick={saveOffer}>
-                Submit Offer
+              <button type="button" className={styles.actionBtn} onClick={saveOffer} disabled={submittingOffer}>
+                {submittingOffer ? "Submitting..." : "Submit Offer"}
               </button>
             </div>
           ) : null}
