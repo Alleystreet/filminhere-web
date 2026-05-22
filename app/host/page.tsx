@@ -26,6 +26,10 @@ export default function HostPage() {
         </ul>
 
         <div className={styles.actions}>
+          <Link className={styles.btn} href="/host/intake">
+            Submit a Listing
+          </Link>
+
           <Link className={styles.btn} href="/#early-access">
             Join Early Access
           </Link>

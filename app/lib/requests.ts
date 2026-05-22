@@ -173,6 +173,47 @@ export async function acceptLatestOfferInSupabase(requestId: string): Promise<vo
   if (updateErr) throw updateErr;
 }
 
+export async function submitHostListingToSupabase(fields: {
+  listingType: string;
+  title: string;
+  description: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  ratePerHour: number | null;
+  ratePerDay: number | null;
+  minHours: number | null;
+  capacity: number | null;
+  amenities: string;
+  rulesNotes: string;
+  hostEmail: string;
+}): Promise<void> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("You must be logged in to submit a listing.");
+
+  const { error } = await supabase.from("host_listing_submissions").insert({
+    user_id: user.id,
+    listing_type: fields.listingType,
+    title: fields.title,
+    description: fields.description,
+    address: fields.address,
+    city: fields.city,
+    state: fields.state,
+    country: fields.country,
+    rate_per_hour: fields.ratePerHour,
+    rate_per_day: fields.ratePerDay,
+    min_hours: fields.minHours,
+    capacity: fields.capacity,
+    amenities: fields.amenities,
+    rules_notes: fields.rulesNotes,
+    host_email: fields.hostEmail,
+  });
+
+  if (error) throw error;
+}
+
 export async function updateRequestStatusInSupabase(
   requestId: string,
   status: "ACCEPTED" | "DECLINED",
