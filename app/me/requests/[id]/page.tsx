@@ -374,6 +374,8 @@ export default function RequestDetailPage() {
       await acceptLatestOfferInSupabase(id);
       await updateRequestStatusInSupabase(id, "ACCEPTED");
       await sendMessageToSupabase(id, "FILMMAKER", "✅ I accept your counter offer. Please confirm/approve to lock it in.");
+      const fresh = await getRequestByIdFromSupabase(id);
+      if (fresh) saveRequest(fresh);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to accept counter offer.");
     }

@@ -156,6 +156,8 @@ export async function acceptLatestOfferInSupabase(requestId: string): Promise<vo
     .from("booking_offers")
     .select("id")
     .eq("request_id", requestId)
+    .eq("offer_type", "HOST_COUNTER_OFFER")
+    .eq("status", "PENDING")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
