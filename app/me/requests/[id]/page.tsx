@@ -355,29 +355,17 @@ export default function RequestDetailPage() {
   async function filmmakerAcceptCounter() {
     if (!req || !id) return;
     if (!canNegotiate) return;
-    if (!req.counterOffer) return;
     setActionError(null);
-
-    const nextReq: BookingRequest = {
-      ...req,
-      filmmakerAccepted: {
-        acceptedISO: new Date().toISOString(),
-        source: "COUNTER",
-      },
-      status: "ACCEPTED",
-      confirmed: undefined,
-    };
-
-    saveRequest(nextReq);
 
     try {
       await acceptLatestOfferInSupabase(id);
       await updateRequestStatusInSupabase(id, "ACCEPTED");
-      await sendMessageToSupabase(id, "FILMMAKER", "✅ I accept your counter offer. Please confirm/approve to lock it in.");
+      await sendMessageToSupabase(id, "FILMMAKER", "Filmmaker accepted the host counter-offer.");
       const fresh = await getRequestByIdFromSupabase(id);
       if (fresh) saveRequest(fresh);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to accept counter offer.");
+      return;
     }
 
     reload();

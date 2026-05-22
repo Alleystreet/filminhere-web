@@ -163,7 +163,7 @@ export async function acceptLatestOfferInSupabase(requestId: string): Promise<vo
     .maybeSingle();
 
   if (fetchErr) throw fetchErr;
-  if (!offer) return;
+  if (!offer) throw new Error("No pending host counter-offer found for this request.");
 
   const { error: updateErr } = await supabase
     .from("booking_offers")
@@ -181,9 +181,11 @@ export async function updateRequestStatusInSupabase(
   if (authError) throw authError;
   if (!user) throw new Error("Please sign in.");
 
+  const threadStatus = status === "ACCEPTED" ? "locked" : "declined";
+
   const { error } = await supabase
     .from("booking_requests")
-    .update({ status })
+    .update({ status, thread_status: threadStatus })
     .eq("id", requestId)
     .eq("user_id", user.id);
 
