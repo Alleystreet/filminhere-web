@@ -214,6 +214,21 @@ export async function submitHostListingToSupabase(fields: {
   if (error) throw error;
 }
 
+export async function getHostListingsFromSupabase(): Promise<any[]> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("You must be logged in to view your listings.");
+
+  const { data, error } = await supabase
+    .from("host_listing_submissions")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("submitted_at", { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function updateRequestStatusInSupabase(
   requestId: string,
   status: "ACCEPTED" | "DECLINED",

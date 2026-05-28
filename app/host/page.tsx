@@ -7,8 +7,8 @@ export default function HostPage() {
       <div className={styles.head}>
         <h1 className={styles.h1}>List a Space</h1>
         <p className={styles.sub}>
-          Host onboarding isn’t enabled in this preview build. Join early access to be first in line
-          when we open listings.
+          List your space, vehicle, props, gear, or services. FilmInHere connects you directly with
+          filmmakers.
         </p>
       </div>
 
@@ -28,6 +28,10 @@ export default function HostPage() {
         <div className={styles.actions}>
           <Link className={styles.btn} href="/host/intake">
             Submit a Listing
+          </Link>
+
+          <Link className={styles.btn} href="/host/my-listings">
+            My Listings
           </Link>
 
           <Link className={styles.btn} href="/#early-access">
