@@ -316,7 +316,7 @@ export async function updateRequestStatusInSupabase(
 
   const { error } = await supabase
     .from("booking_requests")
-    .update({ status, thread_status: threadStatus })
+    .update({ status, thread_status: threadStatus, updated_at: new Date().toISOString() })
     .eq("id", requestId)
     .eq("user_id", user.id);
 
