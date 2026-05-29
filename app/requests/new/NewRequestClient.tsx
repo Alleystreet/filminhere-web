@@ -47,6 +47,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   const [impact] = useState<ImpactChecklist>({} as ImpactChecklist);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -85,6 +86,14 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
       return;
     }
     if (isHostSlug && !hostSubmission) return;
+
+    const startMs = startISO ? new Date(startISO).getTime() : NaN;
+    const endMs = endISO ? new Date(endISO).getTime() : NaN;
+    if (Number.isFinite(startMs) && Number.isFinite(endMs) && endMs <= startMs) {
+      setDateError("End date/time must be after start date/time.");
+      return;
+    }
+    setDateError(null);
 
     try {
       saveEmail?.(email);
@@ -153,7 +162,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
         <input
           className={styles.input}
           value={startISO}
-          onChange={(e) => setStartISO(e.target.value)}
+          onChange={(e) => { setStartISO(e.target.value); setDateError(null); }}
           placeholder="2026-02-18T09:00"
         />
 
@@ -161,9 +170,15 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
         <input
           className={styles.input}
           value={endISO}
-          onChange={(e) => setEndISO(e.target.value)}
+          onChange={(e) => { setEndISO(e.target.value); setDateError(null); }}
           placeholder="2026-02-18T17:00"
         />
+
+        {dateError && (
+          <p style={{ color: "#cb2431", margin: "4px 0 0", fontSize: 14 }}>
+            {dateError}
+          </p>
+        )}
 
         <label className={styles.label}>Message</label>
         <textarea

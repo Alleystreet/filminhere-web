@@ -215,7 +215,7 @@ export default function RequestDetailPage() {
   const proposedMinHours =
     req?.counterOffer?.proposedMinHours ?? req?.offer?.proposedMinHours ?? baseMin;
 
-  const shootHours = req ? hoursBetween(req.startISO, req.endISO) : 0;
+  const shootHours = req ? Math.max(0, hoursBetween(req.startISO, req.endISO)) : 0;
   const billableHours = Math.max(shootHours, proposedMinHours || 0);
   const subtotal = billableHours * (proposedRate || 0) + (baseCleaning || 0);
 
