@@ -221,6 +221,7 @@ export default function RequestDetailPage() {
   async function send() {
     const body = text.trim();
     if (!body || !id) return;
+    if (isLocked) return;
     setActionError(null);
     try {
       await sendMessageToSupabase(id, isHostView ? "HOST" : "FILMMAKER", body);
@@ -996,15 +997,21 @@ export default function RequestDetailPage() {
           </div>
         )}
 
-        <div className={styles.composer}>
-          <textarea
-            className={styles.textarea}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder={isHostView ? "Message the filmmaker…" : "Message the host…"}
-          />
-          <button className={styles.btn} type="button" onClick={send}>Send</button>
-        </div>
+        {isLocked ? (
+          <div className={styles.notice}>
+            Messages are read-only because this request is accepted and locked.
+          </div>
+        ) : (
+          <div className={styles.composer}>
+            <textarea
+              className={styles.textarea}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={isHostView ? "Message the filmmaker…" : "Message the host…"}
+            />
+            <button className={styles.btn} type="button" onClick={send}>Send</button>
+          </div>
+        )}
       </div>
     </div>
   );
