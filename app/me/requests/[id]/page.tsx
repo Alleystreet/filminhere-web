@@ -461,6 +461,7 @@ export default function RequestDetailPage() {
 
   async function decline() {
     if (!req || !id) return;
+    if (!canNegotiate) return;
     setActionError(null);
 
     const nextReq: BookingRequest = {
@@ -532,8 +533,11 @@ export default function RequestDetailPage() {
   const threadStatusText = threadStatusLabel(threadStatus);
   const isLocked =
     req.status === "ACCEPTED" ||
+    req.status === "DECLINED" ||
     req.threadStatus === "locked" ||
-    threadStatus === "locked";
+    req.threadStatus === "declined" ||
+    threadStatus === "locked" ||
+    threadStatus === "declined";
 
   return (
     <div className={styles.wrap}>
@@ -785,8 +789,10 @@ export default function RequestDetailPage() {
           <div className={styles.sectionTitle}>Negotiation</div>
 
           {isLocked ? (
-            <div className={styles.lockBanner} data-status="ACCEPTED">
-              This request is accepted and locked. Negotiation is closed.
+            <div className={styles.lockBanner} data-status={req.status}>
+              {req.status === "DECLINED"
+                ? "This request was declined. The thread is closed."
+                : "This request is accepted and locked. Negotiation is closed."}
             </div>
           ) : null}
 
@@ -999,7 +1005,9 @@ export default function RequestDetailPage() {
 
         {isLocked ? (
           <div className={styles.notice}>
-            Messages are read-only because this request is accepted and locked.
+            {req.status === "DECLINED"
+              ? "This request was declined. The thread is closed."
+              : "Messages are read-only because this request is accepted and locked."}
           </div>
         ) : (
           <div className={styles.composer}>
