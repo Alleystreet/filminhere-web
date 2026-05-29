@@ -718,6 +718,111 @@ export default function RequestDetailPage() {
         </div>
       ) : null}
 
+      {/* Booking Confirmation Record */}
+      {req.status === "ACCEPTED" ? (
+        <div className={styles.confirmedCard}>
+          <div className={styles.confirmedTitle}>Booking Confirmation Record</div>
+          <div className={styles.confirmedSub}>
+            For operations, payment, contracts, receipts, and client communication.
+          </div>
+
+          <div className={styles.dealGrid}>
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Booking ID</div>
+              <div className={styles.dealVal}>{req.id}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Listing title</div>
+              <div className={styles.dealVal}>{req.listingTitle}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Final status</div>
+              <div className={styles.dealVal}>{req.status}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Thread status</div>
+              <div className={styles.dealVal}>{threadStatusText}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Agreed rate</div>
+              <div className={styles.dealVal}>
+                {confirmed ? `${confirmed.currency} ${money(confirmed.ratePerHour)}/hr` : "—"}
+              </div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Agreed min hours</div>
+              <div className={styles.dealVal}>
+                {confirmed ? `${confirmed.minHours} hrs` : "—"}
+              </div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Cleaning fee</div>
+              <div className={styles.dealVal}>
+                {confirmed?.cleaningFee ? `${confirmed.currency} ${money(confirmed.cleaningFee)}` : "—"}
+              </div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Deposit</div>
+              <div className={styles.dealVal}>
+                {confirmed?.securityDeposit ? `${confirmed.currency} ${money(confirmed.securityDeposit)}` : "—"}
+              </div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Start</div>
+              <div className={styles.dealVal}>{new Date(req.startISO).toLocaleString()}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>End</div>
+              <div className={styles.dealVal}>{new Date(req.endISO).toLocaleString()}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Compliance acknowledged</div>
+              <div className={styles.dealVal}>
+                {req.compliance?.acknowledgedISO
+                  ? new Date(req.compliance.acknowledgedISO).toLocaleString()
+                  : "—"}
+              </div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Accepted at</div>
+              <div className={styles.dealVal}>
+                {confirmed?.confirmedISO
+                  ? new Date(confirmed.confirmedISO).toLocaleString()
+                  : "—"}
+              </div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Filmmaker email</div>
+              <div className={styles.dealVal}>{req.email || "—"}</div>
+            </div>
+
+            <div className={styles.dealItem}>
+              <div className={styles.dealLabel}>Host email</div>
+              <div className={styles.dealVal}>—</div>
+            </div>
+
+            <div className={styles.dealTotal}>
+              <div className={styles.dealLabel}>Estimated subtotal</div>
+              <div className={styles.dealValBig}>
+                {confirmed ? `${confirmed.currency} ${money(confirmed.estimatedSubtotal)}` : "—"}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {actionError && (
         <div className={styles.notice}>{actionError}</div>
       )}
