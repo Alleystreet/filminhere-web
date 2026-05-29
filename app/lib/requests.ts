@@ -229,6 +229,18 @@ export async function getHostListingsFromSupabase(): Promise<any[]> {
   return data ?? [];
 }
 
+export async function getApprovedHostListingSubmissionByIdFromSupabase(id: string): Promise<any | null> {
+  const { data, error } = await supabase
+    .from("host_listing_submissions")
+    .select("*")
+    .eq("id", id)
+    .eq("status", "APPROVED")
+    .maybeSingle();
+
+  if (error) throw error;
+  return data ?? null;
+}
+
 export async function getApprovedHostListingSubmissionsFromSupabase(): Promise<any[]> {
   const { data, error } = await supabase
     .from("host_listing_submissions")

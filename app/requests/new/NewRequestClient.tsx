@@ -9,7 +9,7 @@ import styles from "./NewRequest.module.css";
 import type { BookingRequest, Listing, ImpactChecklist } from "@/lib/types";
 import { listings } from "@/lib/mock/listings";
 import { getSavedEmail, saveEmail } from "@/lib/store/requests";
-import { saveRequestToSupabase } from "@/lib/requests";
+import { saveRequestToSupabase, getApprovedHostListingSubmissionByIdFromSupabase } from "@/lib/requests";
 
 type Props = {
   listingSlug?: string;
@@ -28,11 +28,17 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   }, []);
 
   const effectiveSlug = listingSlug || slugFromUrl;
+  const isHostSlug = effectiveSlug.startsWith("host-");
 
-  const listing: Listing | undefined = useMemo(
-    () => listings.find((l) => l.slug === effectiveSlug),
-    [effectiveSlug]
+  const mockListing: Listing | undefined = useMemo(
+    () => isHostSlug ? undefined : listings.find((l) => l.slug === effectiveSlug),
+    [effectiveSlug, isHostSlug],
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [hostSubmission, setHostSubmission] = useState<any | null>(null);
+  const [hostLoading, setHostLoading] = useState(false);
+  const [hostError, setHostError] = useState<string | null>(null);
 
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -49,12 +55,36 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     } catch {}
   }, []);
 
+  useEffect(() => {
+    if (!isHostSlug || !effectiveSlug) return;
+    const id = effectiveSlug.slice(5);
+    setHostLoading(true);
+    setHostError(null);
+    getApprovedHostListingSubmissionByIdFromSupabase(id)
+      .then((sub) => {
+        if (!sub) {
+          setHostError("This listing could not be found or is no longer available.");
+        } else {
+          setHostSubmission(sub);
+        }
+      })
+      .catch((err: unknown) => {
+        setHostError(err instanceof Error ? err.message : "Failed to load listing details.");
+      })
+      .finally(() => setHostLoading(false));
+  }, [effectiveSlug, isHostSlug]);
+
+  const displayTitle: string = isHostSlug
+    ? (hostSubmission?.title ?? (hostLoading ? "Loading…" : effectiveSlug.replace(/-/g, " ")))
+    : (mockListing?.title ?? effectiveSlug.replace(/-/g, " "));
+
   async function onSubmit() {
     if (!email) return;
     if (!effectiveSlug) {
       router.push("/locations");
       return;
     }
+    if (isHostSlug && !hostSubmission) return;
 
     try {
       saveEmail?.(email);
@@ -62,9 +92,11 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
 
     const req: BookingRequest = {
       id: `req_${Date.now()}`,
-      listingId: listing?.id ?? effectiveSlug,
+      listingId: isHostSlug ? ("host_" + effectiveSlug.slice(5)) : (mockListing?.id ?? effectiveSlug),
       listingSlug: effectiveSlug,
-      listingTitle: listing?.title ?? effectiveSlug.replace(/-/g, " "),
+      listingTitle: isHostSlug
+        ? (hostSubmission.title as string)
+        : (mockListing?.title ?? effectiveSlug.replace(/-/g, " ")),
       email,
       message,
       startISO,
@@ -96,11 +128,17 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
           <h1 className={styles.h1}>New Request</h1>
           <p className={styles.sub}>
             {effectiveSlug
-              ? `Requesting: ${listing?.title ?? effectiveSlug.replace(/-/g, " ")}`
+              ? `Requesting: ${displayTitle}`
               : "Select a listing to request."}
           </p>
         </div>
       </div>
+
+      {isHostSlug && hostError && (
+        <p style={{ color: "#cb2431", margin: "0 0 1rem", padding: "0.75rem 1rem", background: "#fff0f0", borderRadius: 6 }}>
+          {hostError}
+        </p>
+      )}
 
       <div className={styles.card}>
         <label className={styles.label}>Email</label>
@@ -138,7 +176,12 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
         {saveError && <p className={styles.error}>{saveError}</p>}
 
         <div className={styles.actions}>
-          <button type="button" className={styles.primary} onClick={onSubmit} disabled={saving}>
+          <button
+            type="button"
+            className={styles.primary}
+            onClick={onSubmit}
+            disabled={saving || (isHostSlug && !hostSubmission)}
+          >
             {saving ? "Saving…" : "Save Request"}
           </button>
         </div>
@@ -146,5 +189,3 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     </div>
   );
 }
-
-
