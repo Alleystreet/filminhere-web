@@ -486,6 +486,32 @@ export default function RequestDetailPage() {
     await loadMsgs();
   }
 
+  async function acknowledgeCompliance() {
+    if (!req || !id) return;
+    if (!canNegotiate || isLocked) return;
+    setActionError(null);
+
+    const nextReq: BookingRequest = {
+      ...req,
+      compliance: {
+        jurisdiction: req.compliance?.jurisdiction ?? "",
+        ...(req.compliance ?? {}),
+        acknowledgedISO: new Date().toISOString(),
+      },
+    };
+
+    saveRequest(nextReq);
+
+    try {
+      await sendMessageToSupabase(id, "FILMMAKER", "✅ Compliance acknowledged.");
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to save compliance acknowledgment.");
+    }
+
+    reload();
+    await loadMsgs();
+  }
+
   if (!id) {
     return (
       <div className={styles.wrap}>
@@ -976,6 +1002,21 @@ export default function RequestDetailPage() {
           ) : null}
 
           {compliance?.summary ? <div className={styles.guidanceNote}>{compliance.summary}</div> : null}
+
+          {!complianceAcknowledged && canNegotiate && !isLocked ? (
+            <div className={styles.counterCard}>
+              <p className={styles.guidanceNote}>
+                You must acknowledge compliance before this request can be accepted.
+              </p>
+              <button
+                type="button"
+                className={styles.actionBtn}
+                onClick={acknowledgeCompliance}
+              >
+                Acknowledge Compliance
+              </button>
+            </div>
+          ) : null}
         </div>
 
         {/* Impact */}
