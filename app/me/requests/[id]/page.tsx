@@ -529,6 +529,10 @@ export default function RequestDetailPage() {
   const filmmakerAcceptedCounter = req.filmmakerAccepted?.source === "COUNTER";
   const threadStatus = resolveThreadStatus(req, msgs.length);
   const threadStatusText = threadStatusLabel(threadStatus);
+  const isLocked =
+    req.status === "ACCEPTED" ||
+    req.threadStatus === "locked" ||
+    threadStatus === "locked";
 
   return (
     <div className={styles.wrap}>
@@ -726,7 +730,7 @@ export default function RequestDetailPage() {
             <div className={styles.guidanceNote}>{req.hostConstraints.note}</div>
           ) : null}
 
-          {isHostView && canNegotiate ? (
+          {isHostView && canNegotiate && !isLocked ? (
             <div className={styles.counterCard}>
               <div className={styles.counterTitle}>Set constraints (what you can approve)</div>
 
@@ -779,6 +783,12 @@ export default function RequestDetailPage() {
         <div className={styles.section}>
           <div className={styles.sectionTitle}>Negotiation</div>
 
+          {isLocked ? (
+            <div className={styles.lockBanner} data-status="ACCEPTED">
+              This request is accepted and locked. Negotiation is closed.
+            </div>
+          ) : null}
+
           <div className={styles.rowItem}>
             <span className={styles.rowLabel}>Filmmaker offer</span>
             <span className={styles.rowVal}>{req.offer ? "Submitted ✅" : "—"}</span>
@@ -801,7 +811,7 @@ export default function RequestDetailPage() {
             </div>
           ) : null}
 
-          {!isHostView && canNegotiate ? (
+          {!isHostView && canNegotiate && !isLocked ? (
             <div className={styles.counterCard}>
               <div className={styles.counterTitle}>Make an Offer</div>
 
@@ -860,7 +870,7 @@ export default function RequestDetailPage() {
             <span className={styles.rowVal}>{filmmakerAcceptedCounter ? "Yes ✅" : "—"}</span>
           </div>
 
-          {!isHostView && canNegotiate && req.counterOffer ? (
+          {!isHostView && canNegotiate && !isLocked && req.counterOffer ? (
             <div className={styles.hostBtns}>
               <button
                 type="button"
@@ -873,7 +883,7 @@ export default function RequestDetailPage() {
             </div>
           ) : null}
 
-          {isHostView && canNegotiate ? (
+          {isHostView && canNegotiate && !isLocked ? (
             <div className={styles.counterCard}>
               <div className={styles.counterTitle}>Set / Update Counter Offer</div>
 
