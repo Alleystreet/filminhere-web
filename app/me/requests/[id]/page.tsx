@@ -196,6 +196,7 @@ export default function RequestDetailPage() {
   // ===== State gates =====
   const isFinal = req?.status === "ACCEPTED" || req?.status === "DECLINED";
   const canNegotiate = Boolean(req && req.status === "PENDING" && !req.confirmed);
+  const complianceAcknowledged = Boolean(req?.compliance?.acknowledgedISO);
 
   // ===== Deal logic =====
   const baseCurrency =
@@ -362,6 +363,7 @@ export default function RequestDetailPage() {
   async function filmmakerAcceptCounter() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    if (!req.compliance?.acknowledgedISO) return;
     setActionError(null);
 
     try {
@@ -419,6 +421,7 @@ export default function RequestDetailPage() {
   async function accept() {
     if (!req || !id) return;
     if (!canNegotiate) return;
+    if (!req.compliance?.acknowledgedISO) return;
     setActionError(null);
 
     const requirementsSnapshot = buildRequirementsSnapshot(req.impact, listing?.state);
@@ -879,11 +882,16 @@ export default function RequestDetailPage() {
 
           {!isHostView && canNegotiate && !isLocked && req.counterOffer ? (
             <div className={styles.hostBtns}>
+              {!complianceAcknowledged ? (
+                <p className={styles.notice}>
+                  Compliance must be acknowledged before this request can be accepted.
+                </p>
+              ) : null}
               <button
                 type="button"
                 className={`${styles.actionBtn} ${styles.acceptBtn}`}
                 onClick={filmmakerAcceptCounter}
-                disabled={filmmakerAcceptedCounter}
+                disabled={filmmakerAcceptedCounter || !complianceAcknowledged}
               >
                 Accept Counter Offer
               </button>
@@ -920,8 +928,18 @@ export default function RequestDetailPage() {
                 Save Counter Offer
               </button>
 
+              {!complianceAcknowledged ? (
+                <p className={styles.notice}>
+                  Compliance must be acknowledged before this request can be accepted.
+                </p>
+              ) : null}
               <div className={styles.hostBtns}>
-                <button type="button" className={`${styles.actionBtn} ${styles.acceptBtn}`} onClick={accept}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.acceptBtn}`}
+                  onClick={accept}
+                  disabled={!complianceAcknowledged}
+                >
                   Accept
                 </button>
                 <button type="button" className={`${styles.actionBtn} ${styles.declineBtn}`} onClick={decline}>
