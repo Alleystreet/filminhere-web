@@ -2,6 +2,8 @@ import Link from "next/link";
 import styles from "./Locations.module.css";
 import { listings } from "../lib/mock/listings";
 import type { Listing } from "../lib/types";
+import { getApprovedHostListingSubmissionsFromSupabase } from "../lib/requests";
+
 type SearchParams = Record<string, string | string[] | undefined>;
 
 function capWord(s: string) {
@@ -59,12 +61,57 @@ function locationsHref(sp: SearchParams, zip?: string) {
   return params.size ? `/locations?${params.toString()}` : "/locations";
 }
 
+function mapListingType(raw: string | null | undefined): Listing["type"] {
+  switch ((raw ?? "").toLowerCase().trim()) {
+    case "house": return "House";
+    case "apartment": return "Apartment";
+    case "warehouse": return "Warehouse";
+    case "studio": return "Studio";
+    case "office": return "Office";
+    case "outdoor": return "Outdoor";
+    default: return "Other";
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function submissionToListing(row: any): Listing {
+  return {
+    id: "host_" + row.id,
+    slug: "host-" + row.id,
+    title: row.title || "Untitled Listing",
+    city: row.city || "",
+    state: row.state ?? undefined,
+    country: row.country ?? undefined,
+    type: mapListingType(row.listing_type),
+    pricePerHour: row.rate_per_hour ?? 0,
+    minHours: row.min_hours ?? 1,
+    capacity: row.capacity ?? 1,
+    description: row.description || "No description provided.",
+    rules: {
+      parking: row.amenities ?? undefined,
+      noise: row.rules_notes ?? undefined,
+    },
+    photos: ["/placeholders/space1.jpg"],
+  };
+}
+
 export default async function LocationsPage({
   searchParams,
 }: {
   searchParams?: SearchParams | Promise<SearchParams>;
 }) {
   const sp = await Promise.resolve(searchParams ?? {});
+
+  let hostListings: Listing[] = [];
+  let hostError: string | null = null;
+  try {
+    const rows = await getApprovedHostListingSubmissionsFromSupabase();
+    hostListings = rows.map(submissionToListing);
+  } catch (err) {
+    hostError = err instanceof Error ? err.message : "Could not load host listings.";
+  }
+
+  const allListings: Listing[] = [...(listings as Listing[]), ...hostListings];
 
   const q = (getQ(sp) ?? "").trim().toLowerCase();
   const cityOrZipRaw = (first(sp.city) ?? "").trim();
@@ -82,7 +129,7 @@ export default async function LocationsPage({
   const max = toNum(sp.max);
   const cap = toNum(sp.cap);
 
-  const filtered = (listings as Listing[]).filter((l) => {
+  const filtered = allListings.filter((l) => {
     const title = l.title.toLowerCase();
     const lcity = l.city.toLowerCase();
     const ltype = l.type.toLowerCase();
@@ -98,10 +145,10 @@ export default async function LocationsPage({
     return true;
   });
 
-    const zipCounts = Array.from(
-    (listings as Listing[]).reduce((acc, l) => {
+  const zipCounts = Array.from(
+    allListings.reduce((acc, l) => {
       const z = l.zip;
-      if (!z) return acc; // skip listings without zips
+      if (!z) return acc;
       acc.set(z, (acc.get(z) ?? 0) + 1);
       return acc;
     }, new Map<string, number>())
@@ -116,12 +163,18 @@ export default async function LocationsPage({
         <p className={styles.sub}>Browse film-ready spaces and request to book in minutes.</p>
       </div>
 
+      {hostError && (
+        <p style={{ color: "#888", fontSize: 13, marginBottom: "0.5rem" }}>
+          Note: some listings could not be loaded. ({hostError})
+        </p>
+      )}
+
       <div className={styles.helperCard}>
-        <div className={styles.helperLabel}>What you’re looking at</div>
+        <div className={styles.helperLabel}>What you're looking at</div>
         <div className={styles.helperGrid}>
           <div><strong>Browse:</strong> These are location options you can choose from.</div>
-          <div><strong>Choose:</strong> Click a card to view one location’s details.</div>
-          <div><strong>Request:</strong> On the detail page, “Request to Book” starts a message thread where you can negotiate and lock an hourly rate.</div>
+          <div><strong>Choose:</strong> Click a card to view one location's details.</div>
+          <div><strong>Request:</strong> On the detail page, "Request to Book" starts a message thread where you can negotiate and lock an hourly rate.</div>
         </div>
       </div>
 

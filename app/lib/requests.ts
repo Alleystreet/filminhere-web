@@ -229,6 +229,17 @@ export async function getHostListingsFromSupabase(): Promise<any[]> {
   return data ?? [];
 }
 
+export async function getApprovedHostListingSubmissionsFromSupabase(): Promise<any[]> {
+  const { data, error } = await supabase
+    .from("host_listing_submissions")
+    .select("*")
+    .eq("status", "APPROVED")
+    .order("submitted_at", { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function getAdminHostListingSubmissionsFromSupabase(): Promise<any[]> {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
