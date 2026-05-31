@@ -48,11 +48,11 @@ export default function MyRequestsPage() {
         </div>
       </div>
 
-      <div className={styles.listingCard} style={{ marginBottom: 12 }}>
+      <div className={styles.infoCard}>
         <div className={styles.listingLabel}>How to use this page</div>
-        <div style={{ display: "grid", gap: 6 }}>
+        <div className={styles.infoBody}>
           <div>Click any request to open the message thread and negotiate.</div>
-          <div style={{ marginTop: 6 }}>
+          <div className={styles.infoGuide}>
             <strong>Status guide:</strong> draft = started • sent = sent to host • negotiating = offer in play • locked = rate locked • declined = closed
           </div>
         </div>
@@ -62,8 +62,10 @@ export default function MyRequestsPage() {
         <div className={styles.empty}>Loading…</div>
       ) : error ? (
         <div className={styles.empty}>
-          {error.toLowerCase().includes("sign in") ? (
-            <><Link href="/auth/login">Sign in</Link> to view your requests.</>
+          {error.toLowerCase().includes("sign in") ||
+           error.toLowerCase().includes("auth session") ||
+           error.toLowerCase().includes("log in") ? (
+            <>Please <Link href="/auth/login">log in</Link> to view your requests.</>
           ) : (
             error
           )}
@@ -89,9 +91,17 @@ export default function MyRequestsPage() {
               </div>
               <div className={styles.meta}>
                 <span className={styles.muted}>ID: {r.id}</span>
-                <span className={styles.muted}>
-                  {new Date(r.startISO).toLocaleString()} → {new Date(r.endISO).toLocaleString()}
-                </span>
+                {(() => {
+                  const s = r.startISO ? new Date(r.startISO).getTime() : NaN;
+                  const e = r.endISO ? new Date(r.endISO).getTime() : NaN;
+                  return Number.isFinite(s) && Number.isFinite(e) && e > s ? (
+                    <span className={styles.muted}>
+                      {new Date(r.startISO).toLocaleString()} → {new Date(r.endISO).toLocaleString()}
+                    </span>
+                  ) : (
+                    <span className={styles.dateWarn}>Invalid date range</span>
+                  );
+                })()}
               </div>
             </Link>
           ))}

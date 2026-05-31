@@ -87,3 +87,30 @@
   text-decoration: underline;
 }
 .smallLink:hover { opacity: 1; }
+
+.infoCard {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(10,10,10,0.35);
+  padding: 14px;
+  opacity: .95;
+  margin-bottom: 12px;
+}
+
+.infoBody {
+  display: grid;
+  gap: 6px;
+}
+
+.infoGuide {
+  margin-top: 6px;
+}
+
+.dateWarn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,200,80,0.22);
+  background: rgba(255,200,80,0.10);
+  color: rgba(255,200,80,0.9);
+}
