@@ -97,23 +97,58 @@ function buildRequirementsSnapshot(impact?: ImpactChecklist, stateCode?: string)
   return Array.from(new Set(snapshot));
 }
 
+function normalizeNegotiationText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[​‌‍⁠﻿­]/g, "") // zero-width / invisible chars
+    .replace(/\(at\)|\[at\]/gi, " at ")                      // (at) / [at] → at
+    .replace(/\(dot\)|\[dot\]/gi, " dot ")                   // (dot) / [dot] → dot
+    .replace(/\s+/g, " ")                                    // collapse whitespace
+    .trim();
+}
+
+// 7+ number words consecutive, separated only by spaces, dashes, or "and"
+const _NW = "(?:zero|one|two|three|four|five|six|seven|eight|nine)";
+const _NS = "[\\s\\-]+(?:and[\\s\\-]+)?";
+const CONSECUTIVE_NUM_WORD_RE = new RegExp(`\\b${_NW}(?:${_NS}${_NW}){6,}\\b`, "i");
+
 const BLOCKED_PATTERNS: RegExp[] = [
-  /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/, // email addresses
-  /\d{7,}/,                                              // 7+ consecutive digits (no separators)
-  /\d(?:[\s\-.()+]\d){6,}/,                             // phone groups: digit+separator pattern (comma-numbers excluded)
-  /https?:\/\//i,                                        // URLs with protocol
-  /\bwww\./i,                                            // bare www links
-  /@\w+/,                                                // @handles
+  // Email addresses
+  /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/,
+  // 7+ consecutive digits (comma-separated numbers like 1,200,000 are safe)
+  /\d{7,}/,
+  // Phone-formatted digit groups: spaces/dashes/dots/parens only (commas excluded)
+  /\d(?:[\s\-.()+]\d){6,}/,
+  // URLs
+  /https?:\/\//i,
+  /\bwww\./i,
+  // @handles
+  /@\w+/,
+  // Payment platforms
   /\bcash\s*app\b/i,
   /\bvenmo\b/i,
   /\bzelle\b/i,
   /\bpaypal\b/i,
   /\bwire\s+transfer\b/i,
   /\bbank\s+transfer\b/i,
+  // Domain obfuscation
+  /\bdot\s+com\b/i,
+  /\bdot\s+net\b/i,
+  /\bdot\s+org\b/i,
+  // Email address in word form: "at" followed by "dot" within 50 chars
+  /\bat\b.{1,50}\bdot\b/i,
+  // Off-platform bypass
+  /\boff\b.{0,25}\bplatform\b/i,
+  /\boutside\b.{0,15}\bplatform\b/i,
+  // Fee avoidance
+  /\bavoid\s+fee\b/i,
 ];
 
-function containsBlockedContent(body: string): boolean {
-  return BLOCKED_PATTERNS.some((re) => re.test(body));
+function containsBlockedNegotiationContent(value: string): boolean {
+  const n = normalizeNegotiationText(value);
+  if (BLOCKED_PATTERNS.some((re) => re.test(n))) return true;
+  if (CONSECUTIVE_NUM_WORD_RE.test(n)) return true;
+  return false;
 }
 
 export default function RequestDetailPage() {
@@ -268,7 +303,7 @@ export default function RequestDetailPage() {
     const body = text.trim();
     if (!body || !id) return;
     if (isLocked) return;
-    if (containsBlockedContent(body)) {
+    if (containsBlockedNegotiationContent(body)) {
       setBlockedWarning("Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.");
       return;
     }
@@ -301,6 +336,12 @@ export default function RequestDetailPage() {
     if (ofTotal.trim() && !(totalN > 0)) return;
 
     const hasAny = ofRate.trim() || ofMinHours.trim() || ofTotal.trim() || ofNote.trim();
+
+    if (ofNote.trim() && containsBlockedNegotiationContent(ofNote.trim())) {
+      setActionError("Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.");
+      setSubmittingOffer(false);
+      return;
+    }
 
     const nextReq: BookingRequest = {
       ...req,
@@ -363,6 +404,11 @@ export default function RequestDetailPage() {
     if (coTotal.trim() && !(totalN > 0)) return;
 
     const hasAny = coRate.trim() || coMinHours.trim() || coTotal.trim() || coNote.trim();
+
+    if (coNote.trim() && containsBlockedNegotiationContent(coNote.trim())) {
+      setActionError("Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.");
+      return;
+    }
 
     const nextReq: BookingRequest = {
       ...req,
