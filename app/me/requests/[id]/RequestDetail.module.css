@@ -437,3 +437,55 @@
   background: rgba(255,255,255,0.06);
   margin-left: 6px;
 }
+
+/* ===== Client Confirmation Summary ===== */
+.summaryCard {
+  border: 1px solid rgba(120,255,160,0.18);
+  border-radius: 16px;
+  background: rgba(120,255,160,0.04);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.summarySubject {
+  font-size: 15px;
+  opacity: 0.95;
+  margin: 8px 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+
+.summaryBody {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.summaryField {
+  display: flex;
+  gap: 8px;
+}
+
+.summaryFieldLabel {
+  opacity: 0.7;
+  min-width: 200px;
+  flex-shrink: 0;
+}
+
+.summaryDivider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  margin: 4px 0;
+}
+
+.summaryNote {
+  font-size: 12px;
+  opacity: 0.72;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  line-height: 1.5;
+  font-style: italic;
+}

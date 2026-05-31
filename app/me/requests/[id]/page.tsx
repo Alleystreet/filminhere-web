@@ -824,6 +824,92 @@ export default function RequestDetailPage() {
         </div>
       ) : null}
 
+      {/* Client Confirmation Summary */}
+      {req.status === "ACCEPTED" ? (
+        <div className={styles.summaryCard}>
+          <div className={styles.confirmedTitle}>Client Confirmation Summary</div>
+          <div className={styles.summarySubject}>
+            Subject: Your Film In Here booking is confirmed
+          </div>
+
+          <div className={styles.summaryBody}>
+            <div>
+              Your booking at <strong>{req.listingTitle}</strong> has been confirmed.
+            </div>
+
+            <hr className={styles.summaryDivider} />
+
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Confirmation ID</span>
+              <span>{req.id}</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Start</span>
+              <span>{new Date(req.startISO).toLocaleString()}</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>End</span>
+              <span>{new Date(req.endISO).toLocaleString()}</span>
+            </div>
+
+            <hr className={styles.summaryDivider} />
+
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Agreed rate</span>
+              <span>{baseCurrency} {money(proposedRate)}/hr</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Minimum booking time</span>
+              <span>{billableHours.toFixed(2)} hrs</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Cleaning fee</span>
+              <span>{baseCleaning ? `${baseCurrency} ${money(baseCleaning)}` : "—"}</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Deposit</span>
+              <span>{baseDeposit ? `${baseCurrency} ${money(baseDeposit)}` : "—"}</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Estimated total</span>
+              <span><strong>{baseCurrency} {money(subtotal)}</strong></span>
+            </div>
+
+            <hr className={styles.summaryDivider} />
+
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Compliance acknowledged</span>
+              <span>
+                {complianceTimestamp
+                  ? new Date(complianceTimestamp).toLocaleString()
+                  : complianceAcknowledged
+                    ? "Yes"
+                    : "—"}
+              </span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Accepted on</span>
+              <span>{acceptedOnISO ? new Date(acceptedOnISO).toLocaleString() : "—"}</span>
+            </div>
+
+            <hr className={styles.summaryDivider} />
+
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Your email</span>
+              <span>{req.email || "—"}</span>
+            </div>
+            <div className={styles.summaryField}>
+              <span className={styles.summaryFieldLabel}>Host</span>
+              <span>Host details will be provided by Film In Here.</span>
+            </div>
+          </div>
+
+          <div className={styles.summaryNote}>
+            This confirmation is for booking coordination. Payment and final production documents may follow separately.
+          </div>
+        </div>
+      ) : null}
+
       {actionError && (
         <div className={styles.notice}>{actionError}</div>
       )}
