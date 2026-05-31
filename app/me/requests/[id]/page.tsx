@@ -1,6 +1,5 @@
 "use client";
 
-import PermitsGuidance from "./PermitsGuidance";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
@@ -728,7 +727,7 @@ export default function RequestDetailPage() {
 
           <div className={styles.dealGrid}>
             <div className={styles.dealItem}>
-              <div className={styles.dealLabel}>Booking ID</div>
+              <div className={styles.dealLabel}>Confirmation ID</div>
               <div className={styles.dealVal}>{req.id}</div>
             </div>
 
@@ -738,13 +737,8 @@ export default function RequestDetailPage() {
             </div>
 
             <div className={styles.dealItem}>
-              <div className={styles.dealLabel}>Final status</div>
+              <div className={styles.dealLabel}>Confirmed status</div>
               <div className={styles.dealVal}>{req.status}</div>
-            </div>
-
-            <div className={styles.dealItem}>
-              <div className={styles.dealLabel}>Thread status</div>
-              <div className={styles.dealVal}>{threadStatusText}</div>
             </div>
 
             <div className={styles.dealItem}>
@@ -755,7 +749,7 @@ export default function RequestDetailPage() {
             </div>
 
             <div className={styles.dealItem}>
-              <div className={styles.dealLabel}>Agreed min hours</div>
+              <div className={styles.dealLabel}>Minimum booking time</div>
               <div className={styles.dealVal}>
                 {confirmed ? `${confirmed.minHours} hrs` : "—"}
               </div>
@@ -795,7 +789,7 @@ export default function RequestDetailPage() {
             </div>
 
             <div className={styles.dealItem}>
-              <div className={styles.dealLabel}>Accepted at</div>
+              <div className={styles.dealLabel}>Accepted on</div>
               <div className={styles.dealVal}>
                 {confirmed?.confirmedISO
                   ? new Date(confirmed.confirmedISO).toLocaleString()
@@ -814,7 +808,7 @@ export default function RequestDetailPage() {
             </div>
 
             <div className={styles.dealTotal}>
-              <div className={styles.dealLabel}>Estimated subtotal</div>
+              <div className={styles.dealLabel}>Estimated total</div>
               <div className={styles.dealValBig}>
                 {confirmed ? `${confirmed.currency} ${money(confirmed.estimatedSubtotal)}` : "—"}
               </div>
