@@ -25,6 +25,8 @@ import {
   saveOfferToSupabase,
   acceptLatestOfferInSupabase,
   updateRequestStatusInSupabase,
+  getPolicyAcceptanceFromSupabase,
+  acceptPolicyInSupabase,
 } from "@/lib/requests";
 import { listings } from "@/lib/mock/listings";
 
@@ -95,6 +97,25 @@ function buildRequirementsSnapshot(impact?: ImpactChecklist, stateCode?: string)
   return Array.from(new Set(snapshot));
 }
 
+const BLOCKED_PATTERNS: RegExp[] = [
+  /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/, // email addresses
+  /\d{7,}/,                                              // 7+ consecutive digits (no separators)
+  /\d(?:[\s\-.()+]\d){6,}/,                             // phone groups: digit+separator pattern (comma-numbers excluded)
+  /https?:\/\//i,                                        // URLs with protocol
+  /\bwww\./i,                                            // bare www links
+  /@\w+/,                                                // @handles
+  /\bcash\s*app\b/i,
+  /\bvenmo\b/i,
+  /\bzelle\b/i,
+  /\bpaypal\b/i,
+  /\bwire\s+transfer\b/i,
+  /\bbank\s+transfer\b/i,
+];
+
+function containsBlockedContent(body: string): boolean {
+  return BLOCKED_PATTERNS.some((re) => re.test(body));
+}
+
 export default function RequestDetailPage() {
   const params = useParams() as Record<string, string | string[]>;
   const id = getIdFromParams(params) ?? "";
@@ -123,6 +144,13 @@ export default function RequestDetailPage() {
 
   const [submittingOffer, setSubmittingOffer] = useState(false);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+  const [blockedWarning, setBlockedWarning] = useState<string | null>(null);
+
+  // Protected Communications policy acceptance
+  const [protectedCommunicationsAccepted, setProtectedCommunicationsAccepted] = useState(false);
+  const [protectedCommunicationsAcceptedAt, setProtectedCommunicationsAcceptedAt] = useState<string | null>(null);
+  const [protectedCommunicationsError, setProtectedCommunicationsError] = useState<string | null>(null);
+  const [acknowledgingProtectedCommunications, setAcknowledgingProtectedCommunications] = useState(false);
 
   // Host availability/constraints
   const [hcWeekendOnly, setHcWeekendOnly] = useState(false);
@@ -183,6 +211,20 @@ export default function RequestDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  useEffect(() => {
+    getPolicyAcceptanceFromSupabase("protected_communications", "2026-05-31")
+      .then(({ accepted, acceptedAt }) => {
+        setProtectedCommunicationsAccepted(accepted);
+        setProtectedCommunicationsAcceptedAt(acceptedAt);
+      })
+      .catch((err: unknown) => {
+        setProtectedCommunicationsError(
+          err instanceof Error ? err.message : "Failed to load policy acceptance."
+        );
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const listing: Listing | undefined = useMemo(() => {
     if (!req?.listingSlug) return undefined;
     return listings.find((l) => l.slug === req.listingSlug);
@@ -226,6 +268,11 @@ export default function RequestDetailPage() {
     const body = text.trim();
     if (!body || !id) return;
     if (isLocked) return;
+    if (containsBlockedContent(body)) {
+      setBlockedWarning("Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.");
+      return;
+    }
+    setBlockedWarning(null);
     setActionError(null);
     try {
       await sendMessageToSupabase(id, isHostView ? "HOST" : "FILMMAKER", body);
@@ -366,7 +413,7 @@ export default function RequestDetailPage() {
   async function filmmakerAcceptCounter() {
     if (!req || !id) return;
     if (!canNegotiate) return;
-    if (!req.compliance?.acknowledgedISO) return;
+    if (!complianceAcknowledged) return;
     setActionError(null);
 
     try {
@@ -424,7 +471,7 @@ export default function RequestDetailPage() {
   async function accept() {
     if (!req || !id) return;
     if (!canNegotiate) return;
-    if (!req.compliance?.acknowledgedISO) return;
+    if (!complianceAcknowledged) return;
     setActionError(null);
 
     const requirementsSnapshot = buildRequirementsSnapshot(req.impact, listing?.state);
@@ -513,6 +560,23 @@ export default function RequestDetailPage() {
 
     reload();
     await loadMsgs();
+  }
+
+  async function acceptProtectedCommunications() {
+    if (acknowledgingProtectedCommunications) return;
+    setAcknowledgingProtectedCommunications(true);
+    setProtectedCommunicationsError(null);
+    try {
+      await acceptPolicyInSupabase("protected_communications", "2026-05-31");
+      setProtectedCommunicationsAccepted(true);
+      setProtectedCommunicationsAcceptedAt(new Date().toISOString());
+    } catch (err) {
+      setProtectedCommunicationsError(
+        err instanceof Error ? err.message : "Failed to record acknowledgment."
+      );
+    } finally {
+      setAcknowledgingProtectedCommunications(false);
+    }
   }
 
   async function copyConfirmationSummary() {
@@ -1064,6 +1128,29 @@ export default function RequestDetailPage() {
           ) : null}
         </div>
 
+        {/* Protected Communications */}
+        {!protectedCommunicationsAccepted && canNegotiate && !isLocked ? (
+          <div className={styles.section}>
+            <div className={styles.counterCard}>
+              <div className={styles.counterTitle}>Protected Communications</div>
+              <p className={styles.guidanceNote}>
+                Keep booking terms, contact details, payment discussion, and production coordination on FilmInHere until the platform permits otherwise. Do not share phone numbers, emails, payment handles, social handles, addresses, coded bypass language, or off-platform deal instructions.
+              </p>
+              {protectedCommunicationsError ? (
+                <p className={styles.notice}>{protectedCommunicationsError}</p>
+              ) : null}
+              <button
+                type="button"
+                className={styles.actionBtn}
+                onClick={acceptProtectedCommunications}
+                disabled={acknowledgingProtectedCommunications}
+              >
+                {acknowledgingProtectedCommunications ? "Saving…" : "Acknowledge Protected Communications"}
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         {/* Negotiation */}
         <div className={styles.section}>
           <div className={styles.sectionTitle}>Negotiation</div>
@@ -1074,6 +1161,12 @@ export default function RequestDetailPage() {
                 ? "This request was declined. The thread is closed."
                 : "This request is accepted and locked. Negotiation is closed."}
             </div>
+          ) : null}
+
+          {!protectedCommunicationsAccepted && canNegotiate && !isLocked ? (
+            <p className={styles.notice}>
+              Acknowledge Protected Communications before sending negotiation messages or offers.
+            </p>
           ) : null}
 
           <div className={styles.rowItem}>
@@ -1124,7 +1217,7 @@ export default function RequestDetailPage() {
                 <textarea className={styles.smallTextarea} value={ofNote} onChange={(e) => setOfNote(e.target.value)} placeholder="Ex: small footprint, flexible schedule..." />
               </label>
 
-              <button type="button" className={styles.actionBtn} onClick={saveOffer} disabled={submittingOffer}>
+              <button type="button" className={styles.actionBtn} onClick={saveOffer} disabled={submittingOffer || !protectedCommunicationsAccepted}>
                 {submittingOffer ? "Submitting..." : "Submit Offer"}
               </button>
             </div>
@@ -1168,7 +1261,7 @@ export default function RequestDetailPage() {
                 type="button"
                 className={`${styles.actionBtn} ${styles.acceptBtn}`}
                 onClick={filmmakerAcceptCounter}
-                disabled={filmmakerAcceptedCounter || !complianceAcknowledged}
+                disabled={filmmakerAcceptedCounter || !complianceAcknowledged || !protectedCommunicationsAccepted}
               >
                 Accept Counter Offer
               </button>
@@ -1201,7 +1294,7 @@ export default function RequestDetailPage() {
                 <textarea className={styles.smallTextarea} value={coNote} onChange={(e) => setCoNote(e.target.value)} placeholder="Ex: weekend only, quiet hours, deposit required..." />
               </label>
 
-              <button type="button" className={styles.actionBtn} onClick={saveCounterOffer}>
+              <button type="button" className={styles.actionBtn} onClick={saveCounterOffer} disabled={!protectedCommunicationsAccepted}>
                 Save Counter Offer
               </button>
 
@@ -1215,7 +1308,7 @@ export default function RequestDetailPage() {
                   type="button"
                   className={`${styles.actionBtn} ${styles.acceptBtn}`}
                   onClick={accept}
-                  disabled={!complianceAcknowledged}
+                  disabled={!complianceAcknowledged || !protectedCommunicationsAccepted}
                 >
                   Accept
                 </button>
@@ -1319,14 +1412,21 @@ export default function RequestDetailPage() {
               ? "This request was declined. The thread is closed."
               : "Messages are read-only because this request is accepted and locked."}
           </div>
+        ) : !protectedCommunicationsAccepted ? (
+          <div className={styles.notice}>
+            Acknowledge Protected Communications before sending negotiation messages or offers.
+          </div>
         ) : (
           <div className={styles.composer}>
             <textarea
               className={styles.textarea}
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => { setText(e.target.value); setBlockedWarning(null); }}
               placeholder={isHostView ? "Message the filmmaker…" : "Message the host…"}
             />
+            {blockedWarning ? (
+              <div className={styles.notice}>{blockedWarning}</div>
+            ) : null}
             <button className={styles.btn} type="button" onClick={send}>Send</button>
           </div>
         )}

@@ -322,3 +322,46 @@ export async function updateRequestStatusInSupabase(
 
   if (error) throw error;
 }
+
+export async function getPolicyAcceptanceFromSupabase(
+  policyKey: string,
+  policyVersion: string,
+): Promise<{ accepted: boolean; acceptedAt: string | null }> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in.");
+
+  const { data, error } = await supabase
+    .from("policy_acceptances")
+    .select("id, accepted_at")
+    .eq("user_id", user.id)
+    .eq("policy_key", policyKey)
+    .eq("policy_version", policyVersion)
+    .maybeSingle();
+
+  if (error) throw error;
+  return {
+    accepted: Boolean(data),
+    acceptedAt: data ? (data.accepted_at as string) : null,
+  };
+}
+
+export async function acceptPolicyInSupabase(
+  policyKey: string,
+  policyVersion: string,
+): Promise<{ accepted: boolean }> {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError) throw authError;
+  if (!user) throw new Error("Please sign in.");
+
+  const { error } = await supabase.from("policy_acceptances").insert({
+    user_id: user.id,
+    policy_key: policyKey,
+    policy_version: policyVersion,
+  });
+
+  // Unique constraint violation (23505) means already accepted — treat as success
+  if (error && error.code !== "23505") throw error;
+
+  return { accepted: true };
+}
