@@ -122,6 +122,7 @@ export default function RequestDetailPage() {
   const [ofNote, setOfNote] = useState("");
 
   const [submittingOffer, setSubmittingOffer] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
   // Host availability/constraints
   const [hcWeekendOnly, setHcWeekendOnly] = useState(false);
@@ -512,6 +513,57 @@ export default function RequestDetailPage() {
 
     reload();
     await loadMsgs();
+  }
+
+  async function copyConfirmationSummary() {
+    if (!req) return;
+
+    const complianceMsg = msgs.find((m) => m.body.includes("Compliance acknowledged"));
+    const localComplianceTS = req.compliance?.acknowledgedISO ?? complianceMsg?.createdISO ?? null;
+    const acceptanceMsg = msgs.find(
+      (m) =>
+        m.body.includes("Confirmed terms saved") ||
+        m.body.includes("accepted the host counter-offer"),
+    );
+    const localAcceptedOnISO = req.confirmed?.confirmedISO ?? acceptanceMsg?.createdISO ?? null;
+
+    const complianceDisplay = localComplianceTS
+      ? new Date(localComplianceTS).toLocaleString()
+      : complianceAcknowledged
+        ? "Yes"
+        : "—";
+
+    const text = [
+      "Subject: Your Film In Here booking is confirmed",
+      "",
+      `Your booking at ${req.listingTitle} has been confirmed.`,
+      "",
+      `Confirmation ID:         ${req.id}`,
+      `Start:                   ${new Date(req.startISO).toLocaleString()}`,
+      `End:                     ${new Date(req.endISO).toLocaleString()}`,
+      "",
+      `Agreed rate:             ${baseCurrency} ${money(proposedRate)}/hr`,
+      `Minimum booking time:    ${billableHours.toFixed(2)} hrs`,
+      `Cleaning fee:            ${baseCleaning ? `${baseCurrency} ${money(baseCleaning)}` : "—"}`,
+      `Deposit:                 ${baseDeposit ? `${baseCurrency} ${money(baseDeposit)}` : "—"}`,
+      `Estimated total:         ${baseCurrency} ${money(subtotal)}`,
+      "",
+      `Compliance acknowledged: ${complianceDisplay}`,
+      `Accepted on:             ${localAcceptedOnISO ? new Date(localAcceptedOnISO).toLocaleString() : "—"}`,
+      "",
+      `Your email:              ${req.email || "—"}`,
+      "Host:                    Host details will be provided by Film In Here.",
+      "",
+      "This confirmation is for booking coordination. Payment and final production documents may follow separately.",
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
+    setTimeout(() => setCopyState("idle"), 2000);
   }
 
   if (!id) {
@@ -907,6 +959,13 @@ export default function RequestDetailPage() {
           <div className={styles.summaryNote}>
             This confirmation is for booking coordination. Payment and final production documents may follow separately.
           </div>
+          <button
+            type="button"
+            className={styles.actionBtn}
+            onClick={copyConfirmationSummary}
+          >
+            {copyState === "copied" ? "Copied" : copyState === "failed" ? "Copy failed" : "Copy Summary"}
+          </button>
         </div>
       ) : null}
 
