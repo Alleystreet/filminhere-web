@@ -195,7 +195,10 @@ export default function RequestDetailPage() {
   // ===== State gates =====
   const isFinal = req?.status === "ACCEPTED" || req?.status === "DECLINED";
   const canNegotiate = Boolean(req && req.status === "PENDING" && !req.confirmed);
-  const complianceAcknowledged = Boolean(req?.compliance?.acknowledgedISO);
+  const complianceAcknowledged = Boolean(
+    req?.compliance?.acknowledgedISO ||
+    msgs.some((m) => m.body.includes("Compliance acknowledged"))
+  );
 
   // ===== Deal logic =====
   const baseCurrency =
@@ -567,6 +570,16 @@ export default function RequestDetailPage() {
     threadStatus === "locked" ||
     threadStatus === "declined";
 
+  const complianceMsg = msgs.find((m) => m.body.includes("Compliance acknowledged"));
+  const complianceTimestamp = compliance?.acknowledgedISO ?? complianceMsg?.createdISO ?? null;
+
+  const acceptanceMsg = msgs.find(
+    (m) =>
+      m.body.includes("Confirmed terms saved") ||
+      m.body.includes("accepted the host counter-offer"),
+  );
+  const acceptedOnISO = confirmed?.confirmedISO ?? acceptanceMsg?.createdISO ?? null;
+
   return (
     <div className={styles.wrap}>
       <div className={styles.topRow}>
@@ -743,29 +756,25 @@ export default function RequestDetailPage() {
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Agreed rate</div>
-              <div className={styles.dealVal}>
-                {confirmed ? `${confirmed.currency} ${money(confirmed.ratePerHour)}/hr` : "—"}
-              </div>
+              <div className={styles.dealVal}>{baseCurrency} {money(proposedRate)}/hr</div>
             </div>
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Minimum booking time</div>
-              <div className={styles.dealVal}>
-                {confirmed ? `${confirmed.minHours} hrs` : "—"}
-              </div>
+              <div className={styles.dealVal}>{billableHours.toFixed(2)} hrs</div>
             </div>
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Cleaning fee</div>
               <div className={styles.dealVal}>
-                {confirmed?.cleaningFee ? `${confirmed.currency} ${money(confirmed.cleaningFee)}` : "—"}
+                {baseCleaning ? `${baseCurrency} ${money(baseCleaning)}` : "—"}
               </div>
             </div>
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Deposit</div>
               <div className={styles.dealVal}>
-                {confirmed?.securityDeposit ? `${confirmed.currency} ${money(confirmed.securityDeposit)}` : "—"}
+                {baseDeposit ? `${baseCurrency} ${money(baseDeposit)}` : "—"}
               </div>
             </div>
 
@@ -782,18 +791,18 @@ export default function RequestDetailPage() {
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Compliance acknowledged</div>
               <div className={styles.dealVal}>
-                {req.compliance?.acknowledgedISO
-                  ? new Date(req.compliance.acknowledgedISO).toLocaleString()
-                  : "—"}
+                {complianceTimestamp
+                  ? new Date(complianceTimestamp).toLocaleString()
+                  : complianceAcknowledged
+                    ? "Yes ✅"
+                    : "—"}
               </div>
             </div>
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Accepted on</div>
               <div className={styles.dealVal}>
-                {confirmed?.confirmedISO
-                  ? new Date(confirmed.confirmedISO).toLocaleString()
-                  : "—"}
+                {acceptedOnISO ? new Date(acceptedOnISO).toLocaleString() : "—"}
               </div>
             </div>
 
@@ -809,9 +818,7 @@ export default function RequestDetailPage() {
 
             <div className={styles.dealTotal}>
               <div className={styles.dealLabel}>Estimated total</div>
-              <div className={styles.dealValBig}>
-                {confirmed ? `${confirmed.currency} ${money(confirmed.estimatedSubtotal)}` : "—"}
-              </div>
+              <div className={styles.dealValBig}>{baseCurrency} {money(subtotal)}</div>
             </div>
           </div>
         </div>
@@ -1081,7 +1088,7 @@ export default function RequestDetailPage() {
 
           <div className={styles.rowItem}>
             <span className={styles.rowLabel}>Acknowledged</span>
-            <span className={styles.rowVal}>{compliance?.acknowledgedISO ? "Yes ✅" : "No ⚠️"}</span>
+            <span className={styles.rowVal}>{complianceAcknowledged ? "Yes ✅" : "No ⚠️"}</span>
           </div>
 
           <div className={styles.rowItem}>
