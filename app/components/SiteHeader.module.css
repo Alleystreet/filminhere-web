@@ -54,6 +54,13 @@
 
 .navLink:hover{ color: rgba(255,255,255,1); }
 
+.navBtn{
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
 @media (max-width: 768px){
   .nav{ display:none; }
 }
