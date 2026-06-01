@@ -21,9 +21,6 @@ import {
 import {
   getRequestByIdFromSupabase,
   getMessagesFromSupabase,
-  sendMessageToSupabase,
-  acceptLatestOfferInSupabase,
-  updateRequestStatusInSupabase,
   getPolicyAcceptanceFromSupabase,
   acceptPolicyInSupabase,
   getSessionAccessToken,
@@ -423,9 +420,17 @@ export default function RequestDetailPage() {
     setActionError(null);
 
     try {
-      await acceptLatestOfferInSupabase(id);
-      await updateRequestStatusInSupabase(id, "ACCEPTED");
-      await sendMessageToSupabase(id, "FILMMAKER", "Filmmaker accepted the host counter-offer.");
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in.");
+      const res = await fetch("/api/negotiation/accept-counter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ requestId: id }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to accept counter offer.");
+      }
       const fresh = await getRequestByIdFromSupabase(id);
       if (fresh) saveRequest(fresh);
     } catch (err) {
@@ -523,8 +528,17 @@ export default function RequestDetailPage() {
     saveRequest(nextReq);
 
     try {
-      await updateRequestStatusInSupabase(id, "ACCEPTED");
-      await sendMessageToSupabase(id, "HOST", "✅ Host accepted. Confirmed terms saved.");
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in.");
+      const res = await fetch("/api/negotiation/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ requestId: id }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to accept request.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to accept request.");
     }
@@ -547,8 +561,17 @@ export default function RequestDetailPage() {
     saveRequest(nextReq);
 
     try {
-      await updateRequestStatusInSupabase(id, "DECLINED");
-      await sendMessageToSupabase(id, "HOST", "❌ Host declined this request.");
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in.");
+      const res = await fetch("/api/negotiation/decline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ requestId: id }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to decline request.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to decline request.");
     }
@@ -574,7 +597,17 @@ export default function RequestDetailPage() {
     saveRequest(nextReq);
 
     try {
-      await sendMessageToSupabase(id, "FILMMAKER", "✅ Compliance acknowledged.");
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in.");
+      const res = await fetch("/api/negotiation/acknowledge-compliance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ requestId: id }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to save compliance acknowledgment.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to save compliance acknowledgment.");
     }

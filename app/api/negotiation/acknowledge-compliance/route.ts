@@ -1,30 +1,23 @@
 /**
- * POST /api/negotiation/send-message
+ * POST /api/negotiation/acknowledge-compliance
  *
- * Free-text negotiation messages and host availability notes.
- * Sender derived server-side from booking_requests ownership.
- *   user_id       = FILMMAKER
- *   host_user_id  = HOST
- *   anyone else   = 403
- * host_user_id IS NULL (platform listing) + non-filmmaker = 403.
+ * Filmmaker inserts compliance acknowledgment sentinel message.
+ * Requires: user_id match, not closed/locked.
+ * No protected_communications check (compliance is a prerequisite to messaging).
  *
- * Reads:  anon + JWT (respects RLS)
- * Writes: service-role (bypasses RLS, runs after all auth checks pass)
+ * Reads:  anon + JWT
+ * Writes: service-role
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { containsBlockedNegotiationContent } from "@/lib/dlp";
 
 const SB_URL     = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SB_ANON    = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const SB_SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-const BLOCKED_MSG     = "Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.";
 const CLOSED_STATUSES = new Set(["ACCEPTED", "DECLINED"]);
 const CLOSED_THREADS  = new Set(["locked", "declined"]);
-const POLICY_KEY = "protected_communications";
-const POLICY_VER = "2026-05-31";
 
 function makeAnonDb(jwt: string) {
   return createClient(SB_URL, SB_ANON, {
@@ -50,52 +43,32 @@ export async function POST(req: NextRequest) {
   const { data: { user }, error: authErr } = await anon.auth.getUser(jwt);
   if (authErr || !user) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
-  let payload: { requestId?: unknown; body?: unknown };
+  let payload: { requestId?: unknown };
   try { payload = await req.json(); }
   catch { return NextResponse.json({ error: "Invalid request body." }, { status: 400 }); }
 
   const requestId = typeof payload.requestId === "string" ? payload.requestId : null;
-  const body      = typeof payload.body === "string" ? payload.body.trim() : null;
-  if (!requestId || !body) return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
-
-  if (containsBlockedNegotiationContent(body)) {
-    return NextResponse.json({ error: BLOCKED_MSG }, { status: 400 });
-  }
+  if (!requestId) return NextResponse.json({ error: "Missing requestId." }, { status: 400 });
 
   const anonDb = makeAnonDb(jwt);
 
   const { data: row, error: rowErr } = await anonDb
     .from("booking_requests")
-    .select("id, user_id, host_user_id, status, thread_status")
+    .select("id, user_id, status, thread_status")
     .eq("id", requestId)
     .maybeSingle();
   if (rowErr) return NextResponse.json({ error: rowErr.message }, { status: 500 });
-  if (!row)   return NextResponse.json({ error: "Request not found." }, { status: 404 });
+  if (!row)   return NextResponse.json({ error: "Request not found." }, { status: 403 });
 
-  const filmmakerUid = row.user_id as string;
-  const hostUid      = row.host_user_id as string | null;
-
-  let sender: "FILMMAKER" | "HOST";
-  if (user.id === filmmakerUid) {
-    sender = "FILMMAKER";
-  } else if (hostUid !== null && user.id === hostUid) {
-    sender = "HOST";
-  } else {
-    return NextResponse.json({ error: "Not authorized to message on this request." }, { status: 403 });
+  // Only the filmmaker acknowledges compliance
+  if ((row.user_id as string) !== user.id) {
+    return NextResponse.json({ error: "Not authorized to acknowledge compliance for this request." }, { status: 403 });
   }
 
   const status       = (row.status as string) ?? "";
   const threadStatus = (row.thread_status as string) ?? "";
   if (CLOSED_STATUSES.has(status) || CLOSED_THREADS.has(threadStatus)) {
-    return NextResponse.json({ error: "This request is closed. No further messages." }, { status: 409 });
-  }
-
-  const { data: policy } = await anonDb
-    .from("policy_acceptances").select("id")
-    .eq("user_id", user.id).eq("policy_key", POLICY_KEY).eq("policy_version", POLICY_VER)
-    .maybeSingle();
-  if (!policy) {
-    return NextResponse.json({ error: "Protected Communications acknowledgment required." }, { status: 403 });
+    return NextResponse.json({ error: "This request is closed." }, { status: 409 });
   }
 
   // All checks passed — write with service-role
@@ -103,9 +76,10 @@ export async function POST(req: NextRequest) {
     id: crypto.randomUUID(),
     request_id: requestId,
     user_id: user.id,
-    sender,
-    body,
+    sender: "FILMMAKER",
+    body: "✅ Compliance acknowledged.",
   });
   if (msgErr) return NextResponse.json({ error: msgErr.message }, { status: 500 });
+
   return NextResponse.json({ ok: true });
 }
