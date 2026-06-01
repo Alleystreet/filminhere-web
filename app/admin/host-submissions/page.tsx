@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   getAdminHostListingSubmissionsFromSupabase,
-  updateHostListingSubmissionStatusInSupabase,
+  getSessionAccessToken,
 } from "@/lib/requests";
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {
@@ -45,7 +45,17 @@ export default function AdminHostSubmissionsPage() {
   async function handleAction(id: string, status: "APPROVED" | "REJECTED") {
     setUpdating(id);
     try {
-      await updateHostListingSubmissionStatusInSupabase(id, status);
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in.");
+      const res = await fetch("/api/admin/host-submissions/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to update submission status.");
+      }
       await load();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : String(err));

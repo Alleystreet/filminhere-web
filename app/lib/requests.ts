@@ -218,33 +218,6 @@ export async function getAdminHostListingSubmissionsFromSupabase(): Promise<any[
   return data ?? [];
 }
 
-export async function updateHostListingSubmissionStatusInSupabase(
-  id: string,
-  status: "APPROVED" | "REJECTED",
-): Promise<void> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("You must be logged in to view admin submissions.");
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("user_role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError) throw profileError;
-  if (!profile || profile.user_role !== "admin") {
-    throw new Error("You do not have permission to view admin submissions.");
-  }
-
-  const { error } = await supabase
-    .from("host_listing_submissions")
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", id);
-
-  if (error) throw error;
-}
-
 export async function getPolicyAcceptanceFromSupabase(
   policyKey: string,
   policyVersion: string,
