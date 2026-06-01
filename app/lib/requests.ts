@@ -27,6 +27,19 @@ export async function saveRequestToSupabase(req: BookingRequest): Promise<string
 
   const id = UUID_RE.test(req.id) ? req.id : crypto.randomUUID();
 
+  // Resolve host_user_id for host-submitted listings (listing_id = "host_<uuid>").
+  // Platform/mock listings (e.g. "l_001") have no host in the DB — host_user_id stays null.
+  let host_user_id: string | null = null;
+  if (req.listingId.startsWith("host_")) {
+    const submissionId = req.listingId.slice(5); // strip "host_" prefix → raw UUID
+    const { data: sub } = await supabase
+      .from("host_listing_submissions")
+      .select("user_id")
+      .eq("id", submissionId)
+      .maybeSingle();
+    host_user_id = (sub?.user_id as string) ?? null;
+  }
+
   const { error } = await supabase.from("booking_requests").insert({
     id,
     listing_id: req.listingId,
@@ -41,6 +54,7 @@ export async function saveRequestToSupabase(req: BookingRequest): Promise<string
     created_iso: req.createdISO,
     impact: req.impact ?? null,
     user_id: user.id,
+    host_user_id,
   });
 
   if (error) throw error;
@@ -364,4 +378,9 @@ export async function acceptPolicyInSupabase(
   if (error && error.code !== "23505") throw error;
 
   return { accepted: true };
+}
+
+export async function getSessionAccessToken(): Promise<string | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
 }

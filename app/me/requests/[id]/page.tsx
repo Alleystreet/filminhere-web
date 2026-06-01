@@ -22,12 +22,13 @@ import {
   getRequestByIdFromSupabase,
   getMessagesFromSupabase,
   sendMessageToSupabase,
-  saveOfferToSupabase,
   acceptLatestOfferInSupabase,
   updateRequestStatusInSupabase,
   getPolicyAcceptanceFromSupabase,
   acceptPolicyInSupabase,
+  getSessionAccessToken,
 } from "@/lib/requests";
+import { containsBlockedNegotiationContent } from "@/lib/dlp";
 import { listings } from "@/lib/mock/listings";
 
 function getIdFromParams(p: Record<string, string | string[]>) {
@@ -95,60 +96,6 @@ function buildRequirementsSnapshot(impact?: ImpactChecklist, stateCode?: string)
     : ["No special flags detected"];
   const snapshot = guidance.highImpact ? ["High impact warning", ...base] : base;
   return Array.from(new Set(snapshot));
-}
-
-function normalizeNegotiationText(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[​‌‍⁠﻿­]/g, "") // zero-width / invisible chars
-    .replace(/\(at\)|\[at\]/gi, " at ")                      // (at) / [at] → at
-    .replace(/\(dot\)|\[dot\]/gi, " dot ")                   // (dot) / [dot] → dot
-    .replace(/\s+/g, " ")                                    // collapse whitespace
-    .trim();
-}
-
-// 7+ number words consecutive, separated only by spaces, dashes, or "and"
-const _NW = "(?:zero|one|two|three|four|five|six|seven|eight|nine)";
-const _NS = "[\\s\\-]+(?:and[\\s\\-]+)?";
-const CONSECUTIVE_NUM_WORD_RE = new RegExp(`\\b${_NW}(?:${_NS}${_NW}){6,}\\b`, "i");
-
-const BLOCKED_PATTERNS: RegExp[] = [
-  // Email addresses
-  /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/,
-  // 7+ consecutive digits (comma-separated numbers like 1,200,000 are safe)
-  /\d{7,}/,
-  // Phone-formatted digit groups: spaces/dashes/dots/parens only (commas excluded)
-  /\d(?:[\s\-.()+]\d){6,}/,
-  // URLs
-  /https?:\/\//i,
-  /\bwww\./i,
-  // @handles
-  /@\w+/,
-  // Payment platforms
-  /\bcash\s*app\b/i,
-  /\bvenmo\b/i,
-  /\bzelle\b/i,
-  /\bpaypal\b/i,
-  /\bwire\s+transfer\b/i,
-  /\bbank\s+transfer\b/i,
-  // Domain obfuscation
-  /\bdot\s+com\b/i,
-  /\bdot\s+net\b/i,
-  /\bdot\s+org\b/i,
-  // Email address in word form: "at" followed by "dot" within 50 chars
-  /\bat\b.{1,50}\bdot\b/i,
-  // Off-platform bypass
-  /\boff\b.{0,25}\bplatform\b/i,
-  /\boutside\b.{0,15}\bplatform\b/i,
-  // Fee avoidance
-  /\bavoid\s+fee\b/i,
-];
-
-function containsBlockedNegotiationContent(value: string): boolean {
-  const n = normalizeNegotiationText(value);
-  if (BLOCKED_PATTERNS.some((re) => re.test(n))) return true;
-  if (CONSECUTIVE_NUM_WORD_RE.test(n)) return true;
-  return false;
 }
 
 export default function RequestDetailPage() {
@@ -310,7 +257,17 @@ export default function RequestDetailPage() {
     setBlockedWarning(null);
     setActionError(null);
     try {
-      await sendMessageToSupabase(id, isHostView ? "HOST" : "FILMMAKER", body);
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in to send messages.");
+      const res = await fetch("/api/negotiation/send-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ requestId: id, body }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to send message.");
+      }
       setText("");
       await loadMsgs();
     } catch (err) {
@@ -362,22 +319,25 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
-    const parts: string[] = [];
-    if (ofRate.trim()) parts.push(`${currency} ${ofRate}/hr`);
-    if (ofMinHours.trim()) parts.push(`min ${ofMinHours} hrs`);
-    if (ofTotal.trim()) parts.push(`${currency} ${ofTotal} total`);
-    const headline = parts.length ? `Offer: ${parts.join(" • ")}` : "Offer updated.";
-    const body = ofNote.trim() ? `${headline}\n\nNote: ${ofNote.trim()}` : headline;
-
     try {
-      await saveOfferToSupabase(
-        id,
-        ofRate.trim() ? rateN : undefined,
-        ofMinHours.trim() ? minHoursN : undefined,
-        ofTotal.trim() ? totalN : undefined,
-        ofNote.trim() || undefined,
-      );
-      await sendMessageToSupabase(id, "FILMMAKER", body);
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in to submit an offer.");
+      const res = await fetch("/api/negotiation/submit-offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({
+          requestId: id,
+          currency,
+          ratePerHour: ofRate.trim() ? rateN : undefined,
+          minHours: ofMinHours.trim() ? minHoursN : undefined,
+          total: ofTotal.trim() ? totalN : undefined,
+          note: ofNote.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to submit offer.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to submit offer.");
     } finally {
@@ -429,25 +389,25 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
-    const parts: string[] = [];
-    if (coRate.trim()) parts.push(`${currency} ${coRate}/hr`);
-    if (coMinHours.trim()) parts.push(`min ${coMinHours} hrs`);
-    if (coTotal.trim()) parts.push(`${currency} ${coTotal} total`);
-    const headline = parts.length ? `Counter offer: ${parts.join(" • ")}` : "Counter offer updated.";
-
     try {
-      await saveOfferToSupabase(
-        id,
-        coRate.trim() ? rateN : undefined,
-        coMinHours.trim() ? minHoursN : undefined,
-        coTotal.trim() ? totalN : undefined,
-        coNote.trim() || undefined,
-        "HOST_COUNTER_OFFER",
-      );
-      await sendMessageToSupabase(
-        id, "HOST",
-        coNote.trim() ? `${headline}\n\nNote: ${coNote.trim()}` : headline,
-      );
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in to submit a counter offer.");
+      const res = await fetch("/api/negotiation/submit-counteroffer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({
+          requestId: id,
+          currency,
+          ratePerHour: coRate.trim() ? rateN : undefined,
+          minHours: coMinHours.trim() ? minHoursN : undefined,
+          total: coTotal.trim() ? totalN : undefined,
+          note: coNote.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to save counter offer.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to save counter offer.");
     }
@@ -492,6 +452,12 @@ export default function RequestDetailPage() {
     const empty =
       !hc.weekendOnly && !hc.noNights && !hc.blackoutDatesNote && !hc.note;
 
+    // Client-side DLP early warning on free-text note
+    if (hc.note && containsBlockedNegotiationContent(hc.note)) {
+      setActionError("Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.");
+      return;
+    }
+
     const nextReq: BookingRequest = {
       ...req,
       hostConstraints: empty ? undefined : hc,
@@ -499,13 +465,22 @@ export default function RequestDetailPage() {
 
     saveRequest(nextReq);
 
+    const msgBody = empty
+      ? "Host availability cleared."
+      : `Host availability updated.${hc.note ? `\n\nNote: ${hc.note}` : ""}`;
+
     try {
-      await sendMessageToSupabase(
-        id, "HOST",
-        empty
-          ? "Host availability cleared."
-          : `Host availability updated.${hc.note ? `\n\nNote: ${hc.note}` : ""}`,
-      );
+      const token = await getSessionAccessToken();
+      if (!token) throw new Error("Please sign in.");
+      const res = await fetch("/api/negotiation/send-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ requestId: id, body: msgBody }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(data.error ?? "Failed to save availability.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to save availability.");
     }
