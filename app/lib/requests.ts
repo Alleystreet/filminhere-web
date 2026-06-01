@@ -114,79 +114,6 @@ export async function getMessagesFromSupabase(requestId: string): Promise<Reques
   }));
 }
 
-export async function sendMessageToSupabase(
-  requestId: string,
-  sender: RequestMessage["sender"],
-  body: string,
-): Promise<void> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("Please sign in to send messages.");
-
-  const { error } = await supabase.from("booking_messages").insert({
-    id: crypto.randomUUID(),
-    request_id: requestId,
-    user_id: user.id,
-    sender,
-    body,
-  });
-
-  if (error) throw error;
-}
-
-export async function saveOfferToSupabase(
-  requestId: string,
-  ratePerHour: number | undefined,
-  minHours: number | undefined,
-  total: number | undefined,
-  note: string | undefined,
-  offerType = "FILMMAKER_OFFER",
-): Promise<void> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("Please sign in to submit an offer.");
-
-  const { error } = await supabase.from("booking_offers").insert({
-    id: crypto.randomUUID(),
-    request_id: requestId,
-    user_id: user.id,
-    offer_type: offerType,
-    rate_per_hour: ratePerHour ?? null,
-    min_hours: minHours ?? null,
-    total: total ?? null,
-    note: note ?? null,
-    status: "PENDING",
-  });
-
-  if (error) throw error;
-}
-
-export async function acceptLatestOfferInSupabase(requestId: string): Promise<void> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("Please sign in.");
-
-  const { data: offer, error: fetchErr } = await supabase
-    .from("booking_offers")
-    .select("id")
-    .eq("request_id", requestId)
-    .eq("offer_type", "HOST_COUNTER_OFFER")
-    .eq("status", "PENDING")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (fetchErr) throw fetchErr;
-  if (!offer) throw new Error("No pending host counter-offer found for this request.");
-
-  const { error: updateErr } = await supabase
-    .from("booking_offers")
-    .update({ status: "ACCEPTED" })
-    .eq("id", (offer as Record<string, unknown>).id as string);
-
-  if (updateErr) throw updateErr;
-}
-
 export async function submitHostListingToSupabase(fields: {
   listingType: string;
   title: string;
@@ -314,25 +241,6 @@ export async function updateHostListingSubmissionStatusInSupabase(
     .from("host_listing_submissions")
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id);
-
-  if (error) throw error;
-}
-
-export async function updateRequestStatusInSupabase(
-  requestId: string,
-  status: "ACCEPTED" | "DECLINED",
-): Promise<void> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("Please sign in.");
-
-  const threadStatus = status === "ACCEPTED" ? "locked" : "declined";
-
-  const { error } = await supabase
-    .from("booking_requests")
-    .update({ status, thread_status: threadStatus, updated_at: new Date().toISOString() })
-    .eq("id", requestId)
-    .eq("user_id", user.id);
 
   if (error) throw error;
 }
