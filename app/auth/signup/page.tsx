@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
-const roleOptions = ["filmmaker", "host", "vendor", "crew", "talent", "admin"];
+const roleOptions = ["filmmaker", "host", "vendor", "crew", "talent"];
 const knowledgeOptions = ["hobbyist", "student", "professional"];
 
 export default function SignupPage() {
