@@ -15,10 +15,9 @@ export async function generateMetadata({
   if (p.slug.startsWith("host-")) {
     const id = p.slug.slice(5);
     const { data } = await supabase
-      .from("host_listing_submissions")
+      .from("approved_host_listings_public")
       .select("title")
       .eq("id", id)
-      .eq("status", "APPROVED")
       .maybeSingle();
     return { title: data ? `${(data as { title: string }).title} — FilmInHere` : "Location — FilmInHere" };
   }
@@ -38,10 +37,9 @@ export default async function LocationDetailPage({
   if (p.slug.startsWith("host-")) {
     const id = p.slug.slice(5);
     const { data: row } = await supabase
-      .from("host_listing_submissions")
-      .select("*")
+      .from("approved_host_listings_public")
+      .select("id, listing_type, title, description, city, state, country, rate_per_hour, min_hours, capacity, amenities, rules_notes")
       .eq("id", id)
-      .eq("status", "APPROVED")
       .maybeSingle();
 
     if (!row) return notFound();

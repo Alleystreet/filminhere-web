@@ -33,8 +33,8 @@ export async function saveRequestToSupabase(req: BookingRequest): Promise<string
   if (req.listingId.startsWith("host_")) {
     const submissionId = req.listingId.slice(5); // strip "host_" prefix → raw UUID
     const { data: sub } = await supabase
-      .from("host_listing_submissions")
-      .select("user_id")
+      .from("approved_host_listings_public")
+      .select("id, user_id, title")
       .eq("id", submissionId)
       .maybeSingle();
     host_user_id = (sub?.user_id as string) ?? null;
@@ -172,10 +172,9 @@ export async function getHostListingsFromSupabase(): Promise<any[]> {
 
 export async function getApprovedHostListingSubmissionByIdFromSupabase(id: string): Promise<any | null> {
   const { data, error } = await supabase
-    .from("host_listing_submissions")
-    .select("*")
+    .from("approved_host_listings_public")
+    .select("id, listing_type, title, description, city, state, country, rate_per_hour, rate_per_day, min_hours, capacity, amenities, rules_notes")
     .eq("id", id)
-    .eq("status", "APPROVED")
     .maybeSingle();
 
   if (error) throw error;
@@ -184,10 +183,9 @@ export async function getApprovedHostListingSubmissionByIdFromSupabase(id: strin
 
 export async function getApprovedHostListingSubmissionsFromSupabase(): Promise<any[]> {
   const { data, error } = await supabase
-    .from("host_listing_submissions")
-    .select("*")
-    .eq("status", "APPROVED")
-    .order("submitted_at", { ascending: false });
+    .from("approved_host_listings_public")
+    .select("id, listing_type, title, description, city, state, country, rate_per_hour, rate_per_day, min_hours, capacity, amenities, rules_notes")
+    .order("title", { ascending: true });
 
   if (error) throw error;
   return data ?? [];
