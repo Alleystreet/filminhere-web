@@ -10,6 +10,7 @@ import type { BookingRequest, Listing, ImpactChecklist } from "@/lib/types";
 import { listings } from "@/lib/mock/listings";
 import { getSavedEmail, saveEmail } from "@/lib/store/requests";
 import { saveRequestToSupabase, getApprovedHostListingSubmissionByIdFromSupabase } from "@/lib/requests";
+import { supabase } from "@/lib/supabase";
 
 type Props = {
   listingSlug?: string;
@@ -48,6 +49,13 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [sessionReady, setSessionReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSessionReady(!!session);
+    });
+  }, []);
 
   useEffect(() => {
     try {
@@ -80,6 +88,12 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     : (mockListing?.title ?? effectiveSlug.replace(/-/g, " "));
 
   async function onSubmit() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      router.push("/auth/login");
+      return;
+    }
+
     if (!email) return;
     if (!effectiveSlug) {
       router.push("/locations");
@@ -188,6 +202,10 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
           placeholder="Describe the shoot, crew, needs, timing…"
         />
 
+        {sessionReady === false && (
+          <p className={styles.error}>Please log in to send a request.</p>
+        )}
+
         {saveError && <p className={styles.error}>{saveError}</p>}
 
         <div className={styles.actions}>
@@ -195,7 +213,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
             type="button"
             className={styles.primary}
             onClick={onSubmit}
-            disabled={saving || (isHostSlug && !hostSubmission)}
+            disabled={saving || sessionReady === false || (isHostSlug && !hostSubmission)}
           >
             {saving ? "Saving…" : "Save Request"}
           </button>
