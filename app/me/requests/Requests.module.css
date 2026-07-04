@@ -10,6 +10,8 @@
   font-size: 12px;
   opacity: .75;
   margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
 }
 
 .actions {
@@ -38,21 +40,34 @@
   border-radius: 16px;
   background: rgba(10,10,10,0.35);
   overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .15s ease, background .15s ease;
 }
 
 .cardMain {
   display: block;
-  padding: 14px;
+  padding: 16px;
   text-decoration: none;
 }
 
-.card:hover { border-color: rgba(255,255,255,0.2); }
+.card:hover {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(18,18,18,0.48);
+}
 
-.row { display:flex; justify-content:space-between; gap: 10px; align-items:baseline; }
-.title { font-size: 15px; }
+.row { display:flex; justify-content:space-between; gap: 14px; align-items:flex-start; }
+.title {
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.25;
+}
 
 .status {
   font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.14);
@@ -68,8 +83,12 @@
 .status[data-status="negotiating"] { background: rgba(255,210,120,0.10); border-color: rgba(255,210,120,0.18); }
 .status[data-status="locked"] { background: rgba(120,255,160,0.10); border-color: rgba(120,255,160,0.18); }
 .status[data-status="declined"] { background: rgba(255,120,120,0.10); border-color: rgba(255,120,120,0.18); }
-.meta { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 8px; }
+.meta { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 12px; }
 .muted { font-size: 12px; opacity: .75; }
+.dateText {
+  font-size: 13px;
+  opacity: .82;
+}
 
 /* Bottom action bar inside the card */
 .cardActions {
@@ -82,7 +101,8 @@
 }
 
 .smallLink {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 650;
   opacity: .85;
   text-decoration: underline;
 }

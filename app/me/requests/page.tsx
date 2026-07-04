@@ -7,11 +7,11 @@ import type { BookingRequest, RequestThreadStatus } from "../../lib/types";
 import { getRequestsFromSupabase } from "../../lib/requests";
 
 function statusLabel(status: RequestThreadStatus) {
-  if (status === "sent") return "sent";
-  if (status === "negotiating") return "negotiating";
-  if (status === "locked") return "locked";
-  if (status === "declined") return "declined";
-  return "draft";
+  if (status === "sent") return "Sent";
+  if (status === "negotiating") return "In Discussion";
+  if (status === "locked") return "Rate Locked";
+  if (status === "declined") return "Declined";
+  return "Draft";
 }
 
 function resolveStatus(req: BookingRequest): RequestThreadStatus {
@@ -21,6 +21,32 @@ function resolveStatus(req: BookingRequest): RequestThreadStatus {
   if ((req.lockedHourly ?? 0) > 0) return "locked";
   if ((req.proposedHourly ?? 0) > 0) return "negotiating";
   return "draft";
+}
+
+function formatRequestRange(startISO?: string, endISO?: string) {
+  const start = startISO ? new Date(startISO) : null;
+  const end = endISO ? new Date(endISO) : null;
+
+  if (!start || !end || !Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start) {
+    return null;
+  }
+
+  const dateFormatter = new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const timeFormatter = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  if (start.toDateString() === end.toDateString()) {
+    return `${dateFormatter.format(start)}, ${timeFormatter.format(start)} - ${timeFormatter.format(end)}`;
+  }
+
+  return `${dateFormatter.format(start)}, ${timeFormatter.format(start)} - ${dateFormatter.format(end)}, ${timeFormatter.format(end)}`;
 }
 
 export default function MyRequestsPage() {
@@ -53,7 +79,7 @@ export default function MyRequestsPage() {
         <div className={styles.infoBody}>
           <div>Click any request to open the message thread and negotiate.</div>
           <div className={styles.infoGuide}>
-            <strong>Status guide:</strong> draft = started • sent = sent to host • negotiating = offer in play • locked = rate locked • declined = closed
+            <strong>Status guide:</strong> Draft = started | Sent = sent to host | In Discussion = offer in play | Rate Locked = rate locked | Declined = closed
           </div>
         </div>
       </div>
@@ -76,35 +102,36 @@ export default function MyRequestsPage() {
         </div>
       ) : (
         <div className={styles.list}>
-          {items.map((r) => (
-            <Link key={r.id} href={`/me/requests/${r.id}`} className={styles.card}>
-              <div className={styles.row}>
-                <div className={styles.title}>{r.listingTitle}</div>
-                {(() => {
-                  const s = resolveStatus(r);
-                  return (
-                    <div className={styles.status} data-status={s}>
-                      {statusLabel(s)}
+          {items.map((r) => {
+            const status = resolveStatus(r);
+            const dateRange = formatRequestRange(r.startISO, r.endISO);
+
+            return (
+              <Link key={r.id} href={`/me/requests/${r.id}`} className={styles.card}>
+                <div className={styles.cardMain}>
+                  <div className={styles.row}>
+                    <div>
+                      <div className={styles.listingLabel}>Listing</div>
+                      <div className={styles.title}>{r.listingTitle}</div>
                     </div>
-                  );
-                })()}
-              </div>
-              <div className={styles.meta}>
-                <span className={styles.muted}>ID: {r.id}</span>
-                {(() => {
-                  const s = r.startISO ? new Date(r.startISO).getTime() : NaN;
-                  const e = r.endISO ? new Date(r.endISO).getTime() : NaN;
-                  return Number.isFinite(s) && Number.isFinite(e) && e > s ? (
-                    <span className={styles.muted}>
-                      {new Date(r.startISO).toLocaleString()} → {new Date(r.endISO).toLocaleString()}
-                    </span>
-                  ) : (
-                    <span className={styles.dateWarn}>Invalid date range</span>
-                  );
-                })()}
-              </div>
-            </Link>
-          ))}
+                    <div className={styles.status} data-status={status}>
+                      {statusLabel(status)}
+                    </div>
+                  </div>
+                  <div className={styles.meta}>
+                    {dateRange ? (
+                      <span className={styles.dateText}>{dateRange}</span>
+                    ) : (
+                      <span className={styles.dateWarn}>Invalid date range</span>
+                    )}
+                  </div>
+                </div>
+                <div className={styles.cardActions}>
+                  <span className={styles.smallLink}>Open Thread</span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
