@@ -95,6 +95,12 @@ function rateDisplay(currency: string, rate: number) {
   return Number.isFinite(rate) && rate > 0 ? `${currency} ${money(rate)}/hr` : "Rate not set";
 }
 
+function estimatedSubtotalDisplay(currency: string, rate: number, subtotal: number) {
+  return Number.isFinite(rate) && rate > 0
+    ? `${currency} ${money(subtotal)}`
+    : "Not available until rate is set";
+}
+
 function getImpactKeys(impact?: ImpactChecklist) {
   if (!impact) return [];
   const keys: string[] = [];
@@ -846,7 +852,7 @@ export default function RequestDetailPage() {
           <div className={styles.dealTotal}>
             <div className={styles.dealLabel}>Estimated subtotal</div>
             <div className={styles.dealValBig}>
-              {baseCurrency} {money(subtotal)}
+              {estimatedSubtotalDisplay(baseCurrency, proposedRate, subtotal)}
             </div>
           </div>
         </div>
