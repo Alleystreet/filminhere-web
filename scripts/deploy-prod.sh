@@ -32,6 +32,10 @@ git log --oneline -1
 echo
 echo "Building Next app..."
 npm run build
+if ! git diff --quiet -- next-env.d.ts; then
+  echo "Restoring Next-generated next-env.d.ts change after build..."
+  git restore -- next-env.d.ts
+fi
 
 echo
 echo "Restarting ${SERVICE_NAME}..."
