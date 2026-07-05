@@ -43,7 +43,20 @@ sudo systemctl status "$SERVICE_NAME" --no-pager -l
 
 echo
 echo "Health check:"
-curl -I "$HEALTH_URL"
+for attempt in $(seq 1 30); do
+  if curl -I "$HEALTH_URL"; then
+    echo "Health check passed."
+    break
+  fi
+
+  if [ "$attempt" -eq 30 ]; then
+    echo "ERROR: Health check failed after 30 attempts." >&2
+    exit 1
+  fi
+
+  echo "Waiting for app..."
+  sleep 1
+done
 
 echo
 echo "Deploy complete."
