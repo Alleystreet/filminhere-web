@@ -69,6 +69,24 @@ function hoursBetween(startISO: string, endISO: string) {
   return Number.isFinite(hrs) ? hrs : 0;
 }
 
+function formatHoursDisplay(hours: number) {
+  if (!Number.isFinite(hours)) return "0 hrs";
+
+  const hourText = Number.isInteger(hours)
+    ? String(hours)
+    : hours.toFixed(2).replace(/\.?0+$/, "");
+
+  if (hours >= 24) {
+    const days = hours / 24;
+    const dayText = Number.isInteger(days)
+      ? String(days)
+      : days.toFixed(1).replace(/\.0$/, "");
+    return `${hourText} hrs (${dayText} ${dayText === "1" ? "day" : "days"})`;
+  }
+
+  return `${hourText} hrs`;
+}
+
 function money(n: number) {
   return Number.isFinite(n) ? n.toFixed(2) : "0.00";
 }
@@ -794,13 +812,13 @@ export default function RequestDetailPage() {
 
         <div className={styles.dealGrid}>
           <div className={styles.dealItem}>
-            <div className={styles.dealLabel}>Shoot hours</div>
-            <div className={styles.dealVal}>{shootHours.toFixed(2)} hrs</div>
+            <div className={styles.dealLabel}>Requested time window</div>
+            <div className={styles.dealVal}>{formatHoursDisplay(shootHours)}</div>
           </div>
 
           <div className={styles.dealItem}>
-            <div className={styles.dealLabel}>Billable hours</div>
-            <div className={styles.dealVal}>{billableHours.toFixed(2)} hrs</div>
+            <div className={styles.dealLabel}>Estimated billable time</div>
+            <div className={styles.dealVal}>{formatHoursDisplay(billableHours)}</div>
           </div>
 
           <div className={styles.dealItem}>
