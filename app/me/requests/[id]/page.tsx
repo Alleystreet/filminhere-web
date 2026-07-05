@@ -73,6 +73,10 @@ function money(n: number) {
   return Number.isFinite(n) ? n.toFixed(2) : "0.00";
 }
 
+function rateDisplay(currency: string, rate: number) {
+  return Number.isFinite(rate) && rate > 0 ? `${currency} ${money(rate)}/hr` : "Rate not set";
+}
+
 function getImpactKeys(impact?: ImpactChecklist) {
   if (!impact) return [];
   const keys: string[] = [];
@@ -802,7 +806,7 @@ export default function RequestDetailPage() {
           <div className={styles.dealItem}>
             <div className={styles.dealLabel}>Rate (source)</div>
             <div className={styles.dealVal}>
-              {baseCurrency} {money(proposedRate)}/hr{" "}
+              {rateDisplay(baseCurrency, proposedRate)}{" "}
               <span className={styles.dealTag}>{proposedSource}</span>
             </div>
           </div>
@@ -926,7 +930,7 @@ export default function RequestDetailPage() {
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Agreed rate</div>
-              <div className={styles.dealVal}>{baseCurrency} {money(proposedRate)}/hr</div>
+              <div className={styles.dealVal}>{rateDisplay(baseCurrency, proposedRate)}</div>
             </div>
 
             <div className={styles.dealItem}>
@@ -1026,7 +1030,7 @@ export default function RequestDetailPage() {
 
             <div className={styles.summaryField}>
               <span className={styles.summaryFieldLabel}>Agreed rate</span>
-              <span>{baseCurrency} {money(proposedRate)}/hr</span>
+              <span>{rateDisplay(baseCurrency, proposedRate)}</span>
             </div>
             <div className={styles.summaryField}>
               <span className={styles.summaryFieldLabel}>Minimum booking time</span>
