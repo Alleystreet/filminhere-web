@@ -47,6 +47,11 @@ function threadStatusLabel(s: ThreadStatus) {
   return "Declined";
 }
 
+function requestStatusDisplay(threadStatus: ThreadStatus, rawStatus: BookingRequest["status"]) {
+  if (threadStatus === "draft" && rawStatus === "PENDING") return "Draft — awaiting response";
+  return `${threadStatusLabel(threadStatus)} (${rawStatus})`;
+}
+
 function resolveThreadStatus(req: BookingRequest, msgCount: number): ThreadStatus {
   if (req.status === "DECLINED") return "declined";
   if (req.status === "ACCEPTED") return "locked";
@@ -1124,7 +1129,7 @@ export default function RequestDetailPage() {
         <div className={styles.kv}>
           <div className={styles.k}>
             <span className={styles.kLabel}>Status</span>
-            <span className={styles.kVal}>{threadStatusText} ({req.status})</span>
+            <span className={styles.kVal}>{requestStatusDisplay(threadStatus, req.status)}</span>
           </div>
           <div className={styles.k}>
             <span className={styles.kLabel}>When</span>
