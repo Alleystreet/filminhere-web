@@ -215,15 +215,15 @@ export default function RequestDetailPage() {
         return;
       }
 
-      if (getRequestById(id)) {
-        reload();
-        loadMsgs();
-        return;
-      }
-
       try {
         const row = await getRequestByIdFromSupabase(id);
-        if (row) saveRequest(row);
+        if (!row) {
+          setReq(null);
+          setPageError("Request not found or you do not have access.");
+          return;
+        }
+
+        saveRequest(row);
         reload();
         await loadMsgs();
       } catch (err: unknown) {
