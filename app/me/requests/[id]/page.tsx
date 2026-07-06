@@ -206,20 +206,32 @@ export default function RequestDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    if (getRequestById(id)) {
-      reload();
-      loadMsgs();
-      return;
-    }
-    getRequestByIdFromSupabase(id)
-      .then((row) => {
+
+    async function loadRequest() {
+      const token = await getSessionAccessToken();
+      if (!token) {
+        setReq(null);
+        setPageError("Please log in to view this request.");
+        return;
+      }
+
+      if (getRequestById(id)) {
+        reload();
+        loadMsgs();
+        return;
+      }
+
+      try {
+        const row = await getRequestByIdFromSupabase(id);
         if (row) saveRequest(row);
         reload();
-        return loadMsgs();
-      })
-      .catch((err: unknown) => {
+        await loadMsgs();
+      } catch (err: unknown) {
         setPageError(err instanceof Error ? err.message : "Failed to load request.");
-      });
+      }
+    }
+
+    loadRequest();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
