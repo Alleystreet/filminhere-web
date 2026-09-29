@@ -66,10 +66,20 @@ A subsequent full `runVestingEngine` execution completed without error. The fina
 
 ## Ownership and operations
 
-Pending before release:
+### Evidence recorded
 
-- account and data ownership;
-- privileged-access owner and recovery contacts;
+- **Code repository:** `Alleystreet/filminhere-web` is owned by the `Alleystreet` GitHub organization.
+- **Vercel Preview:** the FilmInHere Preview project is under Alleystreet's Vercel project space, and current Preview configuration/deployment access was demonstrated during the 2026-09-29 repair.
+- **Supabase:** project administrator access was demonstrated during the 2026-09-29 repair when API-key and project configuration screens were used to restore Preview connectivity.
+- **General operating model:** the Alleystreet client-services template states that client-provided content, marks, data, and Digital Property remain client-owned; client ownership/registrant status is preferred where practical; and an export/offboarding path should be available. That document is a draft general template and is **not** treated here as a signed FilmInHere-specific ownership record.
+
+### Still required before release
+
+- FilmInHere domain/registrar owner-of-record;
+- legal/project owner for Vercel and Supabase production accounts;
+- owner of production data and database records;
+- named privileged identities and least-privilege roles;
+- MFA/recovery status and recovery contacts;
 - recurring vendor/platform charges and payer;
 - monitoring and alert owner;
 - support/warranty boundaries;
