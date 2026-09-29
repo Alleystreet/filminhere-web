@@ -85,7 +85,6 @@ export async function getRequestByIdFromSupabase(id: string): Promise<BookingReq
     .from("booking_requests")
     .select("*")
     .eq("id", id)
-    .eq("user_id", user.id)
     .maybeSingle();
 
   if (error) throw error;
