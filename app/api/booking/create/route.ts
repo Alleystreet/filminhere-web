@@ -69,9 +69,9 @@ export async function POST(req: NextRequest) {
   const message =
     typeof payload.message === "string" ? payload.message : "";
   const startISO =
-    typeof payload.startISO === "string" ? payload.startISO : "";
+    typeof payload.startISO === "string" ? payload.startISO.trim() : "";
   const endISO =
-    typeof payload.endISO === "string" ? payload.endISO : "";
+    typeof payload.endISO === "string" ? payload.endISO.trim() : "";
   const impact =
     payload.impact &&
     typeof payload.impact === "object" &&
@@ -90,35 +90,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
 
-  if (startISO) {
-    const startMs = new Date(startISO).getTime();
-    if (!Number.isFinite(startMs)) {
-      return NextResponse.json(
-        { error: "Invalid start date/time." },
-        { status: 400 },
-      );
-    }
+  if (!startISO || !endISO) {
+    return NextResponse.json(
+      { error: "Start and end date/time are required." },
+      { status: 400 },
+    );
   }
 
-  if (endISO) {
-    const endMs = new Date(endISO).getTime();
-    if (!Number.isFinite(endMs)) {
-      return NextResponse.json(
-        { error: "Invalid end date/time." },
-        { status: 400 },
-      );
-    }
+  const startMs = new Date(startISO).getTime();
+  if (!Number.isFinite(startMs)) {
+    return NextResponse.json(
+      { error: "Invalid start date/time." },
+      { status: 400 },
+    );
   }
 
-  if (startISO && endISO) {
-    const startMs = new Date(startISO).getTime();
-    const endMs = new Date(endISO).getTime();
-    if (endMs <= startMs) {
-      return NextResponse.json(
-        { error: "End date/time must be after start date/time." },
-        { status: 400 },
-      );
-    }
+  const endMs = new Date(endISO).getTime();
+  if (!Number.isFinite(endMs)) {
+    return NextResponse.json(
+      { error: "Invalid end date/time." },
+      { status: 400 },
+    );
+  }
+
+  if (endMs <= startMs) {
+    return NextResponse.json(
+      { error: "End date/time must be after start date/time." },
+      { status: 400 },
+    );
   }
 
   const svcDb = makeServiceDb();
