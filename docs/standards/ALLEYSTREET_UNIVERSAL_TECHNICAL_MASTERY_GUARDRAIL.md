@@ -39,7 +39,7 @@ Every new build must either:
 Project-specific addenda may impose stricter requirements. They may not silently weaken this standard's security, evidence, reproducibility, owner-independence, learning, or governance requirements.
 
 
-the active build client delivery must move forward without sacrificing the owner's ability to understand, operate, troubleshoot, secure, recover, review, and eventually maintain the system independently.
+Client delivery for the active build must move forward without sacrificing the owner's ability to understand, operate, troubleshoot, secure, recover, review, and eventually maintain the system independently.
 
 Artificial Intelligence (AI), contractors, vendors, and automation may accelerate execution. They must not become undocumented authority or create knowledge dependence.
 
@@ -193,7 +193,7 @@ When a task genuinely maps to a certification:
 2. identify the objective/domain;
 3. explain what the objective expects;
 4. give the exam recognition cue;
-5. show why the real the active build task maps to it;
+5. show why the real build task maps to it;
 6. explain why it matters operationally;
 7. verify exact current objective numbering before recording it as authoritative.
 
@@ -462,7 +462,7 @@ Do not inflate level. Record the evidence or responsibility required to move to 
 
 ### 6.4 Delivery Requirement
 
-For substantial the active build work, delivery should record not only whether the feature worked, but also, when relevant:
+For substantial work on any build, delivery should record not only whether the feature worked, but also, when relevant:
 
 - what professional capability was exercised;
 - which mastery stage it develops;
@@ -476,7 +476,7 @@ For substantial the active build work, delivery should record not only whether t
 - whether it can be delegated;
 - whether it remains labor or has become a reusable system, service, asset, product, platform, or distribution capability.
 
-the active build may develop several mastery stages at once. It should be treated as a real production system, training environment, portfolio evidence source, and potential owned platform asset — without allowing study goals to create client scope drift.
+A build may develop several mastery stages at once. It should be treated as a real production system, training environment, portfolio evidence source, and potential owned platform asset — without allowing study goals to create client scope drift.
 
 
 ## 7. Open Systems Interconnection Mapping
@@ -514,9 +514,9 @@ Unknown proprietary internals must be labeled as unknown rather than guessed.
 
 The long-term success criterion is not:
 
-> "AI built the active build."
+> "AI built this system."
 
-The success criterion is that the owner can explain, inspect, troubleshoot, secure, operate, review, recover, and make informed architecture decisions about the active build without dependence on one AI, contractor, employee, vendor, or platform.
+The success criterion is that the owner can explain, inspect, troubleshoot, secure, operate, review, recover, and make informed architecture decisions about the system without dependence on one AI, contractor, employee, vendor, or platform.
 
 Documentation must therefore support:
 
