@@ -4,13 +4,14 @@ import NewRequestClient from "./NewRequestClient";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams?: { listing?: string };
+  searchParams: Promise<{ listing?: string | string[] }>;
 }) {
+  const params = await searchParams;
   const listingSlug =
-    typeof searchParams?.listing === "string" ? searchParams.listing : "";
+    typeof params.listing === "string" ? params.listing : "";
 
   return (
     <Suspense fallback={<div />}>
