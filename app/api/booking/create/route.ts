@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { listings } from "@/lib/mock/listings";
+import { validateBookingDates } from "./validation.mjs";
 
 const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -68,10 +69,6 @@ export async function POST(req: NextRequest) {
   const email = typeof payload.email === "string" ? payload.email.trim() : "";
   const message =
     typeof payload.message === "string" ? payload.message : "";
-  const startISO =
-    typeof payload.startISO === "string" ? payload.startISO.trim() : "";
-  const endISO =
-    typeof payload.endISO === "string" ? payload.endISO.trim() : "";
   const impact =
     payload.impact &&
     typeof payload.impact === "object" &&
@@ -90,35 +87,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
 
-  if (!startISO || !endISO) {
+  const dateValidation = validateBookingDates(
+    payload.startISO,
+    payload.endISO,
+  );
+
+  if (!dateValidation.ok) {
     return NextResponse.json(
-      { error: "Start and end date/time are required." },
+      { error: dateValidation.error },
       { status: 400 },
     );
   }
 
-  const startMs = new Date(startISO).getTime();
-  if (!Number.isFinite(startMs)) {
-    return NextResponse.json(
-      { error: "Invalid start date/time." },
-      { status: 400 },
-    );
-  }
-
-  const endMs = new Date(endISO).getTime();
-  if (!Number.isFinite(endMs)) {
-    return NextResponse.json(
-      { error: "Invalid end date/time." },
-      { status: 400 },
-    );
-  }
-
-  if (endMs <= startMs) {
-    return NextResponse.json(
-      { error: "End date/time must be after start date/time." },
-      { status: 400 },
-    );
-  }
+  const { startISO, endISO } = dateValidation;
 
   const svcDb = makeServiceDb();
 
