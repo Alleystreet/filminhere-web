@@ -1,0 +1,34 @@
+name: Booking Role Separation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  role-separation:
+    name: Verify filmmaker and host are separate identities
+    runs-on: ubuntu-latest
+    environment: preview-test
+    env:
+      TEST_BASE_URL: ${{ secrets.TEST_BASE_URL }}
+      TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+      TEST_SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
+      TEST_FILMMAKER_EMAIL: ${{ secrets.TEST_FILMMAKER_EMAIL }}
+      TEST_FILMMAKER_PASSWORD: ${{ secrets.TEST_FILMMAKER_PASSWORD }}
+      TEST_HOST_USER_ID: ${{ secrets.TEST_HOST_USER_ID }}
+      TEST_HOST_LISTING_ID: ${{ secrets.TEST_HOST_LISTING_ID }}
+      TEST_ALLOW_WRITE: ${{ secrets.TEST_ALLOW_WRITE }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Verify booking role separation
+        run: node scripts/test-booking-role-separation.mjs
