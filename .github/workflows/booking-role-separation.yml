@@ -2,6 +2,11 @@ name: Booking Role Separation
 
 on:
   workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Current Vercel Preview URL to test"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -12,14 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: preview-test
     env:
-      TEST_BASE_URL: ${{ secrets.TEST_BASE_URL }}
+      TEST_BASE_URL: ${{ inputs.base_url }}
       TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
       TEST_SUPABASE_ANON_KEY: ${{ secrets.TEST_SUPABASE_ANON_KEY }}
       TEST_FILMMAKER_EMAIL: ${{ secrets.TEST_FILMMAKER_EMAIL }}
       TEST_FILMMAKER_PASSWORD: ${{ secrets.TEST_FILMMAKER_PASSWORD }}
       TEST_HOST_USER_ID: ${{ secrets.TEST_HOST_USER_ID }}
       TEST_HOST_LISTING_ID: ${{ secrets.TEST_HOST_LISTING_ID }}
-      TEST_ALLOW_WRITE: ${{ secrets.TEST_ALLOW_WRITE }}
+      TEST_ALLOW_WRITE: "true"
 
     steps:
       - name: Check out repository
