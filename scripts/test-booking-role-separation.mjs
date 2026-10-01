@@ -1,7 +1,7 @@
 const required = [
   "TEST_BASE_URL",
   "TEST_SUPABASE_URL",
-  "TEST_SUPABASE_ANON_KEY",
+  "TEST_SUPABASE_PUBLISHABLE_KEY",
   "TEST_FILMMAKER_EMAIL",
   "TEST_FILMMAKER_PASSWORD",
   "TEST_HOST_USER_ID",
@@ -23,7 +23,7 @@ if (process.env.TEST_ALLOW_WRITE !== "true") {
 
 const baseUrl = process.env.TEST_BASE_URL.replace(/\/$/, "");
 const supabaseUrl = process.env.TEST_SUPABASE_URL.replace(/\/$/, "");
-const anonKey = process.env.TEST_SUPABASE_ANON_KEY;
+const publishableKey = process.env.TEST_SUPABASE_PUBLISHABLE_KEY;
 const filmmakerEmail = process.env.TEST_FILMMAKER_EMAIL;
 const filmmakerPassword = process.env.TEST_FILMMAKER_PASSWORD;
 const expectedHostUserId = process.env.TEST_HOST_USER_ID;
@@ -61,7 +61,7 @@ const auth = await fetch(
   {
     method: "POST",
     headers: {
-      apikey: anonKey,
+      apikey: publishableKey,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -117,7 +117,7 @@ const rowResponse = await fetch(
   `${supabaseUrl}/rest/v1/booking_requests?id=eq.${encodeURIComponent(requestId)}&select=id,user_id,host_user_id,listing_id,status,thread_status`,
   {
     headers: {
-      apikey: anonKey,
+      apikey: publishableKey,
       Authorization: `Bearer ${accessToken}`,
       Accept: "application/json",
     },
