@@ -3906,7 +3906,7 @@ export type Database = {
       }
     }
     Functions: {
-      current_user_is_admin: { Args: never; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
       knowledge_level_enum: "hobbyist" | "student" | "professional"
