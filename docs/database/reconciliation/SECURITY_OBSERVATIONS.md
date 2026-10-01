@@ -160,3 +160,27 @@ The remaining `approved_host_listings_public` SECURITY DEFINER finding is a docu
 Detailed verification:
 
 `PUBLIC_VIEW_FUNCTION_HARDENING_VERIFICATION.md`
+
+
+## Preview remediation progress — trigger search paths and workflow grants
+
+Additional Preview-only migrations:
+
+- `20261001181520_pin_trigger_search_paths`
+- `20261001181707_user_workflow_grant_hardening`
+
+Results:
+
+- mutable function `search_path` findings: **9 -> 0**;
+- `booking_messages` browser access: authenticated SELECT only;
+- `booking_offers` browser access: authenticated SELECT only;
+- `booking_requests`: authenticated SELECT + INSERT only;
+- `profiles`: authenticated SELECT + INSERT only;
+- `policy_acceptances`: authenticated SELECT + INSERT only;
+- anonymous access to those raw user-workflow tables is removed.
+
+The current app routes confirm negotiation writes use the server-side service role after authorization checks.
+
+Detailed verification:
+
+`LEAST_PRIVILEGE_AND_SEARCH_PATH_VERIFICATION.md`
