@@ -113,3 +113,26 @@ Production remains unchanged and still records only the original `remote_schema`
 Detailed verification:
 
 `PROVIDER_DIRECTORY_RLS_VERIFICATION.md`
+
+
+## Preview remediation milestone — all public tables now protected by RLS
+
+Additional Preview-only migrations:
+
+- `20261001180412_project_workspace_rls`
+- `20261001180542_internal_project_records_rls`
+
+Results:
+
+- Preview `rls_disabled_in_public` findings: **0**
+- 22 browser-accessible `project_*_view` objects had their `anon` / `authenticated` privileges revoked.
+- Externally reachable `SECURITY DEFINER` view findings dropped from **24** to **2**.
+- Five internal audit/review/release/monetization tables intentionally have RLS enabled with no browser policy and no browser grants.
+
+Important Production release gate:
+
+Production has 6 project records and all 6 currently have `owner_user_id IS NULL`. Ownership must be classified/backfilled, or explicitly preserved as internal/system data, before the owner-scoped project RLS migration is approved for Production.
+
+Detailed verification:
+
+`PROJECT_RLS_VERIFICATION.md`
