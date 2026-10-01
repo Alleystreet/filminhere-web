@@ -1,0 +1,131 @@
+{
+  "summary": {
+    "production": {
+      "views": 24,
+      "tables": 30,
+      "policies": 23,
+      "routines": 11,
+      "trigger_events": 21
+    },
+    "preview_test": {
+      "views": 24,
+      "tables": 30,
+      "policies": 23,
+      "routines": 11,
+      "trigger_events": 21
+    }
+  },
+  "relations": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "columns": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "constraints": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "indexes": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "policies": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "triggers": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "routines": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "views": {
+    "production_only": [],
+    "preview_only": []
+  },
+  "grants": {
+    "production_only": [],
+    "preview_only": [
+      {
+        "grantee": "anon",
+        "table_name": "booking_requests",
+        "is_grantable": "NO",
+        "privilege_type": "REFERENCES"
+      },
+      {
+        "grantee": "anon",
+        "table_name": "booking_requests",
+        "is_grantable": "NO",
+        "privilege_type": "TRIGGER"
+      },
+      {
+        "grantee": "anon",
+        "table_name": "booking_requests",
+        "is_grantable": "NO",
+        "privilege_type": "TRUNCATE"
+      },
+      {
+        "grantee": "authenticated",
+        "table_name": "booking_requests",
+        "is_grantable": "NO",
+        "privilege_type": "REFERENCES"
+      },
+      {
+        "grantee": "authenticated",
+        "table_name": "booking_requests",
+        "is_grantable": "NO",
+        "privilege_type": "TRIGGER"
+      },
+      {
+        "grantee": "authenticated",
+        "table_name": "booking_requests",
+        "is_grantable": "NO",
+        "privilege_type": "TRUNCATE"
+      },
+      {
+        "grantee": "anon",
+        "table_name": "profiles",
+        "is_grantable": "NO",
+        "privilege_type": "REFERENCES"
+      },
+      {
+        "grantee": "anon",
+        "table_name": "profiles",
+        "is_grantable": "NO",
+        "privilege_type": "TRIGGER"
+      },
+      {
+        "grantee": "anon",
+        "table_name": "profiles",
+        "is_grantable": "NO",
+        "privilege_type": "TRUNCATE"
+      },
+      {
+        "grantee": "authenticated",
+        "table_name": "profiles",
+        "is_grantable": "NO",
+        "privilege_type": "REFERENCES"
+      },
+      {
+        "grantee": "authenticated",
+        "table_name": "profiles",
+        "is_grantable": "NO",
+        "privilege_type": "TRIGGER"
+      },
+      {
+        "grantee": "authenticated",
+        "table_name": "profiles",
+        "is_grantable": "NO",
+        "privilege_type": "TRUNCATE"
+      }
+    ]
+  },
+  "enums": {
+    "production_only": [],
+    "preview_only": []
+  }
+}
