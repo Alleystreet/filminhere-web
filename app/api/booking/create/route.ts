@@ -20,7 +20,7 @@ import { listings } from "@/lib/mock/listings";
 import { validateBookingDates } from "./validation.mjs";
 
 const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const SB_PUBLISHABLE = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const SB_SERVICE = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 function makeServiceDb() {
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const anon = createClient(SB_URL, SB_ANON, {
+  const anon = createClient(SB_URL, SB_PUBLISHABLE, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
