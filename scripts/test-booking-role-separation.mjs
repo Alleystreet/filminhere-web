@@ -16,6 +16,28 @@ const supabaseUrl = process.env.TEST_SUPABASE_URL.replace(/\/$/, "");
 const publishableKey = process.env.TEST_SUPABASE_PUBLISHABLE_KEY;
 const secretKey = process.env.TEST_SUPABASE_SECRET_KEY;
 
+const expectedSupabaseHost = process.env.TEST_EXPECTED_SUPABASE_HOST?.trim();
+const forbiddenBaseHost = process.env.TEST_FORBIDDEN_BASE_HOST?.trim();
+
+const actualSupabaseHost = new URL(supabaseUrl).hostname;
+const actualBaseHost = new URL(baseUrl).hostname;
+
+if (!expectedSupabaseHost) {
+  throw new Error("TEST_EXPECTED_SUPABASE_HOST is required as a non-secret safety guard.");
+}
+
+if (actualSupabaseHost !== expectedSupabaseHost) {
+  throw new Error(
+    `Refusing integration writes: expected Supabase test host ${expectedSupabaseHost}, got ${actualSupabaseHost}.`,
+  );
+}
+
+if (forbiddenBaseHost && actualBaseHost === forbiddenBaseHost) {
+  throw new Error(
+    `Refusing integration writes against forbidden Vercel host ${forbiddenBaseHost}.`,
+  );
+}
+
 const runId = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 const filmmakerEmail = `filminhere-filmmaker-${runId}@example.com`;
 const hostEmail = `filminhere-host-${runId}@example.com`;
