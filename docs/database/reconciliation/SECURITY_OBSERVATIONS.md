@@ -71,3 +71,20 @@ No Production RLS, grants, functions, views, or data should be changed until:
 4. application integration tests pass;
 5. rollback/recovery is documented;
 6. the owner approves Production release.
+
+
+## Preview remediation progress — reference catalog block
+
+A first security migration has now been applied to `preview-test` only:
+
+`20261001173502_reference_catalog_rls`
+
+It enables RLS and removes direct client write privileges on 13 reference/catalog tables while preserving read-only access through active-row policies.
+
+Preview security-advisor RLS-disabled findings dropped from 24 tables to 11. Production remains unchanged and still has the original baseline migration only.
+
+Verification details are recorded in:
+
+`REFERENCE_CATALOG_RLS_VERIFICATION.md`
+
+The remaining 11 RLS-disabled tables contain private/project/provider/audit/release/monetization data and require separate ownership/role policies. They must not inherit the public-reference policy pattern blindly.
