@@ -88,3 +88,28 @@ Verification details are recorded in:
 `REFERENCE_CATALOG_RLS_VERIFICATION.md`
 
 The remaining 11 RLS-disabled tables contain private/project/provider/audit/release/monetization data and require separate ownership/role policies. They must not inherit the public-reference policy pattern blindly.
+
+
+## Preview remediation progress — provider directory block
+
+Additional Preview-only migrations:
+
+- `20261001175738_provider_directory_rls`
+- `20261001175912_provider_directory_view_privileges`
+
+These migrations:
+
+- enable RLS on `provider_profiles`;
+- remove broad browser write privileges;
+- grant browser roles read access only to approved public provider columns;
+- create `provider_directory_public` as a `SECURITY INVOKER` view;
+- exclude `owner_user_id`, `phone`, and `insurance_status` from the public view;
+- explicitly restrict the public view to SELECT after verification caught broader default view privileges.
+
+Preview RLS-disabled findings are now **10**, down from the original **24**.
+
+Production remains unchanged and still records only the original `remote_schema` migration.
+
+Detailed verification:
+
+`PROVIDER_DIRECTORY_RLS_VERIFICATION.md`
