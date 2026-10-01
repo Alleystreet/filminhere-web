@@ -136,3 +136,27 @@ Production has 6 project records and all 6 currently have `owner_user_id IS NULL
 Detailed verification:
 
 `PROJECT_RLS_VERIFICATION.md`
+
+
+## Preview remediation progress — public views and privileged functions
+
+Additional Preview-only migrations:
+
+- `20261001180951_public_view_function_hardening`
+- `20261001181257_auth_profile_trigger_reconcile`
+
+Results:
+
+- public-table RLS-disabled findings remain **0**;
+- public/authenticated executable `SECURITY DEFINER` function warnings are now **0**;
+- externally reachable `SECURITY DEFINER` view findings dropped to **1**;
+- `distribution_destination_summary_view` is now `SECURITY INVOKER`;
+- `public.current_user_is_admin()` was replaced by `private.current_user_is_admin()`;
+- `public.handle_new_auth_user_profile()` is no longer executable by `anon` or `authenticated`;
+- the missing Preview `auth.users` profile-creation trigger was restored and now matches Production.
+
+The remaining `approved_host_listings_public` SECURITY DEFINER finding is a documented temporary exception because public discovery and current booking host resolution depend on the safe approved-listing view.
+
+Detailed verification:
+
+`PUBLIC_VIEW_FUNCTION_HARDENING_VERIFICATION.md`
