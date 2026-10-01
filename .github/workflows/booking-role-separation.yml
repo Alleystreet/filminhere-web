@@ -21,6 +21,8 @@ jobs:
       TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
       TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
       TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
+      TEST_EXPECTED_SUPABASE_HOST: jryjcvcnbrqtgamxpxas.supabase.co
+      TEST_FORBIDDEN_BASE_HOST: filminhere-preview.vercel.app
 
     steps:
       - name: Check out repository
@@ -32,4 +34,24 @@ jobs:
           node-version: "20"
 
       - name: Verify booking role separation
-        run: node scripts/test-booking-role-separation.mjs
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          {
+            echo "FilmInHere Booking Role-Separation Evidence"
+            echo "Environment: preview-test"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Run: ${GITHUB_RUN_ID}"
+            echo
+            node scripts/test-booking-role-separation.mjs
+          } 2>&1 | tee test-results/booking-role-separation.txt
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: booking-role-separation-evidence-${{ github.run_id }}
+          path: test-results/booking-role-separation.txt
+          if-no-files-found: error
+          retention-days: 30
