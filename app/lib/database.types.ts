@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -3861,6 +3861,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      provider_directory_public: {
+        Row: {
+          business_name: string | null
+          city: string | null
+          country: string | null
+          description: string | null
+          id: string | null
+          is_verified: boolean | null
+          provider_type: string | null
+          slug: string | null
+          state: string | null
+          website: string | null
+          zone_name: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          provider_type?: string | null
+          slug?: string | null
+          state?: string | null
+          website?: string | null
+          zone_name?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          provider_type?: string | null
+          slug?: string | null
+          state?: string | null
+          website?: string | null
+          zone_name?: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {
