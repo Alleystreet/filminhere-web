@@ -1,0 +1,57 @@
+name: Booking Role Separation
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Current Vercel Preview URL to test"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  role-separation:
+    name: Verify filmmaker and host are separate identities
+    runs-on: ubuntu-latest
+    environment: preview-test
+    env:
+      TEST_BASE_URL: ${{ inputs.base_url }}
+      TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+      TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
+      TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
+      TEST_EXPECTED_SUPABASE_HOST: jryjcvcnbrqtgamxpxas.supabase.co
+      TEST_FORBIDDEN_BASE_HOST: filminhere-preview.vercel.app
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Verify booking role separation
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          {
+            echo "FilmInHere Booking Role-Separation Evidence"
+            echo "Environment: preview-test"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Run: ${GITHUB_RUN_ID}"
+            echo
+            node scripts/test-booking-role-separation.mjs
+          } 2>&1 | tee test-results/booking-role-separation.txt
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: booking-role-separation-evidence-${{ github.run_id }}
+          path: test-results/booking-role-separation.txt
+          if-no-files-found: error
+          retention-days: 30

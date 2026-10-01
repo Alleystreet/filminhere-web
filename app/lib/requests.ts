@@ -21,44 +21,33 @@ function rowToBookingRequest(row: Record<string, unknown>): BookingRequest {
 }
 
 export async function saveRequestToSupabase(req: BookingRequest): Promise<string> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("Please sign in before saving a request.");
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  if (!session?.access_token) throw new Error("Please sign in before saving a request.");
 
-  const id = UUID_RE.test(req.id) ? req.id : crypto.randomUUID();
-
-  // Resolve host_user_id for host-submitted listings (listing_id = "host_<uuid>").
-  // Platform/mock listings (e.g. "l_001") have no host in the DB — host_user_id stays null.
-  let host_user_id: string | null = null;
-  if (req.listingId.startsWith("host_")) {
-    const submissionId = req.listingId.slice(5); // strip "host_" prefix → raw UUID
-    const { data: sub } = await supabase
-      .from("approved_host_listings_public")
-      .select("id, user_id, title")
-      .eq("id", submissionId)
-      .maybeSingle();
-    host_user_id = (sub?.user_id as string) ?? null;
-  }
-
-  const { error } = await supabase.from("booking_requests").insert({
-    id,
-    listing_id: req.listingId,
-    listing_slug: req.listingSlug,
-    listing_title: req.listingTitle,
-    email: req.email,
-    message: req.message,
-    start_iso: req.startISO,
-    end_iso: req.endISO,
-    status: req.status,
-    thread_status: req.threadStatus,
-    created_iso: req.createdISO,
-    impact: req.impact ?? null,
-    user_id: user.id,
-    host_user_id,
+  const res = await fetch("/api/booking/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({
+      listingId: req.listingId,
+      listingSlug: req.listingSlug,
+      email: req.email,
+      message: req.message,
+      startISO: req.startISO,
+      endISO: req.endISO,
+      impact: req.impact ?? null,
+    }),
   });
 
-  if (error) throw error;
-  return id;
+  const data = await res.json().catch(() => ({})) as { id?: string; error?: string };
+  if (!res.ok || !data.id) {
+    throw new Error(data.error ?? "Failed to save request.");
+  }
+
+  return data.id;
 }
 
 export async function getRequestsFromSupabase(): Promise<BookingRequest[]> {
