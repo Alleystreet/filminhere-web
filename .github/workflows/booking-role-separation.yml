@@ -20,11 +20,7 @@ jobs:
       TEST_BASE_URL: ${{ inputs.base_url }}
       TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
       TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
-      TEST_FILMMAKER_EMAIL: ${{ secrets.TEST_FILMMAKER_EMAIL }}
-      TEST_FILMMAKER_PASSWORD: ${{ secrets.TEST_FILMMAKER_PASSWORD }}
-      TEST_HOST_USER_ID: ${{ secrets.TEST_HOST_USER_ID }}
-      TEST_HOST_LISTING_ID: ${{ secrets.TEST_HOST_LISTING_ID }}
-      TEST_ALLOW_WRITE: "true"
+      TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
 
     steps:
       - name: Check out repository
