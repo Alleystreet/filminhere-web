@@ -21,7 +21,7 @@ import { validateBookingDates } from "./validation.mjs";
 
 const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const SB_SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const SB_SERVICE = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 function makeServiceDb() {
   return createClient(SB_URL, SB_SERVICE, {
