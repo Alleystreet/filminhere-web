@@ -389,27 +389,19 @@ No Production rows were modified.
 
 ## Signup redirect and knowledge-level follow-up
 
-### Confirmation redirect fix
+### Confirmation redirect finding
 
-The signup page now supplies an explicit environment-local confirmation redirect:
+Preview signup confirmation was observed redirecting to `filminhere.com`, where the project’s intentional site-wide access wall is active.
 
-`emailRedirectTo = window.location.origin + "/auth/login"`
+That behavior is an application/Auth configuration follow-up, not part of database reconciliation.
 
-This prevents the signup flow from relying only on the Supabase global Site URL when the application is running on a Vercel Preview deployment.
+The code-side fix was moved to separate Draft PR #7:
 
-The new Vercel Preview deployment:
+`Keep signup confirmation on current environment`
 
-- deployment: `dpl_5dr9iAKbmiFg6GR21Lp3wbC2jHMm`
-- commit: `5238aedff8adf98be3b53ab364a6d88e3c464668`
-- state: READY
+PR #5 therefore does **not** include the signup-page application change.
 
-Compiled-bundle verification confirmed:
-
-- the signup bundle contains the `/auth/login` redirect path;
-- the Supabase client bundle contains `jryjcvcnbrqtgamxpxas`;
-- the Production ref `gunrmcuvgbipadmelxob` is absent from the active PR Preview bundle.
-
-Supabase still requires the target URL to be present in the Auth Redirect URL allow list. The code-side redirect is now correct; a future confirmation email should be used as the final manual proof that the Preview Auth configuration accepts the branch URL.
+Supabase requires any requested confirmation redirect target to be present in the Auth Redirect URL allow list, so PR #7 still requires an allow-list + confirmation-email verification before merge.
 
 ### Knowledge-level mapping investigation
 
@@ -434,3 +426,4 @@ and verified that the resulting `public.profiles.knowledge_level` was:
 Therefore the database mapping is functioning correctly.
 
 The earlier observed profile value `hobbyist` did not reproduce under controlled testing. It is recorded as a stale-flow/anomaly observation rather than a confirmed mapping defect.
+
