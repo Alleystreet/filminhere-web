@@ -385,3 +385,52 @@ No Production rows were modified.
 
 1. The Preview signup confirmation initially redirected to `filminhere.com` rather than the PR Preview domain. Email confirmation itself succeeded, but Preview Auth URL/redirect configuration needs its own correction.
 2. A signup performed with the UI displaying knowledge level `professional` produced a profile whose stored `knowledge_level` was `hobbyist`. This requires a separate signup/profile-metadata investigation.
+
+
+## Signup redirect and knowledge-level follow-up
+
+### Confirmation redirect fix
+
+The signup page now supplies an explicit environment-local confirmation redirect:
+
+`emailRedirectTo = window.location.origin + "/auth/login"`
+
+This prevents the signup flow from relying only on the Supabase global Site URL when the application is running on a Vercel Preview deployment.
+
+The new Vercel Preview deployment:
+
+- deployment: `dpl_5dr9iAKbmiFg6GR21Lp3wbC2jHMm`
+- commit: `5238aedff8adf98be3b53ab364a6d88e3c464668`
+- state: READY
+
+Compiled-bundle verification confirmed:
+
+- the signup bundle contains the `/auth/login` redirect path;
+- the Supabase client bundle contains `jryjcvcnbrqtgamxpxas`;
+- the Production ref `gunrmcuvgbipadmelxob` is absent from the active PR Preview bundle.
+
+Supabase still requires the target URL to be present in the Auth Redirect URL allow list. The code-side redirect is now correct; a future confirmation email should be used as the final manual proof that the Preview Auth configuration accepts the branch URL.
+
+### Knowledge-level mapping investigation
+
+The signup code sends:
+
+`knowledge_level: knowledgeLevel`
+
+The `handle_new_auth_user_profile()` trigger maps:
+
+- `student -> student`
+- `professional -> professional`
+- anything else -> `hobbyist`
+
+A rollback-only trigger test inserted Auth metadata containing:
+
+`knowledge_level = professional`
+
+and verified that the resulting `public.profiles.knowledge_level` was:
+
+`professional`
+
+Therefore the database mapping is functioning correctly.
+
+The earlier observed profile value `hobbyist` did not reproduce under controlled testing. It is recorded as a stale-flow/anomaly observation rather than a confirmed mapping defect.
