@@ -142,7 +142,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
       listingId: isHostSlug ? ("host_" + effectiveSlug.slice(5)) : (mockListing?.id ?? effectiveSlug),
       listingSlug: effectiveSlug,
       listingTitle: isHostSlug
-        ? (hostSubmission.title as string)
+        ? (hostSubmission!.title as string)
         : (mockListing?.title ?? effectiveSlug.replace(/-/g, " ")),
       email,
       message,
