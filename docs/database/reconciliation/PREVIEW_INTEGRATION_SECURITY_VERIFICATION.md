@@ -299,3 +299,89 @@ Open gates:
 **Rollback cleanup: PASS**
 
 **Production untouched: PASS**
+
+
+## Authenticated server/service-role negotiation write — end-to-end PASS
+
+A real confirmed Preview user was created and signed in through the PR Preview application.
+
+The Preview request fixture:
+
+`f1111111-1111-4111-8111-111111111111`
+
+was owned by that authenticated user and included the required Protected Communications acknowledgment.
+
+The filmmaker submitted the offer through the actual application page, which called:
+
+`POST /api/negotiation/submit-offer`
+
+Vercel runtime evidence recorded two successful HTTP requests:
+
+- 10:40:26 — POST — HTTP 200
+- 10:41:03 — POST — HTTP 200
+
+Both requests executed on:
+
+- deployment: `dpl_EhTWuuEfwuRD9cf2yHBecwNTDHDR`
+- branch: `db/reconcile-supabase-baseline`
+
+Database verification in `preview-test` showed that each HTTP request created exactly:
+
+- one `booking_offers` row;
+- one `booking_messages` row.
+
+The second offer carried the test note `Preview integration test`.
+
+Production verification for the same request UUID showed:
+
+- booking request rows: 0
+- booking offer rows: 0
+- booking message rows: 0
+
+Therefore the real application chain was proven:
+
+```text
+Authenticated browser session
+        |
+        | Bearer JWT
+        v
+Next.js /api/negotiation/submit-offer
+        |
+        | auth.getUser(jwt)
+        | request ownership check
+        | policy-acceptance check
+        v
+server-side Supabase service role
+        |
+        | privileged INSERT
+        v
+preview-test booking_offers + booking_messages
+```
+
+### Repeat-submission observation
+
+Two separate HTTP POST requests were observed roughly 37 seconds apart, and each created one offer/message pair.
+
+This does **not** indicate a single request was duplicated by the server. It does show that the endpoint currently permits another pending filmmaker offer to be submitted after the first request completes.
+
+If the product requires only one active pending filmmaker offer per request, add an explicit idempotency or replacement rule in a separate scoped change. Do not silently infer that requirement.
+
+## Test cleanup
+
+After evidence capture, the temporary Preview-only test data was removed.
+
+Verified remaining counts:
+
+- temporary booking request: 0
+- temporary booking offers: 0
+- temporary booking messages: 0
+- temporary Auth users: 0
+- temporary profiles: 0
+- temporary policy acceptances: 0
+
+No Production rows were modified.
+
+## Additional Preview findings discovered during the flow
+
+1. The Preview signup confirmation initially redirected to `filminhere.com` rather than the PR Preview domain. Email confirmation itself succeeded, but Preview Auth URL/redirect configuration needs its own correction.
+2. A signup performed with the UI displaying knowledge level `professional` produced a profile whose stored `knowledge_level` was `hobbyist`. This requires a separate signup/profile-metadata investigation.
