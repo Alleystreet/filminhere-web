@@ -6,6 +6,7 @@ import {
   getAdminHostListingSubmissionsFromSupabase,
   getSessionAccessToken,
 } from "@/lib/requests";
+import type { HostListingSubmission } from "@/lib/requests";
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {
   PENDING_REVIEW: { color: "#888", fontWeight: 600 },
@@ -23,7 +24,7 @@ function formatDate(iso: string): string {
 }
 
 export default function AdminHostSubmissionsPage() {
-  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<HostListingSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);

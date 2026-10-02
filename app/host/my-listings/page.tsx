@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getHostListingsFromSupabase } from "@/lib/requests";
+import type { HostListingSubmission } from "@/lib/requests";
 
 const STATUS_STYLES: Record<string, React.CSSProperties> = {
   PENDING_REVIEW: { color: "#888", fontWeight: 600 },
@@ -20,7 +21,7 @@ function formatDate(iso: string): string {
 }
 
 export default function MyListingsPage() {
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<HostListingSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

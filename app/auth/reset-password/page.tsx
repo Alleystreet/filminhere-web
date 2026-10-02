@@ -21,8 +21,8 @@ export default function ResetPasswordPage() {
       typeof window !== "undefined" &&
       !window.location.hash.includes("access_token")
     ) {
-      setPageState("invalid");
-      return;
+      const invalidTimer = window.setTimeout(() => setPageState("invalid"), 0);
+      return () => window.clearTimeout(invalidTimer);
     }
 
     // Supabase fires PASSWORD_RECOVERY when it processes the reset hash.
