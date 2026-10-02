@@ -3,6 +3,7 @@ import styles from "./Locations.module.css";
 import { listings } from "../lib/mock/listings";
 import type { Listing } from "../lib/types";
 import { getApprovedHostListingSubmissionsFromSupabase } from "../lib/requests";
+import type { ApprovedHostListingSubmission } from "../lib/requests";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -73,8 +74,7 @@ function mapListingType(raw: string | null | undefined): Listing["type"] {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function submissionToListing(row: any): Listing {
+function submissionToListing(row: ApprovedHostListingSubmission): Listing {
   return {
     id: "host_" + row.id,
     slug: "host-" + row.id,
@@ -170,11 +170,11 @@ export default async function LocationsPage({
       )}
 
       <div className={styles.helperCard}>
-        <div className={styles.helperLabel}>What you're looking at</div>
+        <div className={styles.helperLabel}>What you&apos;re looking at</div>
         <div className={styles.helperGrid}>
           <div><strong>Browse:</strong> These are location options you can choose from.</div>
-          <div><strong>Choose:</strong> Click a card to view one location's details.</div>
-          <div><strong>Request:</strong> On the detail page, "Request to Book" starts a message thread where you can negotiate and lock an hourly rate.</div>
+          <div><strong>Choose:</strong> Click a card to view one location&apos;s details.</div>
+          <div><strong>Request:</strong> On the detail page, &quot;Request to Book&quot; starts a message thread where you can negotiate and lock an hourly rate.</div>
         </div>
       </div>
 
