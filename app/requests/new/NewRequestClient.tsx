@@ -10,6 +10,7 @@ import type { BookingRequest, Listing, ImpactChecklist } from "@/lib/types";
 import { listings } from "@/lib/mock/listings";
 import { getSavedEmail, saveEmail } from "@/lib/store/requests";
 import { saveRequestToSupabase, getApprovedHostListingSubmissionByIdFromSupabase } from "@/lib/requests";
+import type { ApprovedHostListingSubmission } from "@/lib/requests";
 import { supabase } from "@/lib/supabase";
 
 type Props = {
@@ -36,8 +37,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     [effectiveSlug, isHostSlug],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [hostSubmission, setHostSubmission] = useState<any | null>(null);
+  const [hostSubmission, setHostSubmission] = useState<ApprovedHostListingSubmission | null>(null);
   const [hostLoading, setHostLoading] = useState(false);
   const [hostError, setHostError] = useState<string | null>(null);
 
@@ -58,29 +58,53 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   }, []);
 
   useEffect(() => {
-    try {
-      const saved = getSavedEmail?.();
-      if (saved) setEmail(saved);
-    } catch {}
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      if (cancelled) return;
+      try {
+        const saved = getSavedEmail?.();
+        if (saved) setEmail(saved);
+      } catch {}
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
     if (!isHostSlug || !effectiveSlug) return;
+
+    let cancelled = false;
     const id = effectiveSlug.slice(5);
-    setHostLoading(true);
-    setHostError(null);
-    getApprovedHostListingSubmissionByIdFromSupabase(id)
-      .then((sub) => {
+
+    void Promise.resolve().then(async () => {
+      if (cancelled) return;
+      setHostLoading(true);
+      setHostError(null);
+
+      try {
+        const sub = await getApprovedHostListingSubmissionByIdFromSupabase(id);
+        if (cancelled) return;
+
         if (!sub) {
           setHostError("This listing could not be found or is no longer available.");
         } else {
           setHostSubmission(sub);
         }
-      })
-      .catch((err: unknown) => {
-        setHostError(err instanceof Error ? err.message : "Failed to load listing details.");
-      })
-      .finally(() => setHostLoading(false));
+      } catch (err: unknown) {
+        if (!cancelled) {
+          setHostError(err instanceof Error ? err.message : "Failed to load listing details.");
+        }
+      } finally {
+        if (!cancelled) setHostLoading(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [effectiveSlug, isHostSlug]);
 
   const displayTitle: string = isHostSlug
@@ -118,7 +142,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
       listingId: isHostSlug ? ("host_" + effectiveSlug.slice(5)) : (mockListing?.id ?? effectiveSlug),
       listingSlug: effectiveSlug,
       listingTitle: isHostSlug
-        ? (hostSubmission.title as string)
+        ? (hostSubmission!.title as string)
         : (mockListing?.title ?? effectiveSlug.replace(/-/g, " ")),
       email,
       message,

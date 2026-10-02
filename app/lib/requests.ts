@@ -3,6 +3,45 @@ import type { BookingRequest, RequestMessage } from "./types";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+export type HostListingSubmission = {
+  address: string | null;
+  amenities: string | null;
+  capacity: number | null;
+  city: string | null;
+  country: string | null;
+  description: string | null;
+  host_email: string | null;
+  id: string;
+  listing_type: string;
+  min_hours: number | null;
+  rate_per_day: number | null;
+  rate_per_hour: number | null;
+  rules_notes: string | null;
+  state: string | null;
+  status: string;
+  submitted_at: string;
+  title: string;
+  updated_at: string;
+  user_id: string;
+};
+
+export type ApprovedHostListingSubmission = {
+  amenities: string | null;
+  capacity: number | null;
+  city: string | null;
+  country: string | null;
+  description: string | null;
+  id: string | null;
+  listing_type: string | null;
+  min_hours: number | null;
+  rate_per_day: number | null;
+  rate_per_hour: number | null;
+  rules_notes: string | null;
+  state: string | null;
+  title: string | null;
+  user_id: string | null;
+};
+
 function rowToBookingRequest(row: Record<string, unknown>): BookingRequest {
   return {
     id: row.id as string,
@@ -155,7 +194,7 @@ export async function submitHostListingToSupabase(fields: {
   if (error) throw error;
 }
 
-export async function getHostListingsFromSupabase(): Promise<any[]> {
+export async function getHostListingsFromSupabase(): Promise<HostListingSubmission[]> {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (!user) throw new Error("You must be logged in to view your listings.");
@@ -167,10 +206,10 @@ export async function getHostListingsFromSupabase(): Promise<any[]> {
     .order("submitted_at", { ascending: false });
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as HostListingSubmission[];
 }
 
-export async function getApprovedHostListingSubmissionByIdFromSupabase(id: string): Promise<any | null> {
+export async function getApprovedHostListingSubmissionByIdFromSupabase(id: string): Promise<ApprovedHostListingSubmission | null> {
   const { data, error } = await supabase
     .from("approved_host_listings_public")
     .select("id, listing_type, title, description, city, state, country, rate_per_hour, rate_per_day, min_hours, capacity, amenities, rules_notes")
@@ -178,20 +217,20 @@ export async function getApprovedHostListingSubmissionByIdFromSupabase(id: strin
     .maybeSingle();
 
   if (error) throw error;
-  return data ?? null;
+  return (data as ApprovedHostListingSubmission | null) ?? null;
 }
 
-export async function getApprovedHostListingSubmissionsFromSupabase(): Promise<any[]> {
+export async function getApprovedHostListingSubmissionsFromSupabase(): Promise<ApprovedHostListingSubmission[]> {
   const { data, error } = await supabase
     .from("approved_host_listings_public")
     .select("id, listing_type, title, description, city, state, country, rate_per_hour, rate_per_day, min_hours, capacity, amenities, rules_notes")
     .order("title", { ascending: true });
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as ApprovedHostListingSubmission[];
 }
 
-export async function getAdminHostListingSubmissionsFromSupabase(): Promise<any[]> {
+export async function getAdminHostListingSubmissionsFromSupabase(): Promise<HostListingSubmission[]> {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (!user) throw new Error("You must be logged in to view admin submissions.");
@@ -213,7 +252,7 @@ export async function getAdminHostListingSubmissionsFromSupabase(): Promise<any[
     .order("submitted_at", { ascending: false });
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as HostListingSubmission[];
 }
 
 export async function getPolicyAcceptanceFromSupabase(
