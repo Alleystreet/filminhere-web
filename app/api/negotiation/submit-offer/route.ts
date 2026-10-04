@@ -94,17 +94,39 @@ export async function POST(req: NextRequest) {
   // All checks passed — write with service-role
   const svcDb = makeServiceDb();
 
-  const { error: offerErr } = await svcDb.from("booking_offers").insert({
-    id: crypto.randomUUID(),
-    request_id: requestId,
+  const offerValues = {
     user_id: user.id,
-    offer_type: "FILMMAKER_OFFER",
     rate_per_hour: ratePerHour ?? null,
     min_hours: minHours ?? null,
     total: total ?? null,
     note: note ?? null,
     status: "PENDING",
-  });
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: existingOffer, error: existingOfferErr } = await svcDb
+    .from("booking_offers")
+    .select("id")
+    .eq("request_id", requestId)
+    .eq("offer_type", "FILMMAKER_OFFER")
+    .eq("status", "PENDING")
+    .maybeSingle();
+  if (existingOfferErr) return NextResponse.json({ error: existingOfferErr.message }, { status: 500 });
+
+  let offerErr;
+  if (existingOffer) {
+    ({ error: offerErr } = await svcDb
+      .from("booking_offers")
+      .update(offerValues)
+      .eq("id", existingOffer.id));
+  } else {
+    ({ error: offerErr } = await svcDb.from("booking_offers").insert({
+      id: crypto.randomUUID(),
+      request_id: requestId,
+      offer_type: "FILMMAKER_OFFER",
+      ...offerValues,
+    }));
+  }
   if (offerErr) return NextResponse.json({ error: offerErr.message }, { status: 500 });
 
   const parts: string[] = [];
