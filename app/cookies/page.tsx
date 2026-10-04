@@ -91,15 +91,6 @@ export default function CookiesPage() {
             </td>
             <td style={td}>Until cleared by you or the app</td>
           </tr>
-          <tr>
-            <td style={td}><code>fih_ack_v1:*</code></td>
-            <td style={td}>localStorage</td>
-            <td style={td}>
-              Records whether you have checked the Platform Notice acknowledgment checkbox on
-              a listing detail page, scoped to the listing slug.
-            </td>
-            <td style={td}>Until cleared by you or the app</td>
-          </tr>
         </tbody>
       </table>
 
