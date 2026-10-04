@@ -120,16 +120,54 @@ export async function getRequestByIdFromSupabase(id: string): Promise<BookingReq
   if (authError) throw authError;
   if (!user) throw new Error("Please sign in to view this request.");
 
+  // RLS is the authorization boundary here: the request is visible only to
+  // the filmmaker owner or the assigned host. Do not add a filmmaker-only
+  // client filter, or the host view will be unable to reload its request.
   const { data, error } = await supabase
     .from("booking_requests")
     .select("*")
     .eq("id", id)
-    .eq("user_id", user.id)
     .maybeSingle();
 
   if (error) throw error;
   if (!data) return null;
-  return rowToBookingRequest(data as Record<string, unknown>);
+
+  const { data: offers, error: offersError } = await supabase
+    .from("booking_offers")
+    .select("offer_type, rate_per_hour, min_hours, total, note, status, created_at")
+    .eq("request_id", id)
+    .in("status", ["PENDING", "ACCEPTED"])
+    .order("created_at", { ascending: false });
+
+  if (offersError) throw offersError;
+
+  const request = rowToBookingRequest(data as Record<string, unknown>);
+  const filmmakerOffer = (offers ?? []).find((offer) => offer.offer_type === "FILMMAKER_OFFER");
+  const hostCounter = (offers ?? []).find((offer) => offer.offer_type === "HOST_COUNTER_OFFER");
+
+  return {
+    ...request,
+    offer: filmmakerOffer
+      ? {
+          currency: "USD",
+          proposedRatePerHour: filmmakerOffer.rate_per_hour ?? undefined,
+          proposedMinHours: filmmakerOffer.min_hours ?? undefined,
+          proposedTotal: filmmakerOffer.total ?? undefined,
+          note: filmmakerOffer.note ?? undefined,
+          createdISO: filmmakerOffer.created_at ?? new Date().toISOString(),
+        }
+      : undefined,
+    counterOffer: hostCounter
+      ? {
+          currency: "USD",
+          proposedRatePerHour: hostCounter.rate_per_hour ?? undefined,
+          proposedMinHours: hostCounter.min_hours ?? undefined,
+          proposedTotal: hostCounter.total ?? undefined,
+          note: hostCounter.note ?? undefined,
+          createdISO: hostCounter.created_at ?? new Date().toISOString(),
+        }
+      : undefined,
+  };
 }
 
 export async function getMessagesFromSupabase(requestId: string): Promise<RequestMessage[]> {

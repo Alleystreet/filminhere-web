@@ -110,9 +110,21 @@ export async function POST(req: NextRequest) {
     .eq("id", (latestOffer as { id: string }).id);
   if (offerUpdateErr) return NextResponse.json({ error: offerUpdateErr.message }, { status: 500 });
 
+  const now = new Date().toISOString();
+
+  const { error: filmmakerOfferCloseErr } = await svcDb
+    .from("booking_offers")
+    .update({ status: "SUPERSEDED", updated_at: now })
+    .eq("request_id", requestId)
+    .eq("offer_type", "FILMMAKER_OFFER")
+    .eq("status", "PENDING");
+  if (filmmakerOfferCloseErr) {
+    return NextResponse.json({ error: filmmakerOfferCloseErr.message }, { status: 500 });
+  }
+
   const { error: reqErr } = await svcDb
     .from("booking_requests")
-    .update({ status: "ACCEPTED", thread_status: "locked", updated_at: new Date().toISOString() })
+    .update({ status: "ACCEPTED", thread_status: "locked", updated_at: now })
     .eq("id", requestId);
   if (reqErr) return NextResponse.json({ error: reqErr.message }, { status: 500 });
 
