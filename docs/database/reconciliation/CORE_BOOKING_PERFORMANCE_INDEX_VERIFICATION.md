@@ -64,3 +64,39 @@ Those are tracked separately and are not silently treated as fixed.
 ## Release boundary
 
 Migration applied only to `preview-test`. Production Supabase remains unchanged.
+
+
+## RLS initialization-plan optimization
+
+Preview migration:
+
+`20261004112859_optimize_auth_rls_initplans`
+
+The affected RLS policies were rewritten from direct per-row calls such as:
+
+`auth.uid()`
+
+to the equivalent initialization-plan form:
+
+`(select auth.uid())`
+
+No policy role, command, owner predicate, host predicate, admin predicate, or write condition was broadened.
+
+Fresh Performance Advisor proof:
+
+- before: `auth_rls_initplan` count = **16**
+- after: `auth_rls_initplan` category = **absent**
+
+## Authorization regression
+
+Rollback-only participant fixture after the RLS rewrite:
+
+| Actor | Request rows | Message rows | Offer rows |
+| --- | ---: | ---: | ---: |
+| Filmmaker owner | 1 | 1 | 1 |
+| Assigned host | 1 | 1 | 1 |
+| Unrelated authenticated user | 0 | 0 | 0 |
+
+This confirms the performance rewrite preserved the tested participant isolation behavior.
+
+The remaining `multiple_permissive_policies` warnings are not changed by this migration. They are policy-structure performance guidance, not an authorization failure, and remain visible for future consolidation.
