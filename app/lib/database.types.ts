@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      approved_host_listings_public: {
+        Row: {
+          amenities: string | null
+          capacity: number | null
+          city: string | null
+          country: string | null
+          description: string | null
+          id: string
+          listing_type: string
+          min_hours: number | null
+          rate_per_day: number | null
+          rate_per_hour: number | null
+          rules_notes: string | null
+          state: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          amenities?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id: string
+          listing_type: string
+          min_hours?: number | null
+          rate_per_day?: number | null
+          rate_per_hour?: number | null
+          rules_notes?: string | null
+          state?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          amenities?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string
+          listing_type?: string
+          min_hours?: number | null
+          rate_per_day?: number | null
+          rate_per_hour?: number | null
+          rules_notes?: string | null
+          state?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       booking_messages: {
         Row: {
           body: string
@@ -1900,57 +1951,6 @@ export type Database = {
       }
     }
     Views: {
-      approved_host_listings_public: {
-        Row: {
-          amenities: string | null
-          capacity: number | null
-          city: string | null
-          country: string | null
-          description: string | null
-          id: string | null
-          listing_type: string | null
-          min_hours: number | null
-          rate_per_day: number | null
-          rate_per_hour: number | null
-          rules_notes: string | null
-          state: string | null
-          title: string | null
-          user_id: string | null
-        }
-        Insert: {
-          amenities?: string | null
-          capacity?: number | null
-          city?: string | null
-          country?: string | null
-          description?: string | null
-          id?: string | null
-          listing_type?: string | null
-          min_hours?: number | null
-          rate_per_day?: number | null
-          rate_per_hour?: number | null
-          rules_notes?: string | null
-          state?: string | null
-          title?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          amenities?: string | null
-          capacity?: number | null
-          city?: string | null
-          country?: string | null
-          description?: string | null
-          id?: string | null
-          listing_type?: string | null
-          min_hours?: number | null
-          rate_per_day?: number | null
-          rate_per_hour?: number | null
-          rules_notes?: string | null
-          state?: string | null
-          title?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       distribution_destination_summary_view: {
         Row: {
           asset_requirement_list: string | null
