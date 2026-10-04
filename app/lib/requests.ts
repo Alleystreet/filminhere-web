@@ -56,6 +56,7 @@ function rowToBookingRequest(row: Record<string, unknown>): BookingRequest {
     threadStatus: (row.thread_status as BookingRequest["threadStatus"]) ?? "draft",
     createdISO: (row.created_iso as string) ?? "",
     impact: (row.impact as BookingRequest["impact"]) ?? undefined,
+    hostConstraints: (row.host_constraints as BookingRequest["hostConstraints"]) ?? undefined,
   };
 }
 

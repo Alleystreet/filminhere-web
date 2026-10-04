@@ -101,41 +101,34 @@ export async function POST(req: NextRequest) {
   if (offerFetchErr) return NextResponse.json({ error: offerFetchErr.message }, { status: 500 });
   if (!latestOffer)  return NextResponse.json({ error: "No pending host counter-offer found." }, { status: 404 });
 
-  // All checks passed — write with service-role
+  // Final acceptance is one database transaction. The database function
+  // re-checks participant ownership and the pending counter-offer and rolls
+  // back the entire state transition if the schedule conflicts.
   const svcDb = makeServiceDb();
-
-  const { error: offerUpdateErr } = await svcDb
-    .from("booking_offers")
-    .update({ status: "ACCEPTED" })
-    .eq("id", (latestOffer as { id: string }).id);
-  if (offerUpdateErr) return NextResponse.json({ error: offerUpdateErr.message }, { status: 500 });
-
-  const now = new Date().toISOString();
-
-  const { error: filmmakerOfferCloseErr } = await svcDb
-    .from("booking_offers")
-    .update({ status: "SUPERSEDED", updated_at: now })
-    .eq("request_id", requestId)
-    .eq("offer_type", "FILMMAKER_OFFER")
-    .eq("status", "PENDING");
-  if (filmmakerOfferCloseErr) {
-    return NextResponse.json({ error: filmmakerOfferCloseErr.message }, { status: 500 });
-  }
-
-  const { error: reqErr } = await svcDb
-    .from("booking_requests")
-    .update({ status: "ACCEPTED", thread_status: "locked", updated_at: now })
-    .eq("id", requestId);
-  if (reqErr) return NextResponse.json({ error: reqErr.message }, { status: 500 });
-
-  const { error: msgErr } = await svcDb.from("booking_messages").insert({
-    id: crypto.randomUUID(),
-    request_id: requestId,
-    user_id: user.id,
-    sender: "FILMMAKER",
-    body: "Filmmaker accepted the host counter-offer.",
+  const { error: finalizeErr } = await svcDb.rpc("finalize_booking_acceptance", {
+    p_request_id: requestId,
+    p_actor_id: user.id,
+    p_mode: "FILMMAKER_ACCEPT_COUNTER",
   });
-  if (msgErr) return NextResponse.json({ error: msgErr.message }, { status: 500 });
+
+  if (finalizeErr) {
+    if (finalizeErr.code === "23P01") {
+      return NextResponse.json(
+        { error: "This listing already has an accepted booking that overlaps the requested time." },
+        { status: 409 },
+      );
+    }
+    if (finalizeErr.code === "42501") {
+      return NextResponse.json({ error: finalizeErr.message }, { status: 403 });
+    }
+    if (finalizeErr.message.includes("No pending host counter-offer")) {
+      return NextResponse.json({ error: finalizeErr.message }, { status: 404 });
+    }
+    if (finalizeErr.message.includes("already closed")) {
+      return NextResponse.json({ error: finalizeErr.message }, { status: 409 });
+    }
+    return NextResponse.json({ error: finalizeErr.message }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

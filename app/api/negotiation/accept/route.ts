@@ -98,42 +98,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Compliance acknowledgment required before accepting." }, { status: 403 });
   }
 
-  // Write with service-role (svcDb already initialized above)
-
-  const now = new Date().toISOString();
-
-  // If the filmmaker has a pending offer, host acceptance confirms that offer.
-  const { error: offerAcceptErr } = await svcDb
-    .from("booking_offers")
-    .update({ status: "ACCEPTED", updated_at: now })
-    .eq("request_id", requestId)
-    .eq("offer_type", "FILMMAKER_OFFER")
-    .eq("status", "PENDING");
-  if (offerAcceptErr) return NextResponse.json({ error: offerAcceptErr.message }, { status: 500 });
-
-  // A host counter that was still pending is no longer active after direct acceptance.
-  const { error: counterCloseErr } = await svcDb
-    .from("booking_offers")
-    .update({ status: "SUPERSEDED", updated_at: now })
-    .eq("request_id", requestId)
-    .eq("offer_type", "HOST_COUNTER_OFFER")
-    .eq("status", "PENDING");
-  if (counterCloseErr) return NextResponse.json({ error: counterCloseErr.message }, { status: 500 });
-
-  const { error: reqErr } = await svcDb
-    .from("booking_requests")
-    .update({ status: "ACCEPTED", thread_status: "locked", updated_at: now })
-    .eq("id", requestId);
-  if (reqErr) return NextResponse.json({ error: reqErr.message }, { status: 500 });
-
-  const { error: msgErr } = await svcDb.from("booking_messages").insert({
-    id: crypto.randomUUID(),
-    request_id: requestId,
-    user_id: user.id,
-    sender: "HOST",
-    body: "✅ Host accepted. Confirmed terms saved.",
+  // Final acceptance is one database transaction. If the accepted time
+  // overlaps another accepted booking for this listing, Postgres rejects
+  // the transaction and all offer/message changes roll back together.
+  const { error: finalizeErr } = await svcDb.rpc("finalize_booking_acceptance", {
+    p_request_id: requestId,
+    p_actor_id: user.id,
+    p_mode: "HOST_ACCEPT",
   });
-  if (msgErr) return NextResponse.json({ error: msgErr.message }, { status: 500 });
+
+  if (finalizeErr) {
+    if (finalizeErr.code === "23P01") {
+      return NextResponse.json(
+        { error: "This listing already has an accepted booking that overlaps the requested time." },
+        { status: 409 },
+      );
+    }
+    if (finalizeErr.code === "42501") {
+      return NextResponse.json({ error: finalizeErr.message }, { status: 403 });
+    }
+    if (finalizeErr.message.includes("already closed")) {
+      return NextResponse.json({ error: finalizeErr.message }, { status: 409 });
+    }
+    return NextResponse.json({ error: finalizeErr.message }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }
