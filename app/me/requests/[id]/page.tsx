@@ -160,7 +160,6 @@ export default function RequestDetailPage() {
 
   // Protected Communications policy acceptance
   const [protectedCommunicationsAccepted, setProtectedCommunicationsAccepted] = useState(false);
-  const [protectedCommunicationsAcceptedAt, setProtectedCommunicationsAcceptedAt] = useState<string | null>(null);
   const [protectedCommunicationsError, setProtectedCommunicationsError] = useState<string | null>(null);
   const [acknowledgingProtectedCommunications, setAcknowledgingProtectedCommunications] = useState(false);
 
@@ -237,16 +236,14 @@ export default function RequestDetailPage() {
 
   useEffect(() => {
     getPolicyAcceptanceFromSupabase("protected_communications", "2026-05-31")
-      .then(({ accepted, acceptedAt }) => {
+      .then(({ accepted }) => {
         setProtectedCommunicationsAccepted(accepted);
-        setProtectedCommunicationsAcceptedAt(acceptedAt);
       })
       .catch((err: unknown) => {
         setProtectedCommunicationsError(
           err instanceof Error ? err.message : "Failed to load policy acceptance."
         );
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const listing: Listing | undefined = useMemo(() => {
@@ -668,7 +665,6 @@ export default function RequestDetailPage() {
     try {
       await acceptPolicyInSupabase("protected_communications", "2026-05-31");
       setProtectedCommunicationsAccepted(true);
-      setProtectedCommunicationsAcceptedAt(new Date().toISOString());
     } catch (err) {
       setProtectedCommunicationsError(
         err instanceof Error ? err.message : "Failed to record acknowledgment."
