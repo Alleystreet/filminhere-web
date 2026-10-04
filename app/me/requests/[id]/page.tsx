@@ -486,7 +486,7 @@ export default function RequestDetailPage() {
 
   async function saveHostConstraints() {
     if (!req || !id) return;
-    if (!canNegotiate) return;
+    if (!canNegotiate || !protectedCommunicationsAccepted) return;
     setActionError(null);
 
     const hc: HostConstraints = {
@@ -496,44 +496,35 @@ export default function RequestDetailPage() {
       note: hcNote.trim() || undefined,
     };
 
-    const empty =
-      !hc.weekendOnly && !hc.noNights && !hc.blackoutDatesNote && !hc.note;
-
-    // Client-side DLP early warning on free-text note
-    if (hc.note && containsBlockedNegotiationContent(hc.note)) {
+    if (
+      (hc.note && containsBlockedNegotiationContent(hc.note)) ||
+      (hc.blackoutDatesNote && containsBlockedNegotiationContent(hc.blackoutDatesNote))
+    ) {
       setActionError("Message blocked. Keep contact, payment, and off-platform deal details on FilmInHere.");
       return;
     }
 
-    const nextReq: BookingRequest = {
-      ...req,
-      hostConstraints: empty ? undefined : hc,
-    };
-
-    saveRequest(nextReq);
-
-    const msgBody = empty
-      ? "Host availability cleared."
-      : `Host availability updated.${hc.note ? `\n\nNote: ${hc.note}` : ""}`;
-
     try {
       const token = await getSessionAccessToken();
       if (!token) throw new Error("Please sign in.");
-      const res = await fetch("/api/negotiation/send-message", {
+
+      const res = await fetch("/api/negotiation/update-availability", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ requestId: id, body: msgBody }),
+        body: JSON.stringify({ requestId: id, constraints: hc }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({})) as { error?: string };
         throw new Error(data.error ?? "Failed to save availability.");
       }
+
+      const fresh = await getRequestByIdFromSupabase(id);
+      if (fresh) saveRequest(fresh);
+      reload();
+      await loadMsgs();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to save availability.");
     }
-
-    reload();
-    await loadMsgs();
   }
 
   async function accept() {
@@ -1216,7 +1207,12 @@ export default function RequestDetailPage() {
                 />
               </label>
 
-              <button type="button" className={styles.actionBtn} onClick={saveHostConstraints}>
+              <button
+                type="button"
+                className={styles.actionBtn}
+                onClick={saveHostConstraints}
+                disabled={!protectedCommunicationsAccepted}
+              >
                 Save Availability
               </button>
             </div>
