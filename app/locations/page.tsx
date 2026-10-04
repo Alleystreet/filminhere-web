@@ -4,6 +4,7 @@ import { listings } from "../lib/mock/listings";
 import type { Listing } from "../lib/types";
 import { getApprovedHostListingSubmissionsFromSupabase } from "../lib/requests";
 import type { ApprovedHostListingSubmission } from "../lib/requests";
+import BrowseTermHints from "../components/BrowseTermHints";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -162,6 +163,8 @@ export default async function LocationsPage({
         <h1 className={styles.h1}>Locations</h1>
         <p className={styles.sub}>Browse film-ready spaces and request to book in minutes.</p>
       </div>
+
+      <BrowseTermHints />
 
       {hostError && (
         <p style={{ color: "#888", fontSize: 13, marginBottom: "0.5rem" }}>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import styles from "./SiteHeader.module.css";
+import TerminologyToggle from "./TerminologyToggle";
 
 export default function SiteHeader() {
   const [email, setEmail] = useState<string | null>(null);
@@ -36,6 +37,8 @@ export default function SiteHeader() {
           <Link className={styles.navLink} href="/locations">Explore</Link>
           <Link className={styles.navLink} href="/host">List a Space</Link>
           <Link className={styles.navLink} href="/me/requests">My Requests</Link>
+          <Link className={styles.navLink} href="/learn">Learn</Link>
+          <TerminologyToggle compact />
           {email ? (
             <>
               <span className={styles.navLink}>{email}</span>
