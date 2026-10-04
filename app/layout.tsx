@@ -19,8 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <a className="skipLink" href="#main-content">Skip to main content</a>
         <SiteHeader />
-        <main className="appMain">{children}</main>
+        <main id="main-content" className="appMain" tabIndex={-1}>{children}</main>
         <SiteFooter />
       </body>
     </html>
