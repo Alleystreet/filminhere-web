@@ -146,7 +146,7 @@ export default function HostIntakePage() {
           />
         </label>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+        <div className={styles.intakeGrid3}>
           <label>
             <span style={lblTxt}>City *</span>
             <input type="text" value={city} onChange={(e) => setCity(e.target.value)} style={field} placeholder="City" />
@@ -161,7 +161,7 @@ export default function HostIntakePage() {
           </label>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+        <div className={styles.intakeGrid4}>
           <label>
             <span style={lblTxt}>Rate / Hour</span>
             <input type="number" min="0" step="0.01" value={ratePerHour} onChange={(e) => setRatePerHour(e.target.value)} style={field} placeholder="0.00" />

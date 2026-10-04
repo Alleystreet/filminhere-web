@@ -62,5 +62,20 @@
 }
 
 @media (max-width: 768px){
-  .nav{ display:none; }
+  .shell{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .nav{
+    width:100%;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:thin;
+  }
+
+  .navLink{
+    flex:0 0 auto;
+  }
 }
