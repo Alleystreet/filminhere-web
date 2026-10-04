@@ -68,7 +68,7 @@ export default function PrivacyPage() {
         <li>Operate, secure, and improve the FilmInHere platform.</li>
         <li>Facilitate booking requests, negotiations, and listing approvals.</li>
         <li>Apply abuse prevention and DLP filtering to negotiation content.</li>
-        <li>Send transactional communications related to your account or bookings.</li>
+        <li>Support transactional account or booking communications when those notification features are enabled.</li>
         <li>Enforce our Terms of Service and platform policies.</li>
         <li>Comply with applicable legal obligations.</li>
       </ul>
@@ -95,7 +95,7 @@ export default function PrivacyPage() {
       </p>
       <ul style={ul}>
         <li><strong>Supabase</strong> — database, authentication, and storage.</li>
-        <li><strong>Vercel / AWS Lightsail</strong> — hosting and infrastructure.</li>
+        <li><strong>Vercel</strong> — application hosting and deployment infrastructure.</li>
       </ul>
       <p style={p}>
         These providers operate under their own privacy policies. FilmInHere does not control
