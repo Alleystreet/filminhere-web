@@ -156,6 +156,7 @@ export type Database = {
           created_iso: string | null
           email: string
           end_iso: string | null
+          host_constraints: Json | null
           host_user_id: string | null
           id: string
           impact: Json | null
@@ -174,6 +175,7 @@ export type Database = {
           created_iso?: string | null
           email: string
           end_iso?: string | null
+          host_constraints?: Json | null
           host_user_id?: string | null
           id?: string
           impact?: Json | null
@@ -192,6 +194,7 @@ export type Database = {
           created_iso?: string | null
           email?: string
           end_iso?: string | null
+          host_constraints?: Json | null
           host_user_id?: string | null
           id?: string
           impact?: Json | null
@@ -3906,7 +3909,19 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      finalize_booking_acceptance: {
+        Args: { p_actor_id: string; p_mode: string; p_request_id: string }
+        Returns: undefined
+      }
+      persist_host_constraints: {
+        Args: {
+          p_actor_id: string
+          p_constraints: Json
+          p_message: string
+          p_request_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       knowledge_level_enum: "hobbyist" | "student" | "professional"
