@@ -100,9 +100,29 @@ export async function POST(req: NextRequest) {
 
   // Write with service-role (svcDb already initialized above)
 
+  const now = new Date().toISOString();
+
+  // If the filmmaker has a pending offer, host acceptance confirms that offer.
+  const { error: offerAcceptErr } = await svcDb
+    .from("booking_offers")
+    .update({ status: "ACCEPTED", updated_at: now })
+    .eq("request_id", requestId)
+    .eq("offer_type", "FILMMAKER_OFFER")
+    .eq("status", "PENDING");
+  if (offerAcceptErr) return NextResponse.json({ error: offerAcceptErr.message }, { status: 500 });
+
+  // A host counter that was still pending is no longer active after direct acceptance.
+  const { error: counterCloseErr } = await svcDb
+    .from("booking_offers")
+    .update({ status: "SUPERSEDED", updated_at: now })
+    .eq("request_id", requestId)
+    .eq("offer_type", "HOST_COUNTER_OFFER")
+    .eq("status", "PENDING");
+  if (counterCloseErr) return NextResponse.json({ error: counterCloseErr.message }, { status: 500 });
+
   const { error: reqErr } = await svcDb
     .from("booking_requests")
-    .update({ status: "ACCEPTED", thread_status: "locked", updated_at: new Date().toISOString() })
+    .update({ status: "ACCEPTED", thread_status: "locked", updated_at: now })
     .eq("id", requestId);
   if (reqErr) return NextResponse.json({ error: reqErr.message }, { status: 500 });
 
