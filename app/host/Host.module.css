@@ -73,3 +73,24 @@
   text-decoration: underline;
   opacity: 0.85;
 }
+.intakeGrid3,
+.intakeGrid4 {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.intakeGrid3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.intakeGrid4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 760px) {
+  .intakeGrid3,
+  .intakeGrid4 {
+    grid-template-columns: 1fr;
+  }
+}
