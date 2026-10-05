@@ -88,7 +88,9 @@ Current Supabase documentation states:
 - Pro daily-backup retention is 7 days;
 - Point-in-Time Recovery (PITR) is an optional add-on;
 - restoring a database backup makes the project temporarily unavailable;
-- database backups do **not** restore deleted Storage objects; Storage needs its own recovery plan.
+- database backups do **not** restore deleted Storage objects.
+
+A fresh read-only Production query found **no Supabase Storage buckets and no Storage objects**. Therefore Storage-object recovery is not an active MVP baseline blocker today. This gate must be reopened when FilmInHere begins storing user uploads in Supabase Storage.
 
 ### Evidence boundary
 
