@@ -48,7 +48,7 @@ Legend:
 | Backup capability | scheduled recovery capability exists | PASS — capability only | Supabase Pro confirmed; 7-day daily-backup capability |
 | Latest Production backup | actual latest recovery point recorded | MANUAL EVIDENCE OPEN | connector does not expose backup list |
 | PITR | actual Production PITR state known | MANUAL EVIDENCE OPEN | not exposed through connector |
-| Storage recovery | deleted Storage object recovery plan | MANUAL EVIDENCE OPEN | DB backup does not restore Storage objects |
+| Storage recovery | Production Storage baseline known | PASS — current baseline N/A | read-only check found no Production Storage buckets/objects; reopen when uploads are introduced |
 | Vercel runtime monitoring | current staging has no runtime error cluster | PASS — Preview/Staging | 24-hour check |
 | External log drain | centralized Vercel drain configured | NOT IN MVP YET / release decision | currently none |
 | Supabase runtime monitoring | baseline log review captured | PASS — baseline | one isolated PostgREST timeout observed; watch |
