@@ -1,0 +1,62 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> app@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 18ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.7s
+  Running TypeScript ...
+  Finished TypeScript in 3.9s ...
+  Collecting page data using 8 workers ...
+  Generating static pages using 8 workers (0/32) ...
+  Generating static pages using 8 workers (8/32) 
+  Generating static pages using 8 workers (16/32) 
+  Generating static pages using 8 workers (24/32) 
+✓ Generating static pages using 8 workers (32/32) in 505ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin/host-submissions
+├ ƒ /api/admin/host-submissions/update-status
+├ ƒ /api/negotiation/accept
+├ ƒ /api/negotiation/accept-counter
+├ ƒ /api/negotiation/acknowledge-compliance
+├ ƒ /api/negotiation/decline
+├ ƒ /api/negotiation/send-message
+├ ƒ /api/negotiation/submit-counteroffer
+├ ƒ /api/negotiation/submit-offer
+├ ƒ /api/negotiation/update-availability
+├ ○ /auth/forgot-password
+├ ○ /auth/login
+├ ○ /auth/reset-password
+├ ○ /auth/signup
+├ ○ /cookies
+├ ○ /host
+├ ○ /host/intake
+├ ○ /host/my-listings
+├ ○ /learn
+├ ○ /listings
+├ ƒ /listings/[slug]
+├ ƒ /locations
+├ ƒ /locations/[slug]
+├ ○ /me/request
+├ ƒ /me/request/[id]
+├ ○ /me/requests
+├ ƒ /me/requests/[id]
+├ ○ /privacy
+├ ○ /producer
+├ ○ /producer/intake
+├ ƒ /requests/[id]
+├ ○ /requests/confirmed
+├ ƒ /requests/new
+└ ○ /terms
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
