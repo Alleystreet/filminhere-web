@@ -1,0 +1,29 @@
+name: Recovery boundary
+on:
+  pull_request:
+  push:
+    branches: [fix/release-error-boundaries]
+permissions:
+  contents: read
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium --only-shell
+      - name: Verify recovery in isolated production-mode Next app
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:recovery 2>&1 | tee recovery-results.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recovery-results
+          path: recovery-results.log
