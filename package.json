@@ -7,11 +7,12 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1"
+    "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1",
+    "test": "node --test scripts/test-preview-isolation.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
