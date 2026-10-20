@@ -1,0 +1,51 @@
+name: Preview service-key acceptance (restricted)
+
+on:
+  push:
+    branches:
+      - fix/staging-database-isolation-20261018
+    paths:
+      - ".github/workflows/preview-service-acceptance.yml"
+      - "scripts/test-preview-service-acceptance.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Offline target-identity test (no secrets)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node scripts/test-preview-service-acceptance.mjs --self-test
+
+  authenticated:
+    # Requires manual repository variable opt-in AND environment reviewer approval.
+    if: github.repository == 'Alleystreet/filminhere-web' && github.ref == 'refs/heads/fix/staging-database-isolation-20261018' && vars.RUN_PREVIEW_SERVICE_ACCEPTANCE == 'approved'
+    needs: preflight
+    environment: preview-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Exercise guarded Preview service client using synthetic test users
+        run: node scripts/test-preview-service-acceptance.mjs
+        env:
+          CI_PREVIEW_TEST_GATE: "yes"
+          TEST_BASE_URL: https://filminhere-preview-pnlvi6xxs-alleystreets-projects.vercel.app
+          TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+          TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
+          TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
