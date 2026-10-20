@@ -104,3 +104,12 @@ PR #22 stays draft; no merge, Production migration, real customer fixture, payme
 - **Application Programming Interface (API):** A server route that accepts an authenticated request and runs the guarded database operation.
 - **Continuous Integration (CI):** Automated checks are useful but cannot prove an unrun hosted authenticated scenario.
 - **Failure boundary:** Strict host allowlist + exact deployment identity + protected key provenance + temporary fixtures and verified cleanup.
+
+
+## 2026-10-20 — Trusted Sources OIDC revision
+
+The owner confirmed the Vercel project now lists GitHub Actions under **Trusted Sources**, limited to Preview. The authenticated GitHub job uses `permissions: id-token: write` and obtains a short-lived GitHub OpenID Connect (OIDC) token for audience `https://github.com/Alleystreet`. It verifies expected issuer, audience, repository, branch, environment and workflow claims before sending it to Vercel through `x-vercel-trusted-oidc-idp-token`. Vercel, not this script, verifies the signed token. The former permanent `VERCEL_AUTOMATION_BYPASS_SECRET` requirement was removed; Vercel Authentication remains enabled.
+
+Only the GitHub `preview-test` protected job may request the token. The secret-free preflight intentionally has no `id-token: write` grant. Both still require an exact repository and branch match. The authenticated job remains **skipped unless** repository variable `RUN_PREVIEW_SERVICE_ACCEPTANCE` is explicitly `approved` and the human reviewer approves the exact run. `TEST_SUPABASE_SECRET_KEY` must separately be installed as a Preview-owned GitHub Environment secret, after review, before enabling a live run. An OIDC Trusted Source does not supply the privileged Supabase fixture key.
+
+This revision is not proof of a successful hosted OIDC handshake or authenticated Supabase write. Do not add any credential to chat, git history or test logs.

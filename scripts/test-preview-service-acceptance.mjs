@@ -15,12 +15,57 @@ function validateTarget(e) {
 }
 
 function verifyCredentials(e) {
-  for (const k of ["TEST_SUPABASE_PUBLISHABLE_KEY", "TEST_SUPABASE_SECRET_KEY", "VERCEL_AUTOMATION_BYPASS_SECRET"]) {
+  for (const k of ["TEST_SUPABASE_PUBLISHABLE_KEY", "TEST_SUPABASE_SECRET_KEY"]) {
     if (typeof e[k] !== "string" || !e[k].trim()) throw new Error("Protected environment variable missing: " + k);
   }
   if (e.TEST_SUPABASE_PUBLISHABLE_KEY === e.TEST_SUPABASE_SECRET_KEY) throw new Error("Public and secret keys equal.");
   if (!e.TEST_SUPABASE_SECRET_KEY.startsWith("sb_secret_") &&
       e.TEST_SUPABASE_SECRET_KEY.split(".").length !== 3) throw new Error("Unexpected secret key type.");
+}
+
+
+const OIDC_AUDIENCE = "https://github.com/Alleystreet";
+const OIDC_ISSUER = "https://token.actions.githubusercontent.com";
+const REVIEWED_WORKFLOW = "Preview service-key acceptance (restricted)";
+
+function verifyOidcClaims(token) {
+  // Checking fields locally is a fail-closed sanity check, NOT a signature verification.
+  // Vercel independently validates the token signature and configured Trusted Source claims.
+  let claims;
+  try {
+    if (typeof token !== "string" || token.split(".").length !== 3) throw new Error();
+    claims = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString("utf8"));
+  } catch {
+    throw new Error("GitHub OIDC identity token malformed.");
+  }
+  for (const [key, expected] of Object.entries({
+    iss: OIDC_ISSUER,
+    aud: OIDC_AUDIENCE,
+    repository: "Alleystreet/filminhere-web",
+    ref: "refs/heads/fix/staging-database-isolation-20261018",
+    environment: "preview-test",
+    workflow: REVIEWED_WORKFLOW,
+  })) {
+    if (claims[key] !== expected) throw new Error("GitHub OIDC identity claim rejected: " + key);
+  }
+}
+
+async function requestGitHubOidcToken(env) {
+  if (!env.ACTIONS_ID_TOKEN_REQUEST_URL || !env.ACTIONS_ID_TOKEN_REQUEST_TOKEN) {
+    throw new Error("GitHub OIDC request permissions are missing.");
+  }
+  const url = new URL(env.ACTIONS_ID_TOKEN_REQUEST_URL);
+  if (url.protocol !== "https:") throw new Error("GitHub OIDC token endpoint must use HTTPS.");
+  url.searchParams.set("audience", OIDC_AUDIENCE);
+  const response = await fetch(url, {
+    headers: { Authorization: "Bearer " + env.ACTIONS_ID_TOKEN_REQUEST_TOKEN },
+    redirect: "error",
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!response.ok) throw new Error("GitHub OIDC token request was denied.");
+  const data = await response.json();
+  verifyOidcClaims(data?.value);
+  return data.value;
 }
 
 if (process.argv.includes("--self-test")) {
@@ -40,10 +85,23 @@ if (process.argv.includes("--self-test")) {
     { TEST_BASE_URL: PREVIEW + "/" },
   ]) assert.throws(() => validateTarget({ ...ok, ...bad }));
   assert.throws(() => verifyCredentials({}));
-  console.log("PASS: Offline environment/host gate tests; no secrets or network.");
+  const encode = x => Buffer.from(JSON.stringify(x)).toString("base64url");
+  const validClaims = {
+    iss: OIDC_ISSUER, aud: OIDC_AUDIENCE, repository: "Alleystreet/filminhere-web",
+    ref: "refs/heads/fix/staging-database-isolation-20261018",
+    environment: "preview-test", workflow: REVIEWED_WORKFLOW,
+  };
+  const syntheticToken = c => encode({ alg: "none" }) + "." + encode(c) + ".synthetic";
+  assert.doesNotThrow(() => verifyOidcClaims(syntheticToken(validClaims)));
+  for (const key of Object.keys(validClaims)) {
+    assert.throws(() => verifyOidcClaims(syntheticToken({ ...validClaims, [key]: "wrong" })));
+  }
+  assert.throws(() => verifyOidcClaims("not-a-token"));
+  console.log("PASS: Offline environment/host/OIDC-claim gate tests; no secrets or network.");
 } else {
   validateTarget(process.env);
   verifyCredentials(process.env);
+  const githubOidcToken = await requestGitHubOidcToken(process.env);
   const { createClient } = await import("@supabase/supabase-js");
   const config = { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } };
   const admin = createClient(DB, process.env.TEST_SUPABASE_SECRET_KEY, config);
@@ -62,7 +120,7 @@ if (process.argv.includes("--self-test")) {
   async function callRoute(jwt, id, body) {
     const headers = {
       "Content-Type": "application/json",
-      "x-vercel-protection-bypass": process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+      "x-vercel-trusted-oidc-idp-token": githubOidcToken,
     };
     if (jwt) headers.Authorization = "Bearer " + jwt;
     const response = await fetch(PREVIEW + ROUTE, {

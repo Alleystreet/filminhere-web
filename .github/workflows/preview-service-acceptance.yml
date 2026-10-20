@@ -29,6 +29,10 @@ jobs:
     if: github.repository == 'Alleystreet/filminhere-web' && github.ref == 'refs/heads/fix/staging-database-isolation-20261018' && vars.RUN_PREVIEW_SERVICE_ACCEPTANCE == 'approved'
     needs: preflight
     environment: preview-test
+    # Scoped to the protected job only; preflight has no OIDC or secret access.
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -48,4 +52,3 @@ jobs:
           TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
           TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
           TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
-          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
