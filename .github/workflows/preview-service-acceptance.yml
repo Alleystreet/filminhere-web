@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/preview-service-acceptance.yml"
       - "scripts/test-preview-service-acceptance.mjs"
+      - "scripts/test-preview-oidc-smoke.mjs"
 
 permissions:
   contents: read
@@ -23,6 +24,28 @@ jobs:
         with:
           node-version: "24"
       - run: node scripts/test-preview-service-acceptance.mjs --self-test
+
+
+  oidc_smoke:
+    name: GitHub OIDC -> Vercel Preview, no Supabase credentials
+    needs: preflight
+    if: github.repository == 'Alleystreet/filminhere-web' && github.ref == 'refs/heads/fix/staging-database-isolation-20261018'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Test OIDC claim checks offline
+        run: node scripts/test-preview-oidc-smoke.mjs --self-test
+      - name: Verify GitHub OIDC to Vercel protected deployment
+        run: node scripts/test-preview-oidc-smoke.mjs
 
   authenticated:
     # Requires manual repository variable opt-in AND environment reviewer approval.
