@@ -1,0 +1,5 @@
+exit_code: 0
+STDOUT
+{"version" : "PostgreSQL 17.11 (Ubuntu 17.11-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit", "server_version_num" : "170011", "address" : "127.0.0.1/32", "port" : 55439, "database" : "filminhere_audit_replay", "user" : "postgres"}
+
+STDERR

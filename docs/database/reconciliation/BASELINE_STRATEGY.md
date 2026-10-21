@@ -1,5 +1,14 @@
 # Supabase / GitHub Baseline Strategy
 
+> **Verified correction — 2026-10-21:** The 775 historical statements are valid
+> evidence of the managed baseline, but the repository snapshot is explicitly
+> evidence-only and omits top-level statement terminators. The raw file fails
+> SQL replay; prior language below describing reconstruction is not proof that
+> `supabase db reset` can execute the file. See the
+> [permission audit](../permissions-audit/AUDIT_2026-10-21.md) and
+> [disposable local reconstruction procedure](../permissions-audit/LOCAL_RECONSTRUCTION.md).
+> Preserve the snapshot. Never replay it directly against Production.
+
 ## Problem
 
 FilmInHere's database was substantially built directly in Supabase before GitHub became the authoritative database migration history.

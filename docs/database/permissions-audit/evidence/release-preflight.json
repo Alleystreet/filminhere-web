@@ -1,0 +1,71 @@
+{
+  "root": "/workspace/scratch/fff16d164cd2/filminhere-web",
+  "decision": "BLOCKED",
+  "blocker_count": 9,
+  "warning_count": 0,
+  "findings": [
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 8
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 9
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 10
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 11
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 12
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 13
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 14
+    },
+    {
+      "level": "BLOCKER",
+      "check": "critical-gate",
+      "message": "Unchecked critical acceptance gate.",
+      "path": "ACCEPTANCE_TESTS.md",
+      "line": 15
+    },
+    {
+      "level": "BLOCKER",
+      "check": "release-decision",
+      "message": "Release report decision is BLOCKED.",
+      "path": "RELEASE_REPORT.md",
+      "line": null
+    }
+  ]
+}

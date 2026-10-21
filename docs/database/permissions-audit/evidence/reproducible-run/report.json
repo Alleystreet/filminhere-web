@@ -1,0 +1,480 @@
+{
+  "suite": "filminhere-disposable-local-permissions",
+  "started_at": "2026-10-21T20:04:58.083247+00:00",
+  "status": "PASS",
+  "target": {
+    "host": "127.0.0.1",
+    "port": 55439,
+    "database": "filminhere_audit_replay",
+    "user": "postgres"
+  },
+  "hosted_targets_allowed": false,
+  "database_created_dropped_or_reset": false,
+  "credentials_logged": false,
+  "limitations": [
+    "The historical baseline is adapted for local testing; raw CLI replay remains invalid.",
+    "The auth shim is not hosted Supabase Auth or a test of its service behavior.",
+    "GraphQL, real browser sessions, hosted Preview and Production are not tested.",
+    "For --api, the operator must bind the fixed-loopback PostgREST to this same named database.",
+    "The local database and synthetic fixtures remain for inspection; this runner does not clean or reset them."
+  ],
+  "steps": [
+    {
+      "step": "git-source",
+      "exit_code": 0,
+      "log": "01-git-source.log"
+    },
+    {
+      "step": "git-status",
+      "exit_code": 0,
+      "log": "02-git-status.log"
+    },
+    {
+      "step": "psql-version",
+      "exit_code": 0,
+      "log": "03-psql-version.log"
+    },
+    {
+      "step": "empty-local-target-preflight",
+      "exit_code": 0,
+      "log": "04-empty-local-target-preflight.log"
+    },
+    {
+      "step": "server-version",
+      "exit_code": 0,
+      "log": "05-server-version.log"
+    },
+    {
+      "step": "raw-baseline-expected-failure",
+      "exit_code": 3,
+      "log": "06-raw-baseline-expected-failure.log"
+    },
+    {
+      "step": "raw-baseline-empty-proof",
+      "exit_code": 0,
+      "log": "07-raw-baseline-empty-proof.log"
+    },
+    {
+      "step": "prepare-disposable-reconstruction",
+      "exit_code": 0,
+      "log": "08-prepare-disposable-reconstruction.log"
+    },
+    {
+      "step": "local-auth-shim",
+      "exit_code": 0,
+      "log": "09-local-auth-shim.log"
+    },
+    {
+      "step": "adapted-baseline",
+      "exit_code": 0,
+      "log": "10-adapted-baseline.log"
+    },
+    {
+      "step": "baseline-session-reset",
+      "exit_code": 0,
+      "log": "11-baseline-session-reset.log"
+    },
+    {
+      "step": "historical-defaults-exposure-probe",
+      "exit_code": 0,
+      "log": "12-historical-defaults-exposure-probe.log"
+    },
+    {
+      "step": "baseline-only-defaults-before",
+      "exit_code": 0,
+      "log": "13-baseline-only-defaults-before.log"
+    },
+    {
+      "step": "baseline-only-correction-expected-failure",
+      "exit_code": 3,
+      "log": "14-baseline-only-correction-expected-failure.log"
+    },
+    {
+      "step": "baseline-only-defaults-after",
+      "exit_code": 0,
+      "log": "15-baseline-only-defaults-after.log"
+    },
+    {
+      "step": "simulate-new-explicit-defaults",
+      "exit_code": 0,
+      "log": "16-simulate-new-explicit-defaults.log"
+    },
+    {
+      "step": "migration-20261001173502_reference_catalog_rls",
+      "exit_code": 0,
+      "log": "17-migration-20261001173502_reference_catalog_rls.log"
+    },
+    {
+      "step": "migration-20261001175738_provider_directory_rls",
+      "exit_code": 0,
+      "log": "18-migration-20261001175738_provider_directory_rls.log"
+    },
+    {
+      "step": "migration-20261001175912_provider_directory_view_privileges",
+      "exit_code": 0,
+      "log": "19-migration-20261001175912_provider_directory_view_privileges.log"
+    },
+    {
+      "step": "migration-20261001180412_project_workspace_rls",
+      "exit_code": 0,
+      "log": "20-migration-20261001180412_project_workspace_rls.log"
+    },
+    {
+      "step": "migration-20261001180542_internal_project_records_rls",
+      "exit_code": 0,
+      "log": "21-migration-20261001180542_internal_project_records_rls.log"
+    },
+    {
+      "step": "migration-20261001180951_public_view_function_hardening",
+      "exit_code": 0,
+      "log": "22-migration-20261001180951_public_view_function_hardening.log"
+    },
+    {
+      "step": "migration-20261001181257_auth_profile_trigger_reconcile",
+      "exit_code": 0,
+      "log": "23-migration-20261001181257_auth_profile_trigger_reconcile.log"
+    },
+    {
+      "step": "migration-20261001181520_pin_trigger_search_paths",
+      "exit_code": 0,
+      "log": "24-migration-20261001181520_pin_trigger_search_paths.log"
+    },
+    {
+      "step": "migration-20261001181707_user_workflow_grant_hardening",
+      "exit_code": 0,
+      "log": "25-migration-20261001181707_user_workflow_grant_hardening.log"
+    },
+    {
+      "step": "migration-20261004071659_replace_approved_host_public_view_projection",
+      "exit_code": 0,
+      "log": "26-migration-20261004071659_replace_approved_host_public_view_projection.log"
+    },
+    {
+      "step": "migration-20261004072504_enforce_single_pending_offer_per_type",
+      "exit_code": 0,
+      "log": "27-migration-20261004072504_enforce_single_pending_offer_per_type.log"
+    },
+    {
+      "step": "migration-20261004080448_booking_schedule_integrity",
+      "exit_code": 0,
+      "log": "28-migration-20261004080448_booking_schedule_integrity.log"
+    },
+    {
+      "step": "migration-20261004080713_persist_host_constraints",
+      "exit_code": 0,
+      "log": "29-migration-20261004080713_persist_host_constraints.log"
+    },
+    {
+      "step": "migration-20261004081311_translation_roots_catalog",
+      "exit_code": 0,
+      "log": "30-migration-20261004081311_translation_roots_catalog.log"
+    },
+    {
+      "step": "policies-before-correction",
+      "exit_code": 0,
+      "log": "31-policies-before-correction.log"
+    },
+    {
+      "step": "migration-20261021195905_explicit_public_data_api_permissions",
+      "exit_code": 0,
+      "log": "32-migration-20261021195905_explicit_public_data_api_permissions.log"
+    },
+    {
+      "step": "policies-after-correction",
+      "exit_code": 0,
+      "log": "33-policies-after-correction.log"
+    },
+    {
+      "step": "defaults-after-first-correction",
+      "exit_code": 0,
+      "log": "34-defaults-after-first-correction.log"
+    },
+    {
+      "step": "repeat-forward-correction",
+      "exit_code": 0,
+      "log": "35-repeat-forward-correction.log"
+    },
+    {
+      "step": "policies-after-repeat",
+      "exit_code": 0,
+      "log": "36-policies-after-repeat.log"
+    },
+    {
+      "step": "defaults-after-repeat",
+      "exit_code": 0,
+      "log": "37-defaults-after-repeat.log"
+    },
+    {
+      "step": "install-local-pgtap",
+      "exit_code": 0,
+      "log": "38-install-local-pgtap.log"
+    },
+    {
+      "step": "synthetic-fixtures",
+      "exit_code": 0,
+      "log": "39-synthetic-fixtures.log"
+    },
+    {
+      "step": "pgtap-permissions-catalog",
+      "exit_code": 0,
+      "log": "40-pgtap-permissions-catalog.log"
+    },
+    {
+      "step": "notify-postgrest-schema-reload",
+      "exit_code": 0,
+      "log": "41-notify-postgrest-schema-reload.log"
+    }
+  ],
+  "source_commit": "7bba3c6b13acf77b5915513d4246593f9ea11344",
+  "source_worktree_dirty": true,
+  "source_test_files": [
+    {
+      "file": "scripts/database/test-local-permissions.py",
+      "sha256": "3ce9012f88032d15a88a11b05b772116eb071c587c6b40740baaa7eb35f6ea40"
+    },
+    {
+      "file": "scripts/database/prepare-local-reconstruction.py",
+      "sha256": "36b5841dc516e9140a9b9596aa91597026f2919480ffcdf2e9e85fc901a29f45"
+    },
+    {
+      "file": "tests/database/local-auth-shim.sql",
+      "sha256": "09be8d1ec7299cc3510258256cd37656319511e803696f0824dba534c7addbb2"
+    },
+    {
+      "file": "tests/database/simulate-explicit-defaults.sql",
+      "sha256": "797a996e2c425fdc85d714e8bea847d6d18589aa15b18decb39025c700767ea6"
+    },
+    {
+      "file": "tests/database/permissions-fixtures.sql",
+      "sha256": "7ca93945cdaa1d9d602dc97819c3cef87757c07dfd0208a71bb067087c29e2e3"
+    },
+    {
+      "file": "tests/database/permissions-catalog.sql",
+      "sha256": "f6eee68d5052afc6be3af4d0f5dbcb1c65b9bcb5b119b0823ea1a67671946d13"
+    },
+    {
+      "file": "tests/database-permissions.api.mjs",
+      "sha256": "813a8c4b20280c47bdd775c6b873ea9d5c2a084c057fcca1fd3a8cb908e7a236"
+    }
+  ],
+  "psql_version": "psql (PostgreSQL) 17.11 (Ubuntu 17.11-1.pgdg24.04+2)",
+  "server": {
+    "version": "PostgreSQL 17.11 (Ubuntu 17.11-1.pgdg24.04+2) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit",
+    "server_version_num": "170011",
+    "address": "127.0.0.1/32",
+    "port": 55439,
+    "database": "filminhere_audit_replay",
+    "user": "postgres"
+  },
+  "raw_baseline": {
+    "expected_syntax_failure": true,
+    "public_relation_count_after": 0,
+    "sha256": "04492fc3c32900522dbec23d0ce5efd5227d2f09f744594c5ac5fd1dce713255"
+  },
+  "reconstruction": {
+    "format_version": 1,
+    "purpose": "disposable-local-reconstruction-only",
+    "mode": "plain-postgres",
+    "database_connections_made": false,
+    "production_use_authorized": false,
+    "raw_supabase_cli_replay_verified": false,
+    "original_snapshot_modified": false,
+    "baseline": {
+      "source": "supabase/migrations/20261001023713_remote_schema.sql",
+      "sha256": "04492fc3c32900522dbec23d0ce5efd5227d2f09f744594c5ac5fd1dce713255",
+      "bytes": 352997,
+      "numbered_statement_count": 775,
+      "emitted_statement_count": 772,
+      "output": "baseline.local-only.sql",
+      "output_sha256": "42cd562c3842a41a285a873ba25800400c746cef3cf60227066b6b9453a2b937"
+    },
+    "skipped_statements": [
+      {
+        "statement_index": 12,
+        "sql": "CREATE EXTENSION IF NOT EXISTS \"pg_graphql\" WITH SCHEMA \"graphql\"",
+        "reason": "Managed Supabase extension or publication unavailable in plain PostgreSQL."
+      },
+      {
+        "statement_index": 15,
+        "sql": "CREATE EXTENSION IF NOT EXISTS \"supabase_vault\" WITH SCHEMA \"vault\"",
+        "reason": "Managed Supabase extension or publication unavailable in plain PostgreSQL."
+      },
+      {
+        "statement_index": 488,
+        "sql": "ALTER PUBLICATION \"supabase_realtime\" OWNER TO \"postgres\"",
+        "reason": "Managed Supabase extension or publication unavailable in plain PostgreSQL."
+      }
+    ],
+    "session_reset": {
+      "output": "reset-session.local-only.sql",
+      "sha256": "aafb8125440b401a47a4d8744d56fb005be7857e98afae9f53743d56adcbcd0e"
+    },
+    "subsequent_migration_count": 15,
+    "subsequent_migrations": [
+      {
+        "source": "supabase/migrations/20261001173502_reference_catalog_rls.sql",
+        "output": "migrations/20261001173502_reference_catalog_rls.sql",
+        "sha256": "4576aa01d750328d1593c00de208e0297f694a787475cec96e69122198b68823",
+        "bytes": 4064,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001175738_provider_directory_rls.sql",
+        "output": "migrations/20261001175738_provider_directory_rls.sql",
+        "sha256": "68a45ab1d356ecaf603a9fd736b1d044f4bf31d8517fd6ae11c82be695f364c8",
+        "bytes": 1127,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001175912_provider_directory_view_privileges.sql",
+        "output": "migrations/20261001175912_provider_directory_view_privileges.sql",
+        "sha256": "14b17505224824e0e38781dee62d78eb9e5ecd8d8115fdbfbc7ad2c5e480b17b",
+        "bytes": 323,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001180412_project_workspace_rls.sql",
+        "output": "migrations/20261001180412_project_workspace_rls.sql",
+        "sha256": "138d1f769b5101b87e1544aacbd591b182a01130f6ad8dd91490d44391aae32c",
+        "bytes": 3671,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001180542_internal_project_records_rls.sql",
+        "output": "migrations/20261001180542_internal_project_records_rls.sql",
+        "sha256": "fafb481456769d73b536574c9568c83ee94af6a56d2bf9a3c1c82732dd61429e",
+        "bytes": 852,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001180951_public_view_function_hardening.sql",
+        "output": "migrations/20261001180951_public_view_function_hardening.sql",
+        "sha256": "a8dfeb66da80a17dfba033068d46e55d9c9ba88cdd1484310674531cb3397e9a",
+        "bytes": 2373,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001181257_auth_profile_trigger_reconcile.sql",
+        "output": "migrations/20261001181257_auth_profile_trigger_reconcile.sql",
+        "sha256": "e7d2f3af2be255839815f32d1d59aaf7ea2a4a6bf1d40f232c221413aa36f4d3",
+        "bytes": 672,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001181520_pin_trigger_search_paths.sql",
+        "output": "migrations/20261001181520_pin_trigger_search_paths.sql",
+        "sha256": "7ce6ccb10abf372a7c431a1206fb99a9821be7fc216911510b50a3cf55cc88ad",
+        "bytes": 1113,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261001181707_user_workflow_grant_hardening.sql",
+        "output": "migrations/20261001181707_user_workflow_grant_hardening.sql",
+        "sha256": "8852736053c938587327c003d00c85375dbac4cfbb89aa58a5380bd4a00fca91",
+        "bytes": 922,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261004071659_replace_approved_host_public_view_projection.sql",
+        "output": "migrations/20261004071659_replace_approved_host_public_view_projection.sql",
+        "sha256": "d8015797728100145ab986ccd37c98331b663d35205311d024586e9a820d977a",
+        "bytes": 3633,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261004072504_enforce_single_pending_offer_per_type.sql",
+        "output": "migrations/20261004072504_enforce_single_pending_offer_per_type.sql",
+        "sha256": "6318ead8cf5ee77e8b523093ce0bb699cac7836191d7f109028e5775c16d377d",
+        "bytes": 144,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261004080448_booking_schedule_integrity.sql",
+        "output": "migrations/20261004080448_booking_schedule_integrity.sql",
+        "sha256": "7600852f921309759813e2e6ab7ac08362c6f8a219162d336052af501a0cf1f3",
+        "bytes": 5061,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261004080713_persist_host_constraints.sql",
+        "output": "migrations/20261004080713_persist_host_constraints.sql",
+        "sha256": "9e5e74372ffe39d7257611b9c083ba0b931c65f0cbf9de09c04ac4bf9da5a2d5",
+        "bytes": 1970,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261004081311_translation_roots_catalog.sql",
+        "output": "migrations/20261004081311_translation_roots_catalog.sql",
+        "sha256": "bbb6c7d7d78e4eb0fa730915ee06dc05238b4002b75a39cd5daaab7e51d01d22",
+        "bytes": 4284,
+        "copied_byte_for_byte": true
+      },
+      {
+        "source": "supabase/migrations/20261021195905_explicit_public_data_api_permissions.sql",
+        "output": "migrations/20261021195905_explicit_public_data_api_permissions.sql",
+        "sha256": "a08ed66b7b7d3d65981932433d94a7df51063c76c8adb67d2a3ca6d2b5fc2b6e",
+        "bytes": 5761,
+        "copied_byte_for_byte": true
+      }
+    ],
+    "execution_order": [
+      "baseline.local-only.sql",
+      "reset-session.local-only.sql",
+      "migrations/20261001173502_reference_catalog_rls.sql",
+      "migrations/20261001175738_provider_directory_rls.sql",
+      "migrations/20261001175912_provider_directory_view_privileges.sql",
+      "migrations/20261001180412_project_workspace_rls.sql",
+      "migrations/20261001180542_internal_project_records_rls.sql",
+      "migrations/20261001180951_public_view_function_hardening.sql",
+      "migrations/20261001181257_auth_profile_trigger_reconcile.sql",
+      "migrations/20261001181520_pin_trigger_search_paths.sql",
+      "migrations/20261001181707_user_workflow_grant_hardening.sql",
+      "migrations/20261004071659_replace_approved_host_public_view_projection.sql",
+      "migrations/20261004072504_enforce_single_pending_offer_per_type.sql",
+      "migrations/20261004080448_booking_schedule_integrity.sql",
+      "migrations/20261004080713_persist_host_constraints.sql",
+      "migrations/20261004081311_translation_roots_catalog.sql",
+      "migrations/20261021195905_explicit_public_data_api_permissions.sql"
+    ],
+    "prerequisites_not_provided": [
+      "An isolated disposable database; this script never creates or selects one.",
+      "Supabase-compatible roles, auth.users/auth.uid(), and required schemas.",
+      "Supported PostgreSQL extensions installed in the local test environment."
+    ],
+    "limitations": [
+      "Preparation is not database execution or an application access test.",
+      "Original historical statement boundaries receive terminal semicolons in separate output.",
+      "The source evidence snapshot and all subsequent source migrations remain unchanged.",
+      "Historical broad grants and default privileges are deliberately retained, not silently corrected.",
+      "Supabase mode retains all managed-service statements and still requires a compatible local stack."
+    ]
+  },
+  "historical_defaults_probe": {
+    "broad_privileges_confirmed": 24,
+    "probe_rolled_back": true
+  },
+  "baseline_only_correction": {
+    "expected_prerequisite_failure": true,
+    "default_privileges_unchanged": true,
+    "defaults_fingerprint": "6205b7568311acb01a824a0b341f82bc5d5260be836f4091456776bbe3ea3922"
+  },
+  "forward_correction": {
+    "applied_twice": true,
+    "policies_and_rls_unchanged": true,
+    "policy_fingerprint_before": "8968d0209753d3e31420576f99149736fdcd39f65fb05b0e9eec29e8c107a4d8",
+    "policy_fingerprint_after": "8968d0209753d3e31420576f99149736fdcd39f65fb05b0e9eec29e8c107a4d8",
+    "policy_fingerprint_after_repeat": "8968d0209753d3e31420576f99149736fdcd39f65fb05b0e9eec29e8c107a4d8",
+    "defaults_fingerprint_after_repeat": "af9d28abdba7edb6b57d95419d55eaed14451464c34d546d18bcdaf76dab3584"
+  },
+  "pgtap": {
+    "status": "PASS",
+    "planned": 468,
+    "passed": 468,
+    "failed": 0
+  },
+  "api": {
+    "status": "NOT_RUN",
+    "reason": "--api was not requested"
+  },
+  "finished_at": "2026-10-21T20:04:59.384607+00:00"
+}

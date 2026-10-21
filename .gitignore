@@ -9,3 +9,11 @@ dist
 .env*.local
 
 tsconfig.tsbuildinfo
+
+# Local database tooling/cache; never part of a reviewed migration.
+supabase/.temp/
+__pycache__/
+*.pyc
+
+# Reviewed, redacted local reconstruction evidence retained with this audit.
+!docs/database/permissions-audit/evidence/**/*.log

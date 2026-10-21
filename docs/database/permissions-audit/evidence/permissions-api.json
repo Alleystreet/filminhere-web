@@ -1,0 +1,218 @@
+{
+  "suite": "local-supabase-js-permissions",
+  "started_at": "2026-10-21T20:02:25.383Z",
+  "finished_at": "2026-10-21T20:02:25.713Z",
+  "target": "http://127.0.0.1:55440",
+  "identities": "synthetic local fixtures",
+  "secrets_logged": false,
+  "status": "PASS",
+  "passed": 51,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "anon: public approved listing read",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: active glossary read",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: inactive glossary row hidden by RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: public projection insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: glossary insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: public approved listing read",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: active glossary read",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: inactive glossary row hidden by RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: public projection insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: glossary insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "service: direct approved_host_listings_public read denied",
+      "status": "PASS"
+    },
+    {
+      "name": "service: direct approved_host_listings_public insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "service: direct translation_roots read denied",
+      "status": "PASS"
+    },
+    {
+      "name": "service: direct translation_roots insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: participant booking_requests read",
+      "status": "PASS"
+    },
+    {
+      "name": "host: participant booking_requests read",
+      "status": "PASS"
+    },
+    {
+      "name": "outsider: booking_requests hidden by RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: private booking_requests read denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: participant booking_messages read",
+      "status": "PASS"
+    },
+    {
+      "name": "host: participant booking_messages read",
+      "status": "PASS"
+    },
+    {
+      "name": "outsider: booking_messages hidden by RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: private booking_messages read denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: participant booking_offers read",
+      "status": "PASS"
+    },
+    {
+      "name": "host: participant booking_offers read",
+      "status": "PASS"
+    },
+    {
+      "name": "outsider: booking_offers hidden by RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: private booking_offers read denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: direct protected booking update denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: direct protected offer update denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: own pending booking insert preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: cross-owner booking insert denied by RLS",
+      "status": "PASS"
+    },
+    {
+      "name": "admin: own profile authorization read",
+      "status": "PASS"
+    },
+    {
+      "name": "host: own pending listing insert",
+      "status": "PASS"
+    },
+    {
+      "name": "service: approval synchronizes projection through definer trigger",
+      "status": "PASS"
+    },
+    {
+      "name": "service: approved source title update synchronizes projection",
+      "status": "PASS"
+    },
+    {
+      "name": "service: rejection removes projection through definer trigger",
+      "status": "PASS"
+    },
+    {
+      "name": "service: authorized source deletion removes approved projection",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: own policy acceptance insert",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: cross-owner policy acceptance insert denied",
+      "status": "PASS"
+    },
+    {
+      "name": "outsider: own policy prerequisite for RPC authorization test",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: service-only finalize_booking_acceptance execution denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: service-only finalize_booking_acceptance execution denied",
+      "status": "PASS"
+    },
+    {
+      "name": "service: finalize_booking_acceptance rejects unrelated actor",
+      "status": "PASS"
+    },
+    {
+      "name": "anon: service-only persist_host_constraints execution denied",
+      "status": "PASS"
+    },
+    {
+      "name": "filmmaker: service-only persist_host_constraints execution denied",
+      "status": "PASS"
+    },
+    {
+      "name": "service: persist_host_constraints rejects unrelated actor",
+      "status": "PASS"
+    },
+    {
+      "name": "denied RPCs preserve booking state",
+      "status": "PASS"
+    },
+    {
+      "name": "service: required booking message insert and select preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "service: required booking offer insert, update and select preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "service: required booking update preserved",
+      "status": "PASS"
+    },
+    {
+      "name": "service: authorized host constraints RPC persists row and audit message",
+      "status": "PASS"
+    },
+    {
+      "name": "service: authorized host acceptance RPC finalizes booking and offers",
+      "status": "PASS"
+    }
+  ],
+  "limits": "Direct supabase-js/PostgREST checks; no hosted Supabase Auth, browser, GraphQL, or Production tests."
+}
