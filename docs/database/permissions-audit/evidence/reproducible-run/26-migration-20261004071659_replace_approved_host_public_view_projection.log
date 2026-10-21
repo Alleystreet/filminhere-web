@@ -1,0 +1,5 @@
+exit_code: 0
+STDOUT
+
+STDERR
+psql:/tmp/filminhere-permissions-reconstruction-gobakvfy/staging/migrations/20261004071659_replace_approved_host_public_view_projection.sql:138: NOTICE:  trigger "sync_approved_host_listing_public" for relation "public.host_listing_submissions" does not exist, skipping

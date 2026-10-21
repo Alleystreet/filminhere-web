@@ -1,0 +1,208 @@
+20261001173502_reference_catalog_rls.sql
+SET
+REVOKE
+GRANT
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+
+20261001175738_provider_directory_rls.sql
+SET
+REVOKE
+GRANT
+ALTER TABLE
+CREATE POLICY
+CREATE VIEW
+REVOKE
+GRANT
+
+20261001175912_provider_directory_view_privileges.sql
+SET
+REVOKE
+GRANT
+
+20261001180412_project_workspace_rls.sql
+SET
+REVOKE
+GRANT
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+REVOKE
+
+20261001180542_internal_project_records_rls.sql
+SET
+REVOKE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+
+20261001180951_public_view_function_hardening.sql
+SET
+REVOKE
+GRANT
+REVOKE
+GRANT
+ALTER VIEW
+REVOKE
+GRANT
+CREATE SCHEMA
+REVOKE
+GRANT
+CREATE FUNCTION
+REVOKE
+GRANT
+ALTER POLICY
+ALTER POLICY
+DROP FUNCTION
+REVOKE
+
+20261001181257_auth_profile_trigger_reconcile.sql
+SET
+DO
+
+20261001181520_pin_trigger_search_paths.sql
+SET
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+ALTER FUNCTION
+
+20261001181707_user_workflow_grant_hardening.sql
+SET
+REVOKE
+GRANT
+REVOKE
+GRANT
+REVOKE
+GRANT
+REVOKE
+GRANT
+REVOKE
+GRANT
+
+20261004071659_replace_approved_host_public_view_projection.sql
+SET
+DROP VIEW
+CREATE TABLE
+ALTER TABLE
+CREATE POLICY
+REVOKE
+GRANT
+GRANT
+INSERT 0 0
+CREATE FUNCTION
+REVOKE
+DROP TRIGGER
+CREATE TRIGGER
+COMMENT
+COMMENT
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261004071659_replace_approved_host_public_view_projection.sql:138: NOTICE:  trigger "sync_approved_host_listing_public" for relation "public.host_listing_submissions" does not exist, skipping
+
+20261004072504_enforce_single_pending_offer_per_type.sql
+SET
+CREATE INDEX
+
+20261004080448_booking_schedule_integrity.sql
+SET
+CREATE EXTENSION
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+REVOKE
+GRANT
+COMMENT
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261004080448_booking_schedule_integrity.sql:1: NOTICE:  extension "btree_gist" already exists, skipping
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261004080448_booking_schedule_integrity.sql:7: NOTICE:  constraint "booking_requests_valid_time_range" of relation "booking_requests" does not exist, skipping
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261004080448_booking_schedule_integrity.sql:18: NOTICE:  constraint "booking_requests_no_overlapping_accepted_listing" of relation "booking_requests" does not exist, skipping
+
+20261004080713_persist_host_constraints.sql
+SET
+CREATE FUNCTION
+REVOKE
+GRANT
+COMMENT
+
+20261004081311_translation_roots_catalog.sql
+SET
+CREATE TABLE
+ALTER TABLE
+REVOKE
+GRANT
+GRANT
+DROP POLICY
+CREATE POLICY
+INSERT 0 20
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261004081311_translation_roots_catalog.sql:19: NOTICE:  policy "Public can read active translation roots" for relation "public.translation_roots" does not exist, skipping
+
+20261021195905_explicit_public_data_api_permissions.sql pass 1
+SET
+BEGIN
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+DO
+REVOKE
+GRANT
+REVOKE
+REVOKE
+GRANT
+REVOKE
+COMMIT
+
+20261021195905_explicit_public_data_api_permissions.sql pass 2
+SET
+BEGIN
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+DO
+REVOKE
+GRANT
+REVOKE
+REVOKE
+GRANT
+REVOKE
+COMMIT

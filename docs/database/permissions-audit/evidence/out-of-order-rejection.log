@@ -1,0 +1,10 @@
+SET
+BEGIN
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261021195905_explicit_public_data_api_permissions.sql:47: ERROR:  Expected postgres-owned, RLS-enabled public catalog, projection and glossary tables
+CONTEXT:  PL/pgSQL function inline_code_block line 13 at RAISE
+
+Default privilege fingerprint unchanged: ef24848c77d4466f7c244b0984623b45

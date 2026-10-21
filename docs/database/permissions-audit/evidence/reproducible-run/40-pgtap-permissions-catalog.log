@@ -1,0 +1,473 @@
+exit_code: 0
+STDOUT
+ok 1 - All 32 application tables reconstructed
+ok 2 - Every application table retains RLS
+ok 3 - Auth signup trigger created all fixture profiles
+ok 4 - Signup trigger preserves supported host role
+ok 5 - Projection trigger retains trusted definer owner
+ok 6 - anon SELECT listing_types
+ok 7 - anon SELECT departments
+ok 8 - anon SELECT categories
+ok 9 - anon SELECT listing_attributes
+ok 10 - anon SELECT shoot_types
+ok 11 - anon SELECT shoot_requirements
+ok 12 - anon SELECT resource_relationships
+ok 13 - anon SELECT distribution_destinations
+ok 14 - anon SELECT destination_field_mappings
+ok 15 - anon SELECT destination_asset_requirements
+ok 16 - anon SELECT project_statuses
+ok 17 - anon SELECT project_deliverables
+ok 18 - anon SELECT project_rights_checklist
+ok 19 - anon SELECT approved_host_listings_public
+ok 20 - anon SELECT translation_roots
+ok 21 - authenticated SELECT listing_types
+ok 22 - authenticated SELECT departments
+ok 23 - authenticated SELECT categories
+ok 24 - authenticated SELECT listing_attributes
+ok 25 - authenticated SELECT shoot_types
+ok 26 - authenticated SELECT shoot_requirements
+ok 27 - authenticated SELECT resource_relationships
+ok 28 - authenticated SELECT distribution_destinations
+ok 29 - authenticated SELECT destination_field_mappings
+ok 30 - authenticated SELECT destination_asset_requirements
+ok 31 - authenticated SELECT project_statuses
+ok 32 - authenticated SELECT project_deliverables
+ok 33 - authenticated SELECT project_rights_checklist
+ok 34 - authenticated SELECT approved_host_listings_public
+ok 35 - authenticated SELECT translation_roots
+ok 36 - anon denied INSERT listing_types
+ok 37 - anon denied UPDATE listing_types
+ok 38 - anon denied DELETE listing_types
+ok 39 - anon denied TRUNCATE listing_types
+ok 40 - anon denied REFERENCES listing_types
+ok 41 - anon denied TRIGGER listing_types
+ok 42 - anon denied MAINTAIN listing_types
+ok 43 - authenticated denied INSERT listing_types
+ok 44 - authenticated denied UPDATE listing_types
+ok 45 - authenticated denied DELETE listing_types
+ok 46 - authenticated denied TRUNCATE listing_types
+ok 47 - authenticated denied REFERENCES listing_types
+ok 48 - authenticated denied TRIGGER listing_types
+ok 49 - authenticated denied MAINTAIN listing_types
+ok 50 - anon denied INSERT departments
+ok 51 - anon denied UPDATE departments
+ok 52 - anon denied DELETE departments
+ok 53 - anon denied TRUNCATE departments
+ok 54 - anon denied REFERENCES departments
+ok 55 - anon denied TRIGGER departments
+ok 56 - anon denied MAINTAIN departments
+ok 57 - authenticated denied INSERT departments
+ok 58 - authenticated denied UPDATE departments
+ok 59 - authenticated denied DELETE departments
+ok 60 - authenticated denied TRUNCATE departments
+ok 61 - authenticated denied REFERENCES departments
+ok 62 - authenticated denied TRIGGER departments
+ok 63 - authenticated denied MAINTAIN departments
+ok 64 - anon denied INSERT categories
+ok 65 - anon denied UPDATE categories
+ok 66 - anon denied DELETE categories
+ok 67 - anon denied TRUNCATE categories
+ok 68 - anon denied REFERENCES categories
+ok 69 - anon denied TRIGGER categories
+ok 70 - anon denied MAINTAIN categories
+ok 71 - authenticated denied INSERT categories
+ok 72 - authenticated denied UPDATE categories
+ok 73 - authenticated denied DELETE categories
+ok 74 - authenticated denied TRUNCATE categories
+ok 75 - authenticated denied REFERENCES categories
+ok 76 - authenticated denied TRIGGER categories
+ok 77 - authenticated denied MAINTAIN categories
+ok 78 - anon denied INSERT listing_attributes
+ok 79 - anon denied UPDATE listing_attributes
+ok 80 - anon denied DELETE listing_attributes
+ok 81 - anon denied TRUNCATE listing_attributes
+ok 82 - anon denied REFERENCES listing_attributes
+ok 83 - anon denied TRIGGER listing_attributes
+ok 84 - anon denied MAINTAIN listing_attributes
+ok 85 - authenticated denied INSERT listing_attributes
+ok 86 - authenticated denied UPDATE listing_attributes
+ok 87 - authenticated denied DELETE listing_attributes
+ok 88 - authenticated denied TRUNCATE listing_attributes
+ok 89 - authenticated denied REFERENCES listing_attributes
+ok 90 - authenticated denied TRIGGER listing_attributes
+ok 91 - authenticated denied MAINTAIN listing_attributes
+ok 92 - anon denied INSERT shoot_types
+ok 93 - anon denied UPDATE shoot_types
+ok 94 - anon denied DELETE shoot_types
+ok 95 - anon denied TRUNCATE shoot_types
+ok 96 - anon denied REFERENCES shoot_types
+ok 97 - anon denied TRIGGER shoot_types
+ok 98 - anon denied MAINTAIN shoot_types
+ok 99 - authenticated denied INSERT shoot_types
+ok 100 - authenticated denied UPDATE shoot_types
+ok 101 - authenticated denied DELETE shoot_types
+ok 102 - authenticated denied TRUNCATE shoot_types
+ok 103 - authenticated denied REFERENCES shoot_types
+ok 104 - authenticated denied TRIGGER shoot_types
+ok 105 - authenticated denied MAINTAIN shoot_types
+ok 106 - anon denied INSERT shoot_requirements
+ok 107 - anon denied UPDATE shoot_requirements
+ok 108 - anon denied DELETE shoot_requirements
+ok 109 - anon denied TRUNCATE shoot_requirements
+ok 110 - anon denied REFERENCES shoot_requirements
+ok 111 - anon denied TRIGGER shoot_requirements
+ok 112 - anon denied MAINTAIN shoot_requirements
+ok 113 - authenticated denied INSERT shoot_requirements
+ok 114 - authenticated denied UPDATE shoot_requirements
+ok 115 - authenticated denied DELETE shoot_requirements
+ok 116 - authenticated denied TRUNCATE shoot_requirements
+ok 117 - authenticated denied REFERENCES shoot_requirements
+ok 118 - authenticated denied TRIGGER shoot_requirements
+ok 119 - authenticated denied MAINTAIN shoot_requirements
+ok 120 - anon denied INSERT resource_relationships
+ok 121 - anon denied UPDATE resource_relationships
+ok 122 - anon denied DELETE resource_relationships
+ok 123 - anon denied TRUNCATE resource_relationships
+ok 124 - anon denied REFERENCES resource_relationships
+ok 125 - anon denied TRIGGER resource_relationships
+ok 126 - anon denied MAINTAIN resource_relationships
+ok 127 - authenticated denied INSERT resource_relationships
+ok 128 - authenticated denied UPDATE resource_relationships
+ok 129 - authenticated denied DELETE resource_relationships
+ok 130 - authenticated denied TRUNCATE resource_relationships
+ok 131 - authenticated denied REFERENCES resource_relationships
+ok 132 - authenticated denied TRIGGER resource_relationships
+ok 133 - authenticated denied MAINTAIN resource_relationships
+ok 134 - anon denied INSERT distribution_destinations
+ok 135 - anon denied UPDATE distribution_destinations
+ok 136 - anon denied DELETE distribution_destinations
+ok 137 - anon denied TRUNCATE distribution_destinations
+ok 138 - anon denied REFERENCES distribution_destinations
+ok 139 - anon denied TRIGGER distribution_destinations
+ok 140 - anon denied MAINTAIN distribution_destinations
+ok 141 - authenticated denied INSERT distribution_destinations
+ok 142 - authenticated denied UPDATE distribution_destinations
+ok 143 - authenticated denied DELETE distribution_destinations
+ok 144 - authenticated denied TRUNCATE distribution_destinations
+ok 145 - authenticated denied REFERENCES distribution_destinations
+ok 146 - authenticated denied TRIGGER distribution_destinations
+ok 147 - authenticated denied MAINTAIN distribution_destinations
+ok 148 - anon denied INSERT destination_field_mappings
+ok 149 - anon denied UPDATE destination_field_mappings
+ok 150 - anon denied DELETE destination_field_mappings
+ok 151 - anon denied TRUNCATE destination_field_mappings
+ok 152 - anon denied REFERENCES destination_field_mappings
+ok 153 - anon denied TRIGGER destination_field_mappings
+ok 154 - anon denied MAINTAIN destination_field_mappings
+ok 155 - authenticated denied INSERT destination_field_mappings
+ok 156 - authenticated denied UPDATE destination_field_mappings
+ok 157 - authenticated denied DELETE destination_field_mappings
+ok 158 - authenticated denied TRUNCATE destination_field_mappings
+ok 159 - authenticated denied REFERENCES destination_field_mappings
+ok 160 - authenticated denied TRIGGER destination_field_mappings
+ok 161 - authenticated denied MAINTAIN destination_field_mappings
+ok 162 - anon denied INSERT destination_asset_requirements
+ok 163 - anon denied UPDATE destination_asset_requirements
+ok 164 - anon denied DELETE destination_asset_requirements
+ok 165 - anon denied TRUNCATE destination_asset_requirements
+ok 166 - anon denied REFERENCES destination_asset_requirements
+ok 167 - anon denied TRIGGER destination_asset_requirements
+ok 168 - anon denied MAINTAIN destination_asset_requirements
+ok 169 - authenticated denied INSERT destination_asset_requirements
+ok 170 - authenticated denied UPDATE destination_asset_requirements
+ok 171 - authenticated denied DELETE destination_asset_requirements
+ok 172 - authenticated denied TRUNCATE destination_asset_requirements
+ok 173 - authenticated denied REFERENCES destination_asset_requirements
+ok 174 - authenticated denied TRIGGER destination_asset_requirements
+ok 175 - authenticated denied MAINTAIN destination_asset_requirements
+ok 176 - anon denied INSERT project_statuses
+ok 177 - anon denied UPDATE project_statuses
+ok 178 - anon denied DELETE project_statuses
+ok 179 - anon denied TRUNCATE project_statuses
+ok 180 - anon denied REFERENCES project_statuses
+ok 181 - anon denied TRIGGER project_statuses
+ok 182 - anon denied MAINTAIN project_statuses
+ok 183 - authenticated denied INSERT project_statuses
+ok 184 - authenticated denied UPDATE project_statuses
+ok 185 - authenticated denied DELETE project_statuses
+ok 186 - authenticated denied TRUNCATE project_statuses
+ok 187 - authenticated denied REFERENCES project_statuses
+ok 188 - authenticated denied TRIGGER project_statuses
+ok 189 - authenticated denied MAINTAIN project_statuses
+ok 190 - anon denied INSERT project_deliverables
+ok 191 - anon denied UPDATE project_deliverables
+ok 192 - anon denied DELETE project_deliverables
+ok 193 - anon denied TRUNCATE project_deliverables
+ok 194 - anon denied REFERENCES project_deliverables
+ok 195 - anon denied TRIGGER project_deliverables
+ok 196 - anon denied MAINTAIN project_deliverables
+ok 197 - authenticated denied INSERT project_deliverables
+ok 198 - authenticated denied UPDATE project_deliverables
+ok 199 - authenticated denied DELETE project_deliverables
+ok 200 - authenticated denied TRUNCATE project_deliverables
+ok 201 - authenticated denied REFERENCES project_deliverables
+ok 202 - authenticated denied TRIGGER project_deliverables
+ok 203 - authenticated denied MAINTAIN project_deliverables
+ok 204 - anon denied INSERT project_rights_checklist
+ok 205 - anon denied UPDATE project_rights_checklist
+ok 206 - anon denied DELETE project_rights_checklist
+ok 207 - anon denied TRUNCATE project_rights_checklist
+ok 208 - anon denied REFERENCES project_rights_checklist
+ok 209 - anon denied TRIGGER project_rights_checklist
+ok 210 - anon denied MAINTAIN project_rights_checklist
+ok 211 - authenticated denied INSERT project_rights_checklist
+ok 212 - authenticated denied UPDATE project_rights_checklist
+ok 213 - authenticated denied DELETE project_rights_checklist
+ok 214 - authenticated denied TRUNCATE project_rights_checklist
+ok 215 - authenticated denied REFERENCES project_rights_checklist
+ok 216 - authenticated denied TRIGGER project_rights_checklist
+ok 217 - authenticated denied MAINTAIN project_rights_checklist
+ok 218 - anon denied INSERT approved_host_listings_public
+ok 219 - anon denied UPDATE approved_host_listings_public
+ok 220 - anon denied DELETE approved_host_listings_public
+ok 221 - anon denied TRUNCATE approved_host_listings_public
+ok 222 - anon denied REFERENCES approved_host_listings_public
+ok 223 - anon denied TRIGGER approved_host_listings_public
+ok 224 - anon denied MAINTAIN approved_host_listings_public
+ok 225 - authenticated denied INSERT approved_host_listings_public
+ok 226 - authenticated denied UPDATE approved_host_listings_public
+ok 227 - authenticated denied DELETE approved_host_listings_public
+ok 228 - authenticated denied TRUNCATE approved_host_listings_public
+ok 229 - authenticated denied REFERENCES approved_host_listings_public
+ok 230 - authenticated denied TRIGGER approved_host_listings_public
+ok 231 - authenticated denied MAINTAIN approved_host_listings_public
+ok 232 - anon denied INSERT translation_roots
+ok 233 - anon denied UPDATE translation_roots
+ok 234 - anon denied DELETE translation_roots
+ok 235 - anon denied TRUNCATE translation_roots
+ok 236 - anon denied REFERENCES translation_roots
+ok 237 - anon denied TRIGGER translation_roots
+ok 238 - anon denied MAINTAIN translation_roots
+ok 239 - authenticated denied INSERT translation_roots
+ok 240 - authenticated denied UPDATE translation_roots
+ok 241 - authenticated denied DELETE translation_roots
+ok 242 - authenticated denied TRUNCATE translation_roots
+ok 243 - authenticated denied REFERENCES translation_roots
+ok 244 - authenticated denied TRIGGER translation_roots
+ok 245 - authenticated denied MAINTAIN translation_roots
+ok 246 - anon denied sequence USAGE project_destination_selections_id_seq
+ok 247 - authenticated denied sequence USAGE project_destination_selections_id_seq
+ok 248 - anon denied sequence USAGE project_monetization_tracking_id_seq
+ok 249 - authenticated denied sequence USAGE project_monetization_tracking_id_seq
+ok 250 - anon denied sequence USAGE project_rights_tracking_id_seq
+ok 251 - authenticated denied sequence USAGE project_rights_tracking_id_seq
+ok 252 - anon denied sequence USAGE project_statuses_id_seq
+ok 253 - authenticated denied sequence USAGE project_statuses_id_seq
+ok 254 - anon denied sequence USAGE project_submission_packets_id_seq
+ok 255 - authenticated denied sequence USAGE project_submission_packets_id_seq
+ok 256 - anon denied sequence USAGE project_submission_review_log_id_seq
+ok 257 - authenticated denied sequence USAGE project_submission_review_log_id_seq
+ok 258 - anon denied sequence USAGE destination_asset_requirements_id_seq
+ok 259 - authenticated denied sequence USAGE destination_asset_requirements_id_seq
+ok 260 - anon denied sequence USAGE project_deliverable_tracking_id_seq
+ok 261 - authenticated denied sequence USAGE project_deliverable_tracking_id_seq
+ok 262 - anon denied sequence USAGE shoot_types_id_seq
+ok 263 - authenticated denied sequence USAGE shoot_types_id_seq
+ok 264 - anon denied sequence USAGE listing_types_id_seq
+ok 265 - authenticated denied sequence USAGE listing_types_id_seq
+ok 266 - anon denied sequence USAGE project_activity_log_id_seq
+ok 267 - authenticated denied sequence USAGE project_activity_log_id_seq
+ok 268 - anon denied sequence USAGE project_approval_decisions_id_seq
+ok 269 - authenticated denied sequence USAGE project_approval_decisions_id_seq
+ok 270 - anon denied sequence USAGE project_deliverables_id_seq
+ok 271 - authenticated denied sequence USAGE project_deliverables_id_seq
+ok 272 - anon denied sequence USAGE translation_roots_id_seq
+ok 273 - authenticated denied sequence USAGE translation_roots_id_seq
+ok 274 - anon denied sequence USAGE categories_id_seq
+ok 275 - authenticated denied sequence USAGE categories_id_seq
+ok 276 - anon denied sequence USAGE departments_id_seq
+ok 277 - authenticated denied sequence USAGE departments_id_seq
+ok 278 - anon denied sequence USAGE destination_field_mappings_id_seq
+ok 279 - authenticated denied sequence USAGE destination_field_mappings_id_seq
+ok 280 - anon denied sequence USAGE distribution_destinations_id_seq
+ok 281 - authenticated denied sequence USAGE distribution_destinations_id_seq
+ok 282 - anon denied sequence USAGE listing_attributes_id_seq
+ok 283 - authenticated denied sequence USAGE listing_attributes_id_seq
+ok 284 - anon denied sequence USAGE project_distribution_release_tracking_id_seq
+ok 285 - authenticated denied sequence USAGE project_distribution_release_tracking_id_seq
+ok 286 - anon denied sequence USAGE project_rights_checklist_id_seq
+ok 287 - authenticated denied sequence USAGE project_rights_checklist_id_seq
+ok 288 - anon denied sequence USAGE projects_id_seq
+ok 289 - authenticated denied sequence USAGE projects_id_seq
+ok 290 - anon denied sequence USAGE resource_relationships_id_seq
+ok 291 - authenticated denied sequence USAGE resource_relationships_id_seq
+ok 292 - anon denied sequence USAGE shoot_requirements_id_seq
+ok 293 - authenticated denied sequence USAGE shoot_requirements_id_seq
+ok 294 - anon denied sequence SELECT project_destination_selections_id_seq
+ok 295 - authenticated denied sequence SELECT project_destination_selections_id_seq
+ok 296 - anon denied sequence SELECT project_monetization_tracking_id_seq
+ok 297 - authenticated denied sequence SELECT project_monetization_tracking_id_seq
+ok 298 - anon denied sequence SELECT project_rights_tracking_id_seq
+ok 299 - authenticated denied sequence SELECT project_rights_tracking_id_seq
+ok 300 - anon denied sequence SELECT project_statuses_id_seq
+ok 301 - authenticated denied sequence SELECT project_statuses_id_seq
+ok 302 - anon denied sequence SELECT project_submission_packets_id_seq
+ok 303 - authenticated denied sequence SELECT project_submission_packets_id_seq
+ok 304 - anon denied sequence SELECT project_submission_review_log_id_seq
+ok 305 - authenticated denied sequence SELECT project_submission_review_log_id_seq
+ok 306 - anon denied sequence SELECT destination_asset_requirements_id_seq
+ok 307 - authenticated denied sequence SELECT destination_asset_requirements_id_seq
+ok 308 - anon denied sequence SELECT project_deliverable_tracking_id_seq
+ok 309 - authenticated denied sequence SELECT project_deliverable_tracking_id_seq
+ok 310 - anon denied sequence SELECT shoot_types_id_seq
+ok 311 - authenticated denied sequence SELECT shoot_types_id_seq
+ok 312 - anon denied sequence SELECT listing_types_id_seq
+ok 313 - authenticated denied sequence SELECT listing_types_id_seq
+ok 314 - anon denied sequence SELECT project_activity_log_id_seq
+ok 315 - authenticated denied sequence SELECT project_activity_log_id_seq
+ok 316 - anon denied sequence SELECT project_approval_decisions_id_seq
+ok 317 - authenticated denied sequence SELECT project_approval_decisions_id_seq
+ok 318 - anon denied sequence SELECT project_deliverables_id_seq
+ok 319 - authenticated denied sequence SELECT project_deliverables_id_seq
+ok 320 - anon denied sequence SELECT translation_roots_id_seq
+ok 321 - authenticated denied sequence SELECT translation_roots_id_seq
+ok 322 - anon denied sequence SELECT categories_id_seq
+ok 323 - authenticated denied sequence SELECT categories_id_seq
+ok 324 - anon denied sequence SELECT departments_id_seq
+ok 325 - authenticated denied sequence SELECT departments_id_seq
+ok 326 - anon denied sequence SELECT destination_field_mappings_id_seq
+ok 327 - authenticated denied sequence SELECT destination_field_mappings_id_seq
+ok 328 - anon denied sequence SELECT distribution_destinations_id_seq
+ok 329 - authenticated denied sequence SELECT distribution_destinations_id_seq
+ok 330 - anon denied sequence SELECT listing_attributes_id_seq
+ok 331 - authenticated denied sequence SELECT listing_attributes_id_seq
+ok 332 - anon denied sequence SELECT project_distribution_release_tracking_id_seq
+ok 333 - authenticated denied sequence SELECT project_distribution_release_tracking_id_seq
+ok 334 - anon denied sequence SELECT project_rights_checklist_id_seq
+ok 335 - authenticated denied sequence SELECT project_rights_checklist_id_seq
+ok 336 - anon denied sequence SELECT projects_id_seq
+ok 337 - authenticated denied sequence SELECT projects_id_seq
+ok 338 - anon denied sequence SELECT resource_relationships_id_seq
+ok 339 - authenticated denied sequence SELECT resource_relationships_id_seq
+ok 340 - anon denied sequence SELECT shoot_requirements_id_seq
+ok 341 - authenticated denied sequence SELECT shoot_requirements_id_seq
+ok 342 - anon denied sequence UPDATE project_destination_selections_id_seq
+ok 343 - authenticated denied sequence UPDATE project_destination_selections_id_seq
+ok 344 - anon denied sequence UPDATE project_monetization_tracking_id_seq
+ok 345 - authenticated denied sequence UPDATE project_monetization_tracking_id_seq
+ok 346 - anon denied sequence UPDATE project_rights_tracking_id_seq
+ok 347 - authenticated denied sequence UPDATE project_rights_tracking_id_seq
+ok 348 - anon denied sequence UPDATE project_statuses_id_seq
+ok 349 - authenticated denied sequence UPDATE project_statuses_id_seq
+ok 350 - anon denied sequence UPDATE project_submission_packets_id_seq
+ok 351 - authenticated denied sequence UPDATE project_submission_packets_id_seq
+ok 352 - anon denied sequence UPDATE project_submission_review_log_id_seq
+ok 353 - authenticated denied sequence UPDATE project_submission_review_log_id_seq
+ok 354 - anon denied sequence UPDATE destination_asset_requirements_id_seq
+ok 355 - authenticated denied sequence UPDATE destination_asset_requirements_id_seq
+ok 356 - anon denied sequence UPDATE project_deliverable_tracking_id_seq
+ok 357 - authenticated denied sequence UPDATE project_deliverable_tracking_id_seq
+ok 358 - anon denied sequence UPDATE shoot_types_id_seq
+ok 359 - authenticated denied sequence UPDATE shoot_types_id_seq
+ok 360 - anon denied sequence UPDATE listing_types_id_seq
+ok 361 - authenticated denied sequence UPDATE listing_types_id_seq
+ok 362 - anon denied sequence UPDATE project_activity_log_id_seq
+ok 363 - authenticated denied sequence UPDATE project_activity_log_id_seq
+ok 364 - anon denied sequence UPDATE project_approval_decisions_id_seq
+ok 365 - authenticated denied sequence UPDATE project_approval_decisions_id_seq
+ok 366 - anon denied sequence UPDATE project_deliverables_id_seq
+ok 367 - authenticated denied sequence UPDATE project_deliverables_id_seq
+ok 368 - anon denied sequence UPDATE translation_roots_id_seq
+ok 369 - authenticated denied sequence UPDATE translation_roots_id_seq
+ok 370 - anon denied sequence UPDATE categories_id_seq
+ok 371 - authenticated denied sequence UPDATE categories_id_seq
+ok 372 - anon denied sequence UPDATE departments_id_seq
+ok 373 - authenticated denied sequence UPDATE departments_id_seq
+ok 374 - anon denied sequence UPDATE destination_field_mappings_id_seq
+ok 375 - authenticated denied sequence UPDATE destination_field_mappings_id_seq
+ok 376 - anon denied sequence UPDATE distribution_destinations_id_seq
+ok 377 - authenticated denied sequence UPDATE distribution_destinations_id_seq
+ok 378 - anon denied sequence UPDATE listing_attributes_id_seq
+ok 379 - authenticated denied sequence UPDATE listing_attributes_id_seq
+ok 380 - anon denied sequence UPDATE project_distribution_release_tracking_id_seq
+ok 381 - authenticated denied sequence UPDATE project_distribution_release_tracking_id_seq
+ok 382 - anon denied sequence UPDATE project_rights_checklist_id_seq
+ok 383 - authenticated denied sequence UPDATE project_rights_checklist_id_seq
+ok 384 - anon denied sequence UPDATE projects_id_seq
+ok 385 - authenticated denied sequence UPDATE projects_id_seq
+ok 386 - anon denied sequence UPDATE resource_relationships_id_seq
+ok 387 - authenticated denied sequence UPDATE resource_relationships_id_seq
+ok 388 - anon denied sequence UPDATE shoot_requirements_id_seq
+ok 389 - authenticated denied sequence UPDATE shoot_requirements_id_seq
+ok 390 - service role denied unused glossary sequence USAGE
+ok 391 - service role denied unused glossary sequence SELECT
+ok 392 - service role denied unused glossary sequence UPDATE
+ok 393 - service role denied unused SELECT approved_host_listings_public
+ok 394 - service role denied unused INSERT approved_host_listings_public
+ok 395 - service role denied unused UPDATE approved_host_listings_public
+ok 396 - service role denied unused DELETE approved_host_listings_public
+ok 397 - service role denied unused TRUNCATE approved_host_listings_public
+ok 398 - service role denied unused REFERENCES approved_host_listings_public
+ok 399 - service role denied unused TRIGGER approved_host_listings_public
+ok 400 - service role denied unused MAINTAIN approved_host_listings_public
+ok 401 - service role denied unused SELECT translation_roots
+ok 402 - service role denied unused INSERT translation_roots
+ok 403 - service role denied unused UPDATE translation_roots
+ok 404 - service role denied unused DELETE translation_roots
+ok 405 - service role denied unused TRUNCATE translation_roots
+ok 406 - service role denied unused REFERENCES translation_roots
+ok 407 - service role denied unused TRIGGER translation_roots
+ok 408 - service role denied unused MAINTAIN translation_roots
+ok 409 - Required service privilege SELECT booking_requests
+ok 410 - Required service privilege UPDATE booking_requests
+ok 411 - Required service privilege SELECT host_listing_submissions
+ok 412 - Required service privilege UPDATE host_listing_submissions
+ok 413 - Required service privilege SELECT booking_messages
+ok 414 - Required service privilege INSERT booking_messages
+ok 415 - Required service privilege SELECT booking_offers
+ok 416 - Required service privilege INSERT booking_offers
+ok 417 - Required service privilege UPDATE booking_offers
+ok 418 - Preserved authenticated INSERT booking_requests
+ok 419 - Preserved authenticated INSERT host_listing_submissions
+ok 420 - Preserved authenticated INSERT policy_acceptances
+ok 421 - Preserved service RPC public.finalize_booking_acceptance(uuid,uuid,text)
+ok 422 - Preserved service RPC public.persist_host_constraints(uuid,uuid,jsonb,text)
+ok 423 - anon denied service RPC public.finalize_booking_acceptance(uuid,uuid,text)
+ok 424 - anon denied service RPC public.persist_host_constraints(uuid,uuid,jsonb,text)
+ok 425 - authenticated denied service RPC public.finalize_booking_acceptance(uuid,uuid,text)
+ok 426 - authenticated denied service RPC public.persist_host_constraints(uuid,uuid,jsonb,text)
+ok 427 - Authenticated RLS admin helper still executable
+ok 428 - anon cannot call signup trigger helper
+ok 429 - authenticated cannot call signup trigger helper
+ok 430 - Future table: anon denied SELECT
+ok 431 - Future table: anon denied INSERT
+ok 432 - Future table: anon denied UPDATE
+ok 433 - Future table: anon denied DELETE
+ok 434 - Future table: anon denied TRUNCATE
+ok 435 - Future table: anon denied REFERENCES
+ok 436 - Future table: anon denied TRIGGER
+ok 437 - Future table: anon denied MAINTAIN
+ok 438 - Future table: authenticated denied SELECT
+ok 439 - Future table: authenticated denied INSERT
+ok 440 - Future table: authenticated denied UPDATE
+ok 441 - Future table: authenticated denied DELETE
+ok 442 - Future table: authenticated denied TRUNCATE
+ok 443 - Future table: authenticated denied REFERENCES
+ok 444 - Future table: authenticated denied TRIGGER
+ok 445 - Future table: authenticated denied MAINTAIN
+ok 446 - Future table: service_role denied SELECT
+ok 447 - Future table: service_role denied INSERT
+ok 448 - Future table: service_role denied UPDATE
+ok 449 - Future table: service_role denied DELETE
+ok 450 - Future table: service_role denied TRUNCATE
+ok 451 - Future table: service_role denied REFERENCES
+ok 452 - Future table: service_role denied TRIGGER
+ok 453 - Future table: service_role denied MAINTAIN
+ok 454 - Future sequence: anon denied USAGE
+ok 455 - Future sequence: anon denied SELECT
+ok 456 - Future sequence: anon denied UPDATE
+ok 457 - Future sequence: authenticated denied USAGE
+ok 458 - Future sequence: authenticated denied SELECT
+ok 459 - Future sequence: authenticated denied UPDATE
+ok 460 - Future sequence: service_role denied USAGE
+ok 461 - Future sequence: service_role denied SELECT
+ok 462 - Future sequence: service_role denied UPDATE
+ok 463 - Future function: anon denied public.permissions_future_function()
+ok 464 - Future function: authenticated denied public.permissions_future_function()
+ok 465 - Future function: service_role denied public.permissions_future_function()
+ok 466 - Future function: anon denied auth.permissions_future_function()
+ok 467 - Future function: authenticated denied auth.permissions_future_function()
+ok 468 - Future function: service_role denied auth.permissions_future_function()
+1..468
+
+STDERR

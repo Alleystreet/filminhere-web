@@ -1,0 +1,5 @@
+exit_code: 0
+STDOUT
+
+STDERR
+psql:/tmp/filminhere-permissions-reconstruction-gobakvfy/staging/migrations/20261004081311_translation_roots_catalog.sql:19: NOTICE:  policy "Public can read active translation roots" for relation "public.translation_roots" does not exist, skipping

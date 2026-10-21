@@ -1,0 +1,7 @@
+exit_code: 3
+STDOUT
+
+STDERR
+psql:/workspace/scratch/fff16d164cd2/filminhere-web/supabase/migrations/20261001023713_remote_schema.sql:7861: ERROR:  syntax error at or near "SET"
+LINE 3: SET lock_timeout = 0
+        ^

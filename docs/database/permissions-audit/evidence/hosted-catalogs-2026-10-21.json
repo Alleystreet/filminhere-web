@@ -1,0 +1,1596 @@
+{
+  "observed_at": "2026-10-21",
+  "source": "Read-only PostgreSQL catalog and migration-ledger queries through authorized Supabase connector. No application row data retrieved.",
+  "base_commit": "7bba3c6b13acf77b5915513d4246593f9ea11344",
+  "production": {
+    "project_ref": "gunrmcuvgbipadmelxob",
+    "columns": [
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "email"
+      },
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "display_name"
+      },
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "knowledge_level"
+      },
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "city"
+      },
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "state"
+      },
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "country"
+      },
+      {
+        "acl": "{authenticated=w/postgres}",
+        "table": "profiles",
+        "column": "updated_at"
+      }
+    ],
+    "database": "postgres",
+    "routines": [
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "current_user_is_admin",
+        "owner": "postgres",
+        "config": [
+          "search_path=public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": true
+      },
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "handle_new_auth_user_profile",
+        "owner": "postgres",
+        "config": [
+          "search_path=public, auth, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": true
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_activity_log_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_approval_decisions_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_deliverable_tracking_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_distribution_release_tracking_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_monetization_tracking_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_rights_tracking_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_submission_packets_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_submission_review_log_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_updated_at",
+        "owner": "postgres",
+        "config": null,
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      }
+    ],
+    "relations": [
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "categories_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "departments_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "destination_asset_requirements_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "destination_field_mappings_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "distribution_destinations_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "listing_attributes_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "listing_types_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_activity_log_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_approval_decisions_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_deliverable_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_deliverables_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_destination_selections_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_distribution_release_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_monetization_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_rights_checklist_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_rights_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_statuses_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_submission_packets_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_submission_review_log_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "projects_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "resource_relationships_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "shoot_requirements_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "shoot_types_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "booking_messages",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "booking_offers",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=ar/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "booking_requests",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "categories",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "departments",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "destination_asset_requirements",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "destination_field_mappings",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "distribution_destinations",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "host_listing_submissions",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "listing_attributes",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "listing_types",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "policy_acceptances",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=ar/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "profiles",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_activity_log",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_approval_decisions",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_deliverable_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_deliverables",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_destination_selections",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_distribution_release_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_monetization_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_rights_checklist",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_rights_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_statuses",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_submission_packets",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "project_submission_review_log",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "projects",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "provider_profiles",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "resource_relationships",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "shoot_requirements",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "r",
+        "name": "shoot_types",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "approved_host_listings_public",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "distribution_destination_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_activity_timeline_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_action_queue_primary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_action_queue_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_archive_historical_record_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_closeout_workboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_completion_dashboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_executive_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_final_closeout_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_final_delivery_queue_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_final_readiness_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_guidance_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_live_release_monitor_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_master_lifecycle_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_operator_workboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_release_completion_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_release_outcome_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_release_tracking_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_package_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_prep_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_release_action_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_release_dashboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_summary_view",
+        "owner": "postgres"
+      }
+    ],
+    "migrations": [
+      {
+        "name": "remote_schema",
+        "version": "20261001023713"
+      }
+    ],
+    "inspected_as": "postgres",
+    "server_version": "17.6",
+    "default_privileges": [
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "schema": "public",
+        "creator": "postgres",
+        "object_type": "S"
+      },
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "schema": "public",
+        "creator": "postgres",
+        "object_type": "f"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "schema": "public",
+        "creator": "postgres",
+        "object_type": "r"
+      }
+    ]
+  },
+  "preview": {
+    "project_ref": "jryjcvcnbrqtgamxpxas",
+    "columns": [
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "id"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "provider_type"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "business_name"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "slug"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "description"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "website"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "city"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "state"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "country"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "zone_name"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "is_verified"
+      },
+      {
+        "acl": "{anon=r/postgres,authenticated=r/postgres}",
+        "table": "provider_profiles",
+        "column": "active"
+      }
+    ],
+    "database": "postgres",
+    "routines": [
+      {
+        "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "current_user_is_admin",
+        "owner": "postgres",
+        "config": [
+          "search_path=public, pg_temp"
+        ],
+        "schema": "private",
+        "arguments": "",
+        "security_definer": true
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "name": "sync_approved_host_listing_public",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, private"
+        ],
+        "schema": "private",
+        "arguments": "",
+        "security_definer": true
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "name": "finalize_booking_acceptance",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, private"
+        ],
+        "schema": "public",
+        "arguments": "p_request_id uuid, p_actor_id uuid, p_mode text",
+        "security_definer": true
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "name": "handle_new_auth_user_profile",
+        "owner": "postgres",
+        "config": [
+          "search_path=public, auth, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": true
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "name": "persist_host_constraints",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, private"
+        ],
+        "schema": "public",
+        "arguments": "p_request_id uuid, p_actor_id uuid, p_constraints jsonb, p_message text",
+        "security_definer": true
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_activity_log_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_approval_decisions_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_deliverable_tracking_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_distribution_release_tracking_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_monetization_tracking_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_rights_tracking_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_submission_packets_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_project_submission_review_log_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "name": "set_updated_at",
+        "owner": "postgres",
+        "config": [
+          "search_path=pg_catalog, public, pg_temp"
+        ],
+        "schema": "public",
+        "arguments": "",
+        "security_definer": false
+      }
+    ],
+    "relations": [
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "categories_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "departments_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "destination_asset_requirements_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "destination_field_mappings_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "distribution_destinations_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "listing_attributes_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "listing_types_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_activity_log_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_approval_decisions_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_deliverable_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_deliverables_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_destination_selections_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_distribution_release_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_monetization_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_rights_checklist_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_rights_tracking_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_statuses_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_submission_packets_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "project_submission_review_log_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "projects_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "resource_relationships_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "shoot_requirements_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "shoot_types_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "rls": false,
+        "kind": "S",
+        "name": "translation_roots_id_seq",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,anon=r/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "approved_host_listings_public",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "booking_messages",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "booking_offers",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=ar/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "booking_requests",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "categories",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "departments",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "destination_asset_requirements",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "destination_field_mappings",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "distribution_destinations",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=ar/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "host_listing_submissions",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "listing_attributes",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "listing_types",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=ar/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "policy_acceptances",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=ar/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "profiles",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_activity_log",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_approval_decisions",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_deliverable_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_deliverables",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_destination_selections",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_distribution_release_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_monetization_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_rights_checklist",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_rights_tracking",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_statuses",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_submission_packets",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "project_submission_review_log",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "projects",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "provider_profiles",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "resource_relationships",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "shoot_requirements",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=rm/postgres,authenticated=rm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "shoot_types",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,anon=r/postgres,authenticated=r/postgres}",
+        "rls": true,
+        "kind": "r",
+        "name": "translation_roots",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,anon=r/postgres,authenticated=r/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "distribution_destination_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_activity_timeline_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_action_queue_primary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_action_queue_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_archive_historical_record_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_closeout_workboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_completion_dashboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_executive_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_final_closeout_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_final_delivery_queue_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_final_readiness_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_guidance_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_live_release_monitor_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_master_lifecycle_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_operator_workboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_release_completion_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_release_outcome_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_release_tracking_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_package_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_prep_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_release_action_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_submission_release_dashboard_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "project_destination_summary_view",
+        "owner": "postgres"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,anon=r/postgres,authenticated=r/postgres}",
+        "rls": false,
+        "kind": "v",
+        "name": "provider_directory_public",
+        "owner": "postgres"
+      }
+    ],
+    "migrations": [
+      {
+        "name": "remote_schema",
+        "version": "20261001023713"
+      },
+      {
+        "name": "reference_catalog_rls",
+        "version": "20261001173502"
+      },
+      {
+        "name": "provider_directory_rls",
+        "version": "20261001175738"
+      },
+      {
+        "name": "provider_directory_view_privileges",
+        "version": "20261001175912"
+      },
+      {
+        "name": "project_workspace_rls",
+        "version": "20261001180412"
+      },
+      {
+        "name": "internal_project_records_rls",
+        "version": "20261001180542"
+      },
+      {
+        "name": "public_view_function_hardening",
+        "version": "20261001180951"
+      },
+      {
+        "name": "auth_profile_trigger_reconcile",
+        "version": "20261001181257"
+      },
+      {
+        "name": "pin_trigger_search_paths",
+        "version": "20261001181520"
+      },
+      {
+        "name": "user_workflow_grant_hardening",
+        "version": "20261001181707"
+      },
+      {
+        "name": "replace_approved_host_public_view_projection",
+        "version": "20261004071659"
+      },
+      {
+        "name": "enforce_single_pending_offer_per_type",
+        "version": "20261004072504"
+      },
+      {
+        "name": "booking_schedule_integrity",
+        "version": "20261004080448"
+      },
+      {
+        "name": "persist_host_constraints",
+        "version": "20261004080713"
+      },
+      {
+        "name": "translation_roots_catalog",
+        "version": "20261004081311"
+      },
+      {
+        "name": "core_booking_performance_indexes",
+        "version": "20261004112530"
+      },
+      {
+        "name": "optimize_auth_rls_initplans",
+        "version": "20261004112859"
+      }
+    ],
+    "inspected_as": "postgres",
+    "server_version": "17.11",
+    "default_privileges": [
+      {
+        "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+        "schema": "public",
+        "creator": "postgres",
+        "object_type": "S"
+      },
+      {
+        "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+        "schema": "public",
+        "creator": "postgres",
+        "object_type": "f"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+        "schema": "public",
+        "creator": "postgres",
+        "object_type": "r"
+      }
+    ]
+  }
+}

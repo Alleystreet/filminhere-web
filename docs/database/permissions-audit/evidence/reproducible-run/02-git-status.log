@@ -1,0 +1,18 @@
+exit_code: 0
+STDOUT
+ M .gitignore
+ M docs/database/reconciliation/BASELINE_STRATEGY.md
+?? .github/workflows/alleystreet-preflight.yml
+?? ACCEPTANCE_TESTS.md
+?? AGENTS.md
+?? ALLEYSTREET_STANDARD.md
+?? PRIVACY_AND_DATA_RULES.md
+?? RELEASE_REPORT.md
+?? SECURITY_BASELINE.md
+?? docs/database/permissions-audit/
+?? scripts/alleystreet-preflight.py
+?? scripts/database/
+?? supabase/migrations/20261021195905_explicit_public_data_api_permissions.sql
+?? tests/
+
+STDERR

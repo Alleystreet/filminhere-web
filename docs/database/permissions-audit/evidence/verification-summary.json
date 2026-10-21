@@ -1,0 +1,17 @@
+{
+  "source_base": "7bba3c6b13acf77b5915513d4246593f9ea11344",
+  "date": "2026-10-21",
+  "npm_ci": "PASS (lockfile, ignore scripts)",
+  "npm_run_lint": "PASS",
+  "npx_tsc_noEmit": "PASS",
+  "original_migrations_modified": false,
+  "catalog_assertions": 468,
+  "api_checks": 51,
+  "local_reconstruction_runner": "PASS on a second empty local database",
+  "release_preflight": {
+    "decision": "BLOCKED",
+    "blockers": 9,
+    "warnings": 0
+  },
+  "no_hosted_mutations": true
+}

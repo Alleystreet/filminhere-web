@@ -1,0 +1,6 @@
+exit_code: 0
+STDOUT
+
+STDERR
+psql:/tmp/filminhere-permissions-reconstruction-gobakvfy/staging/migrations/20261004080448_booking_schedule_integrity.sql:7: NOTICE:  constraint "booking_requests_valid_time_range" of relation "booking_requests" does not exist, skipping
+psql:/tmp/filminhere-permissions-reconstruction-gobakvfy/staging/migrations/20261004080448_booking_schedule_integrity.sql:18: NOTICE:  constraint "booking_requests_no_overlapping_accepted_listing" of relation "booking_requests" does not exist, skipping

@@ -1,0 +1,8 @@
+exit_code: 0
+STDOUT
+[{"schema_name":"<global>","object_type":"f","acl":"{postgres=X/postgres}"},
+ {"schema_name":"public","object_type":"S","acl":"{postgres=rwU/postgres}"},
+ {"schema_name":"public","object_type":"f","acl":"{postgres=X/postgres}"},
+ {"schema_name":"public","object_type":"r","acl":"{postgres=arwdDxtm/postgres}"}]
+
+STDERR

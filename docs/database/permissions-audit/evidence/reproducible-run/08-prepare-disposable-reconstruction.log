@@ -1,0 +1,16 @@
+exit_code: 0
+STDOUT
+{
+  "output_directory": "/tmp/filminhere-permissions-reconstruction-gobakvfy/staging",
+  "mode": "plain-postgres",
+  "baseline_statements_emitted": 772,
+  "skipped_statement_indices": [
+    12,
+    15,
+    488
+  ],
+  "subsequent_migrations_copied": 15,
+  "database_connections_made": false
+}
+
+STDERR
