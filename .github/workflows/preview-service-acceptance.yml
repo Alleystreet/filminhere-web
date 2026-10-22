@@ -48,6 +48,8 @@ jobs:
         run: node scripts/test-preview-oidc-smoke.mjs
 
   authenticated:
+    # Owner reports TEST_SUPABASE_PUBLISHABLE_KEY corrected in protected preview-test.
+    # GitHub still requires a fresh human approval before releasing it.
     # Requires manual repository variable opt-in AND environment reviewer approval.
     if: github.repository == 'Alleystreet/filminhere-web' && github.ref == 'refs/heads/fix/staging-database-isolation-20261018' && vars.RUN_PREVIEW_SERVICE_ACCEPTANCE == 'approved'
     needs: preflight
