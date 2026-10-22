@@ -132,3 +132,73 @@ Relevant concepts:
 - evidence preservation.
 
 Certification-objective mapping should be added only after verifying the current official objective numbers for the certification being studied.
+
+## Restricted acceptance update — 2026-10-22
+
+The role-separation workflow now has **two separate jobs**:
+
+- **Offline preflight:** automatically runs on reviewed changes to the booking test
+  script, guard or workflow within the exact `fix/server-side-booking-create`
+  branch. It validates database identity, pinned Vercel Preview deployment,
+  repository/branch/workflow identity, OIDC claims and invalid-configuration
+  rejection. It needs **no credentials, reviewers or database writes**.
+- **Authenticated integration:** runs only when the separate repository variable
+  `RUN_BOOKING_ROLE_ACCEPTANCE` is exactly `approved`, and the protected
+  `preview-test` GitHub Environment permits and approves the exact PR #3 branch.
+  The environment secrets remain encrypted and restricted. This is independent
+  of the previously disabled `RUN_PREVIEW_SERVICE_ACCEPTANCE` for PR #22.
+
+### Owner-managed protections — prerequisites to integration
+
+1. In GitHub Settings → Environments → `preview-test`, explicitly **allow**
+   `fix/server-side-booking-create` in the protected deployment-branch list
+   while keeping both existing reviewer protection and the original PR #22 branch.
+2. In Vercel → project `filminhere-preview` → Deployment Protection →
+   Trusted Sources, configure a **Preview-only** GitHub Actions OIDC source for
+   repository `Alleystreet/filminhere-web`, exact workflow
+   `Booking Role Separation`, exact PR #3 branch and audience
+   `https://github.com/Alleystreet`. Leave Vercel Authentication enabled;
+   do not use a long-lived bypass secret or enable public access.
+3. Validate that Vercel's scoped Preview `SUPABASE_SECRET_KEY` belongs to
+   `preview-test` and is never a Production privileged key. The branch-scoped
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   were independently checked against the Preview branch on October 22, 2026.
+   Privileged key provenance is still a separate release/test prerequisite.
+4. Only then set repository variable `RUN_BOOKING_ROLE_ACCEPTANCE=approved`
+   and inspect the new workflow run. Explicitly approve only the exact
+   `preview-test` environment/branch/commit; this is not authorization for
+   Production release or merge. Disable that variable after success.
+5. Keep [PR #3](https://github.com/Alleystreet/filminhere-web/pull/3) draft
+   until integration, artifact review, Preview build, cleanup and diff gates pass.
+
+### Fail-closed identities, proof, and cleanup
+
+The privileged workflow accepts **only** database URL
+`https://jryjcvcnbrqtgamxpxas.supabase.co` and pinned Vercel Preview
+`https://filminhere-preview-35xxhsfio-alleystreets-projects.vercel.app`
+from deployed source commit `d3f9647039adbfbe6ff30d450a39dfccac565902`.
+Never substitute an alias or a Production deployment. A new application change
+requires a newly reviewed exact Preview deployment and corresponding test target.
+
+The test requests a GitHub OIDC identity token, verifies its audience, repository,
+branch, workflow and `preview-test` environment claims, and sends it to the
+Vercel Trusted Sources request header. Its **first** HTTP request must reach
+the actual application and return JSON HTTP 401 without a filmmaker JWT.
+Otherwise no synthetic users or database rows are created.
+
+After authorization succeeds, the synthetic filmmaker's booking request includes
+deliberately forged `user_id`, `host_user_id`, `status` and
+`thread_status`. The server must replace these with the actual filmmaker
+identity, real approved-listing host identity, `PENDING` and `draft`.
+
+The test never logs synthetic IDs, tokens, secrets, passwords or request response
+bodies. A unique synthetic host-listing ID is allocated before insertion so
+cleanup can target it even if insert acknowledgement fails. Booking cleanup is
+scoped to that listing **and the unique synthetic filmmaker email**.
+Any cleanup failure makes the job fail; readback must show no synthetic
+booking or listing. Independent Preview-only aggregate cleanup verification
+must precede a PASS conclusion.
+
+**Current scope:** the offline gate passing does **not** establish live
+integration. This protected booking test has not yet been approved or run.
+No Production merge, deployment or database operation is permitted by this plan.
