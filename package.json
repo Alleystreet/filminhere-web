@@ -2,12 +2,17 @@
   "name": "app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build.mjs",
     "start": "next start",
     "lint": "eslint",
-    "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1"
+    "typecheck": "tsc --noEmit",
+    "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1",
+    "test": "node --test scripts/test-preview-isolation.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
