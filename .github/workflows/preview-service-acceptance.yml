@@ -52,6 +52,10 @@ jobs:
     if: github.repository == 'Alleystreet/filminhere-web' && github.ref == 'refs/heads/fix/staging-database-isolation-20261018' && vars.RUN_PREVIEW_SERVICE_ACCEPTANCE == 'approved'
     needs: preflight
     environment: preview-test
+    # Serialize sensitive acceptance runs. Each still requires owner approval.
+    concurrency:
+      group: filminhere-preview-service-acceptance
+      cancel-in-progress: false
     # Scoped to the protected job only; preflight has no OIDC or secret access.
     permissions:
       contents: read
