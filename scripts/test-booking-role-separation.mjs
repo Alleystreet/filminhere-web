@@ -1,3 +1,8 @@
+import { verifyTarget, requestOidc } from "./booking-acceptance-guard.mjs";
+
+verifyTarget(process.env);
+const vercelToken = await requestOidc(process.env);
+
 const required = [
   "TEST_BASE_URL",
   "TEST_SUPABASE_URL",
@@ -11,8 +16,8 @@ if (missing.length) {
   process.exit(1);
 }
 
-const baseUrl = process.env.TEST_BASE_URL.replace(/\/$/, "");
-const supabaseUrl = process.env.TEST_SUPABASE_URL.replace(/\/$/, "");
+const baseUrl = process.env.TEST_BASE_URL;
+const supabaseUrl = process.env.TEST_SUPABASE_URL;
 const publishableKey = process.env.TEST_SUPABASE_PUBLISHABLE_KEY;
 const secretKey = process.env.TEST_SUPABASE_SECRET_KEY;
 
@@ -57,13 +62,13 @@ async function parseResponse(response, label) {
     try {
       data = JSON.parse(text);
     } catch {
-      throw new Error(`${label} returned non-JSON: ${text.slice(0, 500)}`);
+      throw new Error(`${label}: non-JSON HTTP response (body suppressed).`);
     }
   }
 
   if (!response.ok) {
     throw new Error(
-      `${label} failed (${response.status}): ${JSON.stringify(data)}`,
+      `${label} rejected with HTTP ${response.status} (body suppressed).`,
     );
   }
 
@@ -147,10 +152,10 @@ async function cleanup() {
     }
   }
 
-  if (requestId) {
-    await attempt("delete booking request", async () => {
+  if (hostListingId) {
+    await attempt("delete synthetic booking by listing and email", async () => {
       const response = await rest(
-        `booking_requests?id=eq.${encodeURIComponent(requestId)}`,
+        `booking_requests?listing_id=eq.${encodeURIComponent("host_" + hostListingId)}&email=eq.${encodeURIComponent(filmmakerEmail)}`,
         { method: "DELETE" },
       );
       if (!response.ok) {
@@ -195,13 +200,38 @@ async function cleanup() {
     });
   }
 
-  if (failures.length) {
-    console.warn("Cleanup warnings:");
-    for (const failure of failures) console.warn(`- ${failure}`);
+  if (hostListingId) {
+    await attempt("verify booking cleanup", async () => {
+      const result = await rest(`booking_requests?listing_id=eq.${encodeURIComponent("host_" + hostListingId)}&email=eq.${encodeURIComponent(filmmakerEmail)}&select=id`);
+      const rows = await parseResponse(result, "Check booking cleanup");
+      if (!Array.isArray(rows) || rows.length) throw Error("Booking not fully cleaned.");
+    });
+    await attempt("verify listing cleanup", async () => {
+      const result = await rest(`host_listing_submissions?id=eq.${encodeURIComponent(hostListingId)}&select=id`);
+      const rows = await parseResponse(result, "Check listing cleanup");
+      if (!Array.isArray(rows) || rows.length) throw Error("Listing not fully cleaned.");
+    });
   }
+  if (failures.length) {
+    failures.forEach(label => console.error("FAIL: " + label));
+    process.exitCode = 1;
+  } else console.log("PASS: Synthetic booking/listing cleanup readback and user deletion.");
 }
 
 try {
+  // Confirm real Vercel-protected application JSON, not deployment-login HTML, before fixtures.
+  const noAuth = await fetch(`${baseUrl}/api/booking/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-vercel-trusted-oidc-idp-token": vercelToken },
+    body: JSON.stringify({}),
+    redirect: "manual", signal: AbortSignal.timeout(15000),
+  });
+  if (noAuth.status !== 401 || !noAuth.headers.get("content-type")?.includes("application/json"))
+    throw Error("Vercel Preview Trusted Source not proven; refuse test fixture writes.");
+  const appResponse = await noAuth.json();
+  if (appResponse?.error !== "Unauthorized.") throw Error("Unexpected unauthenticated Preview route response.");
+  console.log("PASS: Vercel protected Preview application reached before synthetic writes.");
+
   filmmakerUserId = await createTestUser(
     filmmakerEmail,
     filmmakerPassword,
@@ -220,6 +250,7 @@ try {
     throw new Error("Role separation setup failed: generated user IDs are identical.");
   }
 
+  hostListingId = crypto.randomUUID();
   const listingResponse = await rest(
     "host_listing_submissions?select=id,user_id,title,status",
     {
@@ -228,6 +259,7 @@ try {
         Prefer: "return=representation",
       },
       body: JSON.stringify({
+        id: hostListingId,
         user_id: hostUserId,
         listing_type: "Location",
         title: `Automated Role Separation Test ${runId}`,
@@ -276,8 +308,10 @@ try {
 
   const createResponse = await fetch(`${baseUrl}/api/booking/create`, {
     method: "POST",
+    redirect: "manual", signal: AbortSignal.timeout(15000),
     headers: {
       Authorization: `Bearer ${auth.access_token}`,
+      "x-vercel-trusted-oidc-idp-token": vercelToken,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -288,6 +322,11 @@ try {
       startISO,
       endISO,
       impact: null,
+      // Deliberately forged client-side system fields must be ignored by the server.
+      user_id: hostUserId,
+      host_user_id: filmmakerUserId,
+      status: "APPROVED",
+      thread_status: "open",
     }),
   });
 
@@ -341,21 +380,7 @@ try {
     );
   }
 
-  console.log(
-    JSON.stringify(
-      {
-        result: "PASS",
-        requestId,
-        filmmakerUserId,
-        hostUserId,
-        hostListingId,
-        status: row.status,
-        threadStatus: row.thread_status,
-      },
-      null,
-      2,
-    ),
-  );
+  console.log("PASS: Server resolved true filmmaker and host, ignored forged system fields and retained PENDING/draft.");
 } finally {
   await cleanup();
 }
