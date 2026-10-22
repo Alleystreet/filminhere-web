@@ -113,3 +113,10 @@ The owner confirmed the Vercel project now lists GitHub Actions under **Trusted 
 Only the GitHub `preview-test` protected job may request the token. The secret-free preflight intentionally has no `id-token: write` grant. Both still require an exact repository and branch match. The authenticated job remains **skipped unless** repository variable `RUN_PREVIEW_SERVICE_ACCEPTANCE` is explicitly `approved` and the human reviewer approves the exact run. `TEST_SUPABASE_SECRET_KEY` must separately be installed as a Preview-owned GitHub Environment secret, after review, before enabling a live run. An OIDC Trusted Source does not supply the privileged Supabase fixture key.
 
 This revision is not proof of a successful hosted OIDC handshake or authenticated Supabase write. Do not add any credential to chat, git history or test logs.
+
+## 2026-10-22 — Direct cross-user authorization acceptance added
+
+- Test runner now uses the Preview publishable key with each synthetic participant's JSON Web Token (JWT) to verify Row Level Security (RLS) directly on `booking_requests` and `booking_messages`.
+- Filmmaker and assigned host must each be able to read the synthetic booking; unrelated user must see zero rows. After the positive message write, the two authorized users must read one synthetic message and the unrelated user must read zero.
+- These checks supplement the server route's existing 401/403/404/409 and successful 200 expectations; they do not bypass RLS or change the application's authorization code.
+- This is **code preparation only**. No protected GitHub credential has been provisioned or exposed, and no synthetic users or bookings were created during this change. Live acceptance remains disabled until the approved secret and owner-controlled GitHub job approval are supplied.

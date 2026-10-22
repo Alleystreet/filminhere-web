@@ -158,6 +158,39 @@ if (process.argv.includes("--self-test")) {
       .select("id,user_id,sender,request_id").eq("request_id", booking), "Read synthetic messages");
   }
 
+
+  async function selectAsUser(jwt, table, field, id) {
+    // Use the publishable key plus the user's actual JWT so PostgREST enforces RLS.
+    const reader = createClient(DB, process.env.TEST_SUPABASE_PUBLISHABLE_KEY, {
+      ...config,
+      global: { headers: { Authorization: "Bearer " + jwt } },
+    });
+    return checked(await reader.from(table).select("id").eq(field, id),
+      "Read authorized synthetic records");
+  }
+
+  async function checkBookingVisibility(filmmaker, host, outsider) {
+    const [filmmakerRows, hostRows, outsiderRows] = await Promise.all([
+      selectAsUser(filmmaker.token, "booking_requests", "id", booking),
+      selectAsUser(host.token, "booking_requests", "id", booking),
+      selectAsUser(outsider.token, "booking_requests", "id", booking),
+    ]);
+    assert.equal(filmmakerRows.length, 1, "Filmmaker cannot read owned booking");
+    assert.equal(hostRows.length, 1, "Assigned host cannot read booking");
+    assert.equal(outsiderRows.length, 0, "Unrelated user can read another booking");
+  }
+
+  async function checkMessageVisibility(filmmaker, host, outsider) {
+    const [filmmakerRows, hostRows, outsiderRows] = await Promise.all([
+      selectAsUser(filmmaker.token, "booking_messages", "request_id", booking),
+      selectAsUser(host.token, "booking_messages", "request_id", booking),
+      selectAsUser(outsider.token, "booking_messages", "request_id", booking),
+    ]);
+    assert.equal(filmmakerRows.length, 1, "Filmmaker cannot read own message");
+    assert.equal(hostRows.length, 1, "Assigned host cannot read booking message");
+    assert.equal(outsiderRows.length, 0, "Unrelated user can read private message");
+  }
+
   try {
     // Prove we reached the application (not Vercel's sign-in HTML)
     // BEFORE creating ANY fixtures.
@@ -182,6 +215,7 @@ if (process.argv.includes("--self-test")) {
       end_iso: new Date(Date.now() + 7200000).toISOString(),
       user_id: a.id, host_user_id: b.id, status: "PENDING", thread_status: "draft",
     }), "Create synthetic booking");
+    await checkBookingVisibility(a, b, c);
 
     let response = await callRoute(a.token, booking, "Synthetic policy test");
     expectCode(response, 403, "Missing acknowledgment");
@@ -205,6 +239,7 @@ if (process.argv.includes("--self-test")) {
     assert.equal(messages.length, 1);
     assert.equal(messages[0].user_id, a.id);
     assert.equal(messages[0].sender, "FILMMAKER");
+    await checkMessageVisibility(a, b, c);
 
     checked(await admin.from("booking_requests")
       .update({ status: "DECLINED", thread_status: "declined" })
@@ -214,7 +249,7 @@ if (process.argv.includes("--self-test")) {
     messages = await readMessages();
     assert.equal(messages.length, 1);
     passed = true;
-    console.log("PASS: Authorized Preview service-key message and denial assertions.");
+    console.log("PASS: Authorized Preview service-key message, owned/host reads, unrelated-user read/write denials, and policy/status checks.");
   } catch (error) {
     // Do not print Supabase response bodies or credentials.
     console.error("FAIL: " + (error instanceof Error ? error.message : "Unknown error"));
