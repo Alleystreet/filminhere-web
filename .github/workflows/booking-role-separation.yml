@@ -1,0 +1,74 @@
+name: Booking Role Separation
+
+on:
+  push:
+    branches:
+      - fix/server-side-booking-create
+    paths:
+      - ".github/workflows/booking-role-separation.yml"
+      - "scripts/booking-acceptance-guard.mjs"
+      - "scripts/test-booking-role-separation.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Offline booking target/identity checks (no secrets)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node scripts/booking-acceptance-guard.mjs --self-test
+      - run: node scripts/test-booking-validation.mjs
+
+  authenticated:
+    name: Protected Preview filmmaker/host booking acceptance
+    needs: preflight
+    if: github.repository == 'Alleystreet/filminhere-web' && github.ref == 'refs/heads/fix/server-side-booking-create' && vars.RUN_BOOKING_ROLE_ACCEPTANCE == 'approved'
+    environment: preview-test
+    concurrency:
+      group: filminhere-booking-role-acceptance
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      CI_BOOKING_TEST_GATE: "yes"
+      TEST_BASE_URL: https://filminhere-preview-35xxhsfio-alleystreets-projects.vercel.app
+      TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+      TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
+      TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Test guarded Preview booking creation using synthetic users
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          {
+            echo "FilmInHere protected booking acceptance"
+            echo "Environment: preview-test"
+            echo "Commit: $GITHUB_SHA"
+            echo "Run: $GITHUB_RUN_ID"
+            node scripts/test-booking-role-separation.mjs
+          } 2>&1 | tee test-results/booking-role-separation.txt
+      - name: Upload sanitized role separation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: booking-role-separation-evidence-${{ github.run_id }}
+          path: test-results/booking-role-separation.txt
+          if-no-files-found: error
+          retention-days: 30

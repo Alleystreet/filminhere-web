@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1"
+    "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1",
+    "test:booking-validation": "node scripts/test-booking-validation.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
