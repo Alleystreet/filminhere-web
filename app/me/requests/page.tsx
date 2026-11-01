@@ -15,9 +15,9 @@ function statusLabel(status: RequestThreadStatus) {
 }
 
 function resolveStatus(req: BookingRequest): RequestThreadStatus {
-  if (req.threadStatus) return req.threadStatus;
   if (req.status === "DECLINED") return "declined";
   if (req.status === "ACCEPTED") return "locked";
+  if (req.threadStatus) return req.threadStatus;
   if ((req.lockedHourly ?? 0) > 0) return "locked";
   if ((req.proposedHourly ?? 0) > 0) return "negotiating";
   return "draft";

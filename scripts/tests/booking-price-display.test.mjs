@@ -136,3 +136,16 @@ test("failed host acceptance or missing refreshed row never produces local confi
     assert.equal(page.events.some(([event]) => event === "save"), false);
   }
 });
+
+test("confirmation and copied summary distinguish two-hour minimum from month-long duration", async () => {
+  const page = pageHarness({ ...booking, endISO: "2026-11-20T10:00:00Z", counterOffer: { proposedRatePerHour: 100, proposedMinHours: 2, proposedTotal: 200 } });
+  assert.match(page.html, /Minimum booking time[\s\S]*?2\.00 hrs/);
+  await button(page.tree, "Copy Summary").props.onClick();
+  assert.match(page.clipboard(), /Minimum booking time:\s+2\.00 hrs/);
+});
+
+test("approved host pricing supplies the detail estimate without a sample listing", () => {
+  const page = pageHarness({ ...booking, status: "PENDING", offer: undefined, listingPricing: { ratePerHour: 100, minHours: 2 } }, { noRate: true });
+  assert.match(page.html, /USD 100\.00\/hr/);
+  assert.match(page.html, /USD 200\.00/);
+});

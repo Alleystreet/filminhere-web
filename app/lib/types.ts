@@ -115,6 +115,7 @@ export type BookingRequest = {
   listingId: string;
   listingSlug: string;
   listingTitle: string;
+  listingPricing?: { ratePerHour: number; minHours: number };
 
   email: string;
   phone?: string;

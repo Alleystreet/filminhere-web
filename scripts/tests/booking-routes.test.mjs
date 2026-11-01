@@ -172,3 +172,24 @@ test("source migrations close browser INSERT and enforce filmmaker compliance in
   assert.match(compliance, /from public, anon, authenticated;/);
   assert.match(compliance, /to service_role;/);
 });
+
+test("request list reflects offer activity and terminal status takes precedence", async () => {
+  const db = makeDB({ tables: { booking_requests: [booking, { ...booking, id: "closed", status: "ACCEPTED" }], booking_offers: [{ request_id: "booking", status: "PENDING" }] } });
+  const api = loadTS("app/lib/requests.ts", { "./supabase": { supabase: db.client } });
+  const rows = await api.getRequestsFromSupabase();
+  assert.equal(rows[0].threadStatus, "negotiating");
+  assert.equal(rows[1].threadStatus, "locked");
+});
+
+test("detail recovers accepted counter indicator and approved host pricing", async () => {
+  const db = makeDB({ tables: {
+    booking_requests: [{ ...booking, status: "ACCEPTED", listing_slug: "host-test" }],
+    booking_offers: [{ request_id: "booking", offer_type: "HOST_COUNTER_OFFER", status: "ACCEPTED", rate_per_hour: 100, min_hours: 2, total: 200, updated_at: "2026-11-01T07:09:59Z" }],
+    approved_host_listings_public: [{ id: "test", rate_per_hour: 100, min_hours: 2 }],
+  } });
+  const api = loadTS("app/lib/requests.ts", { "./supabase": { supabase: db.client } });
+  const detail = await api.getRequestByIdFromSupabase("booking");
+  assert.equal(detail.filmmakerAccepted.source, "COUNTER");
+  assert.equal(detail.listingPricing.ratePerHour, 100);
+  assert.equal(detail.counterOffer.proposedMinHours, 2);
+});

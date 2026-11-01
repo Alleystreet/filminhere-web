@@ -102,7 +102,17 @@ export async function getRequestsFromSupabase(): Promise<BookingRequest[]> {
     .order("created_iso", { ascending: false });
 
   if (error) throw error;
-  return (data ?? []).map((row) => rowToBookingRequest(row as Record<string, unknown>, user.id));
+  const rows = (data ?? []).map((row) => rowToBookingRequest(row as Record<string, unknown>, user.id));
+  if (!rows.length) return rows;
+  const { data: offers, error: offersError } = await supabase
+    .from("booking_offers").select("request_id")
+    .in("request_id", rows.map((row) => row.id))
+    .in("status", ["PENDING", "ACCEPTED"]);
+  if (offersError) throw offersError;
+  const negotiatingIds = new Set((offers ?? []).map((offer) => offer.request_id));
+  return rows.map((row) => ({ ...row, threadStatus:
+    row.status === "ACCEPTED" ? "locked" : row.status === "DECLINED" ? "declined" :
+      negotiatingIds.has(row.id) ? "negotiating" : row.threadStatus }));
 }
 
 export async function getRequestByIdFromSupabase(id: string): Promise<BookingRequest | null> {
@@ -124,7 +134,7 @@ export async function getRequestByIdFromSupabase(id: string): Promise<BookingReq
 
   const { data: offers, error: offersError } = await supabase
     .from("booking_offers")
-    .select("offer_type, rate_per_hour, min_hours, total, note, status, created_at")
+    .select("offer_type, rate_per_hour, min_hours, total, note, status, created_at, updated_at")
     .eq("request_id", id)
     .in("status", ["PENDING", "ACCEPTED"])
     .order("created_at", { ascending: false });
@@ -135,8 +145,19 @@ export async function getRequestByIdFromSupabase(id: string): Promise<BookingReq
   const filmmakerOffer = (offers ?? []).find((offer) => offer.offer_type === "FILMMAKER_OFFER");
   const hostCounter = (offers ?? []).find((offer) => offer.offer_type === "HOST_COUNTER_OFFER");
 
+  const hostListing = request.listingSlug.startsWith("host-")
+    ? await getApprovedHostListingSubmissionByIdFromSupabase(request.listingSlug.slice(5))
+    : null;
+
   return {
     ...request,
+    listingPricing: hostListing ? {
+      ratePerHour: hostListing.rate_per_hour ?? 0,
+      minHours: hostListing.min_hours ?? 0,
+    } : undefined,
+    filmmakerAccepted: request.status === "ACCEPTED" && hostCounter?.status === "ACCEPTED"
+      ? { source: "COUNTER", acceptedISO: hostCounter.updated_at ?? hostCounter.created_at }
+      : undefined,
     offer: filmmakerOffer
       ? {
           currency: "USD",

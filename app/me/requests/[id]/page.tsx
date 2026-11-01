@@ -236,8 +236,8 @@ export default function RequestDetailPage() {
   // ===== Deal logic =====
   const baseCurrency =
     listing?.currency ?? req?.offer?.currency ?? req?.counterOffer?.currency ?? "USD";
-  const baseRate = listing?.pricePerHour ?? 0;
-  const baseMin = listing?.minHours ?? 0;
+  const baseRate = req?.listingPricing?.ratePerHour ?? listing?.pricePerHour ?? 0;
+  const baseMin = req?.listingPricing?.minHours ?? listing?.minHours ?? 0;
   const baseCleaning = listing?.cleaningFee ?? 0;
   const baseDeposit = listing?.securityDeposit ?? 0;
 
@@ -654,7 +654,7 @@ export default function RequestDetailPage() {
       `End:                     ${new Date(req.endISO).toLocaleString()}`,
       "",
       `Agreed rate:             ${rateDisplay(baseCurrency, proposedRate)}`,
-      `Minimum booking time:    ${billableHours.toFixed(2)} hrs`,
+      `Minimum booking time:    ${proposedMinHours.toFixed(2)} hrs`,
       `Cleaning fee:            ${baseCleaning ? `${baseCurrency} ${money(baseCleaning)}` : "—"}`,
       `Deposit:                 ${baseDeposit ? `${baseCurrency} ${money(baseDeposit)}` : "—"}`,
       `${priceDisplay.label}:         ${priceDisplay.value}`,
@@ -923,7 +923,7 @@ export default function RequestDetailPage() {
 
             <div className={styles.dealItem}>
               <div className={styles.dealLabel}>Minimum booking time</div>
-              <div className={styles.dealVal}>{billableHours.toFixed(2)} hrs</div>
+              <div className={styles.dealVal}>{proposedMinHours.toFixed(2)} hrs</div>
             </div>
 
             <div className={styles.dealItem}>
@@ -1022,7 +1022,7 @@ export default function RequestDetailPage() {
             </div>
             <div className={styles.summaryField}>
               <span className={styles.summaryFieldLabel}>Minimum booking time</span>
-              <span>{billableHours.toFixed(2)} hrs</span>
+              <span>{proposedMinHours.toFixed(2)} hrs</span>
             </div>
             <div className={styles.summaryField}>
               <span className={styles.summaryFieldLabel}>Cleaning fee</span>
