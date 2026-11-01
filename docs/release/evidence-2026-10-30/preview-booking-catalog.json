@@ -1,0 +1,205 @@
+{
+  "project": "jryjcvcnbrqtgamxpxas",
+  "observedDate": "2026-10-30",
+  "method": "Read-only PostgreSQL catalog inspection; no customer rows retrieved",
+  "rows": [
+    {
+      "kind": "grants",
+      "details": [
+        {
+          "grantee": "postgres",
+          "privilege_type": "INSERT"
+        },
+        {
+          "grantee": "postgres",
+          "privilege_type": "SELECT"
+        },
+        {
+          "grantee": "postgres",
+          "privilege_type": "UPDATE"
+        },
+        {
+          "grantee": "postgres",
+          "privilege_type": "DELETE"
+        },
+        {
+          "grantee": "postgres",
+          "privilege_type": "TRUNCATE"
+        },
+        {
+          "grantee": "postgres",
+          "privilege_type": "REFERENCES"
+        },
+        {
+          "grantee": "postgres",
+          "privilege_type": "TRIGGER"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "INSERT"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "SELECT"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "UPDATE"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "DELETE"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "TRUNCATE"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "REFERENCES"
+        },
+        {
+          "grantee": "service_role",
+          "privilege_type": "TRIGGER"
+        },
+        {
+          "grantee": "authenticated",
+          "privilege_type": "INSERT"
+        },
+        {
+          "grantee": "authenticated",
+          "privilege_type": "SELECT"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "details": [
+        {
+          "proacl": [
+            "postgres=X/postgres",
+            "service_role=X/postgres"
+          ],
+          "prosecdef": true,
+          "signature": "finalize_booking_acceptance(uuid,uuid,text)",
+          "definition": "CREATE OR REPLACE FUNCTION public.finalize_booking_acceptance(p_request_id uuid, p_actor_id uuid, p_mode text)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public', 'private'\nAS $function$\ndeclare\n  v_request public.booking_requests%rowtype;\n  v_now timestamptz := now();\n  v_counter_id uuid;\nbegin\n  select *\n  into v_request\n  from public.booking_requests\n  where id = p_request_id\n  for update;\n\n  if not found then\n    raise exception 'Request not found.' using errcode = 'P0001';\n  end if;\n\n  if coalesce(v_request.status, '') in ('ACCEPTED','DECLINED')\n     or coalesce(v_request.thread_status, '') in ('locked','declined') then\n    raise exception 'This request is already closed.' using errcode = 'P0001';\n  end if;\n\n  if not exists (\n    select 1\n    from public.policy_acceptances pa\n    where pa.user_id = p_actor_id\n      and pa.policy_key = 'protected_communications'\n      and pa.policy_version = '2026-05-31'\n  ) then\n    raise exception 'Protected Communications acknowledgment required.' using errcode = '42501';\n  end if;\n\n  if not exists (\n    select 1\n    from public.booking_messages bm\n    where bm.request_id = p_request_id\n      and bm.body = '✅ Compliance acknowledged.'\n  ) then\n    raise exception 'Compliance acknowledgment required before accepting.' using errcode = '42501';\n  end if;\n\n  if p_mode = 'HOST_ACCEPT' then\n    if v_request.host_user_id is null or v_request.host_user_id <> p_actor_id then\n      raise exception 'Not authorized to accept this request.' using errcode = '42501';\n    end if;\n\n    update public.booking_offers\n    set status = 'ACCEPTED',\n        updated_at = v_now\n    where request_id = p_request_id\n      and offer_type = 'FILMMAKER_OFFER'\n      and status = 'PENDING';\n\n    update public.booking_offers\n    set status = 'SUPERSEDED',\n        updated_at = v_now\n    where request_id = p_request_id\n      and offer_type = 'HOST_COUNTER_OFFER'\n      and status = 'PENDING';\n\n    update public.booking_requests\n    set status = 'ACCEPTED',\n        thread_status = 'locked',\n        updated_at = v_now\n    where id = p_request_id;\n\n    insert into public.booking_messages (\n      id, request_id, user_id, sender, body\n    ) values (\n      gen_random_uuid(),\n      p_request_id,\n      p_actor_id,\n      'HOST',\n      '✅ Host accepted. Confirmed terms saved.'\n    );\n\n  elsif p_mode = 'FILMMAKER_ACCEPT_COUNTER' then\n    if v_request.user_id is null or v_request.user_id <> p_actor_id then\n      raise exception 'Not authorized to accept a counter-offer for this request.' using errcode = '42501';\n    end if;\n\n    select bo.id\n    into v_counter_id\n    from public.booking_offers bo\n    where bo.request_id = p_request_id\n      and bo.offer_type = 'HOST_COUNTER_OFFER'\n      and bo.status = 'PENDING'\n    order by bo.created_at desc\n    limit 1\n    for update;\n\n    if v_counter_id is null then\n      raise exception 'No pending host counter-offer found.' using errcode = 'P0001';\n    end if;\n\n    update public.booking_offers\n    set status = 'ACCEPTED',\n        updated_at = v_now\n    where id = v_counter_id;\n\n    update public.booking_offers\n    set status = 'SUPERSEDED',\n        updated_at = v_now\n    where request_id = p_request_id\n      and offer_type = 'FILMMAKER_OFFER'\n      and status = 'PENDING';\n\n    update public.booking_requests\n    set status = 'ACCEPTED',\n        thread_status = 'locked',\n        updated_at = v_now\n    where id = p_request_id;\n\n    insert into public.booking_messages (\n      id, request_id, user_id, sender, body\n    ) values (\n      gen_random_uuid(),\n      p_request_id,\n      p_actor_id,\n      'FILMMAKER',\n      'Filmmaker accepted the host counter-offer.'\n    );\n\n  else\n    raise exception 'Invalid acceptance mode.' using errcode = '22023';\n  end if;\nend;\n$function$\n"
+        }
+      ]
+    },
+    {
+      "kind": "policies",
+      "details": [
+        {
+          "cmd": "SELECT",
+          "qual": "(EXISTS ( SELECT 1\n   FROM booking_requests br\n  WHERE ((br.id = booking_messages.request_id) AND (br.host_user_id = ( SELECT auth.uid() AS uid)))))",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_messages",
+          "policyname": "Hosts can read assigned request messages",
+          "with_check": null
+        },
+        {
+          "cmd": "INSERT",
+          "qual": null,
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_messages",
+          "policyname": "No direct client inserts on booking_messages",
+          "with_check": "false"
+        },
+        {
+          "cmd": "SELECT",
+          "qual": "(EXISTS ( SELECT 1\n   FROM booking_requests br\n  WHERE ((br.id = booking_messages.request_id) AND (br.user_id = ( SELECT auth.uid() AS uid)))))",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_messages",
+          "policyname": "Users can read messages for own requests",
+          "with_check": null
+        },
+        {
+          "cmd": "SELECT",
+          "qual": "(EXISTS ( SELECT 1\n   FROM booking_requests br\n  WHERE ((br.id = booking_offers.request_id) AND (br.host_user_id = ( SELECT auth.uid() AS uid)))))",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_offers",
+          "policyname": "Hosts can read assigned request offers",
+          "with_check": null
+        },
+        {
+          "cmd": "INSERT",
+          "qual": null,
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_offers",
+          "policyname": "No direct client inserts on booking_offers",
+          "with_check": "false"
+        },
+        {
+          "cmd": "UPDATE",
+          "qual": "false",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_offers",
+          "policyname": "No direct client updates on booking_offers",
+          "with_check": "false"
+        },
+        {
+          "cmd": "SELECT",
+          "qual": "(EXISTS ( SELECT 1\n   FROM booking_requests br\n  WHERE ((br.id = booking_offers.request_id) AND (br.user_id = ( SELECT auth.uid() AS uid)))))",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_offers",
+          "policyname": "Users can read offers for own requests",
+          "with_check": null
+        },
+        {
+          "cmd": "INSERT",
+          "qual": null,
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_requests",
+          "policyname": "Filmmakers can create pending requests",
+          "with_check": "((( SELECT auth.uid() AS uid) = user_id) AND (status = 'PENDING'::text) AND (thread_status = 'draft'::text))"
+        },
+        {
+          "cmd": "SELECT",
+          "qual": "(( SELECT auth.uid() AS uid) = host_user_id)",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_requests",
+          "policyname": "Hosts can view assigned requests",
+          "with_check": null
+        },
+        {
+          "cmd": "UPDATE",
+          "qual": "false",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_requests",
+          "policyname": "No direct client updates on booking_requests",
+          "with_check": "false"
+        },
+        {
+          "cmd": "SELECT",
+          "qual": "(( SELECT auth.uid() AS uid) = user_id)",
+          "roles": [
+            "authenticated"
+          ],
+          "tablename": "booking_requests",
+          "policyname": "Users can read own requests",
+          "with_check": null
+        }
+      ]
+    }
+  ]
+}

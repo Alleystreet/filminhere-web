@@ -34,6 +34,10 @@ export default function HostPage() {
             My Listings
           </Link>
 
+          <Link className={styles.btn} href="/me/requests">
+            Booking Requests
+          </Link>
+
           <Link className={styles.btn} href="/#early-access">
             Join Early Access
           </Link>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./Hero.module.css";
 
 function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
+  // Keep the poster until the visitor's motion preference is known.
+  const [reduced, setReduced] = useState(true);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -24,17 +25,9 @@ export default function Hero() {
 
   const [videoReady, setVideoReady] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [videoPaused, setVideoPaused] = useState(false);
 
   const canAutoPlay = useMemo(() => !prefersReducedMotion, [prefersReducedMotion]);
-
-  // ✅ Keep this HERE (after hooks, before useEffect/return)
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const q = String(fd.get("q") || "").trim();
-    const url = q ? `/locations?q=${encodeURIComponent(q)}` : `/locations`;
-    window.location.href = url;
-  };
 
   useEffect(() => {
     const v = videoRef.current;
@@ -42,9 +35,14 @@ export default function Hero() {
 
     const onCanPlay = () => setVideoReady(true);
     const onError = () => setVideoError(true);
+    const onPlay = () => setVideoPaused(false);
+    const onPause = () => setVideoPaused(true);
 
     v.addEventListener("canplay", onCanPlay);
     v.addEventListener("error", onError);
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    if (v.readyState >= 3) onCanPlay();
 
     if (canAutoPlay) {
       const p = v.play();
@@ -54,6 +52,8 @@ export default function Hero() {
     return () => {
       v.removeEventListener("canplay", onCanPlay);
       v.removeEventListener("error", onError);
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
     };
   }, [canAutoPlay]);
 
@@ -61,7 +61,7 @@ export default function Hero() {
     <section className={styles.hero} aria-label="FilmInHere hero">
       <div className={styles.poster} aria-hidden="true" />
 
-      {!videoError && (
+      {!videoError && !prefersReducedMotion && (
         <video
           ref={videoRef}
           className={`${styles.video} ${videoReady ? styles.videoOn : ""}`}
@@ -78,22 +78,36 @@ export default function Hero() {
 
       <div className={styles.overlay} />
 
+      {videoReady && !videoError && !prefersReducedMotion && (
+        <button type="button" className={styles.motionControl} onClick={() => {
+          const video = videoRef.current;
+          if (!video) return;
+          if (video.paused) {
+            setVideoPaused(false);
+            video.play().catch(() => setVideoError(true));
+          } else {
+            video.pause();
+            setVideoPaused(true);
+          }
+        }}>
+          {videoPaused ? "Play background video" : "Pause background video"}
+        </button>
+      )}
+
       <div className={styles.content}>
         <h1>Find the space your story needs.</h1>
-        <p>Connecting people and spaces so stories can happen.</p>
 
       <div className={styles.heroCta}>
      <Link className={styles.primaryBtn} href="/locations">
             Find Film Locations
      </Link>
-     <Link className={styles.secondaryBtn} href="/locations">
-            List My Property
+     <Link className={styles.secondaryBtn} href="/host">
+            Become a Host
      </Link>
       </div>
 
-        {/* ✅ INSERT SEARCH DOCK HERE (after CTAs, still inside .content) */}
         <div className={styles.searchDock} role="search" aria-label="Search film locations">
-          <form className={styles.searchForm} onSubmit={onSubmit}>
+          <form className={styles.searchForm} method="GET" action="/locations">
             <span className={styles.searchIcon} aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18" focusable="false" aria-hidden="true">
                 <path
@@ -107,7 +121,7 @@ export default function Hero() {
             </span>
 
             <label className={styles.srOnly} htmlFor="heroSearch">
-              Search film-ready locations
+              City, state or ZIP
             </label>
 
             <input
@@ -115,7 +129,7 @@ export default function Hero() {
               name="q"
               className={styles.searchInput}
               type="search"
-              placeholder="Search film-ready locations"
+              placeholder="City, state or ZIP"
               autoComplete="off"
               inputMode="search"
             />
@@ -125,7 +139,6 @@ export default function Hero() {
             </button>
           </form>
 
-          <div className={styles.searchHint}>Homes • Studios • Warehouses • Outdoor spaces</div>
         </div>
       </div>
     </section>

@@ -1,248 +1,40 @@
 .hero {
   position: relative;
-  min-height: 88vh;
+  min-height: 620px;
   overflow: hidden;
-  background: #000; /* prevents white flash */
+  background: #eef8ed;
+  color: #173826;
 }
-
-
-/* poster paints instantly */
-.poster {
-  position: absolute;
-  inset: 0;
-  background: url("/media/filminhere-poster.jpg") center/cover no-repeat;
-  z-index: 0;
-}
-
-.logo { display: none; }
-
- /* was position: absolute;
-  top: 28px;
-  left: 28px;
-  z-index: 2;
-  width: 96px;
-  opacity: 0.95;
-} */
-
-.logo img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* video fades in on ready */
-.video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-
-  opacity: 0;
-  transition: opacity 1200ms ease;
-  will-change: opacity;
-
-  z-index: 0;
-}
-
-.videoOn {
-  opacity: 1;
-}
-
-/* overlay guarantees readability */
-.overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(0,0,0,0.7) 0%,
-    rgba(0,0,0,0.45) 45%,
-    rgba(0,0,0,0.8) 100%
-  );
-}
-
-/* content sits on top */
-.content {
-  position: relative;
-  z-index: 2;
-  padding-top: 110px; /* was 160px */
-  text-align: center;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding-left: 24px;
-  padding-right: 24px;
-}
-
-.content h1 {
-  font-size: clamp(2.25rem, 4.2vw, 3.25rem);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
-  margin: 0 0 0.75rem;
-}
-
-.content p {
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  line-height: 1.35;
-  opacity: 0.9;
-  max-width: 42rem;
-  margin: 0 auto;
-}
-
-.heroOverlay h1 {
-  font-size: clamp(2.25rem, 5vw, 4rem);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  margin: 0 0 1rem;
-}
-
-.heroOverlay p {
-  font-size: 1.125rem;
-  line-height: 1.6;
-  opacity: 0.9;
-  margin: 0 0 2rem;
-}
-
-.heroCta {
-  width: 100%;
-  max-width: 980px;
-  margin: 18px auto;
-
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-/* Optional button styling starter */
-/* shared glass surface */
-.primaryBtn,
-.secondaryBtn {
-  background: rgba(0, 0, 0, 0.28);          /* readable at rest */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  border-radius: 12px;
-  padding: 0.9rem 1.35rem;
-  font-weight: 600;
-
-  box-shadow:
-    0 6px 18px rgba(0,0,0,0.28),
-    inset 0 0 0 1px rgba(255,255,255,0.12);
-
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
-}
-
-/* primary = stronger edge + clarity */
-.primaryBtn {
-  border: 1px solid rgba(255,255,255,0.45);
-  color: #fff;
-}
-
-/* secondary = softer */
-.secondaryBtn {
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #f5f5f5;
-}
-
-.primaryBtn:hover,
-.secondaryBtn:hover {
-  transform: translateY(-1px);
-  background: rgba(0, 0, 0, 0.36);
-
-  box-shadow:
-    0 12px 32px rgba(0,0,0,0.45),
-    inset 0 0 0 1px rgba(255,255,255,0.18);
-}
-
-.primaryBtn:focus-visible,
-.secondaryBtn:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(255,255,255,0.45),
-    0 12px 32px rgba(0,0,0,0.45);
-}
-
-/* keep your existing colors; just add subtle glass option if you want */
-.secondaryBtn {
-  background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(6px);
-}
-
+.poster, .video, .overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+.poster { background: url("/media/filminhere-poster.jpg") center/cover no-repeat; z-index: 0; }
+.video { object-fit: cover; opacity: 0; transition: opacity 1200ms ease; z-index: 0; }
+.videoOn { opacity: 1; }
+.overlay { z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(244,251,241,.82)); }
+.motionControl { position: absolute; right: 16px; bottom: 12px; z-index: 3; min-height: 44px; padding: 8px 14px; background: #fff; color: #173826; border: 1px solid #7b9481; border-radius: 12px; cursor: pointer; font: inherit; font-size: 13px; }
+.content { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; padding: 100px 24px 80px; text-align: center; }
+.content h1 { font-size: clamp(2.25rem, 4.2vw, 3.5rem); font-weight: 750; line-height: 1.12; letter-spacing: -.025em; margin: 0 auto 32px; max-width: 20ch; }
+.heroCta { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin: 0 auto 32px; }
+.primaryBtn, .secondaryBtn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 14px 24px; border-radius: 16px; text-decoration: none; font-weight: 700; border: 2px solid #21643c; }
+.primaryBtn { color: #fff; background: #21643c; }
+.secondaryBtn { color: #173826; background: #fff; }
+.primaryBtn:hover { background: #174b2c; }
+.secondaryBtn:hover { background: #ecf7ee; }
+.primaryBtn:focus-visible, .secondaryBtn:focus-visible { outline: 3px solid #173826; outline-offset: 4px; }
+.searchDock { max-width: 720px; margin: 0 auto; padding: 10px 12px; border-radius: 18px; background: #fff; border: 1px solid #7b9481; box-shadow: 0 8px 28px rgba(20,50,30,.08); }
+.searchForm { display: grid; grid-template-columns: 24px minmax(0,1fr) auto; gap: 10px; align-items: center; }
+.searchIcon { display: grid; place-items: center; }
+.searchInput { min-width: 0; width: 100%; background: #fff; border: 0; color: #173826; font: inherit; padding: 12px 6px; }
+.searchInput::placeholder { color: #52665a; opacity: 1; }
+.searchInput:focus-visible { outline: 2px solid #21643c; outline-offset: 2px; border-radius: 6px; }
+.searchBtn { min-height: 48px; border: 1px solid #21643c; background: #21643c; color: #fff; padding: 12px 18px; border-radius: 12px; cursor: pointer; font: inherit; font-weight: 700; }
+.searchBtn:hover { background: #174b2c; }
+.searchBtn:focus-visible { outline: 3px solid #173826; outline-offset: 3px; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 @media (max-width: 640px) {
-  .content {
-    padding: 110px 18px 44px; /* slightly less top padding on mobile */
-  }
-  .content p {
-    margin-bottom: 1.75rem;
-  }
+  .hero { min-height: 0; }
+  .content { padding: 64px 20px; }
+  .heroCta { display: grid; grid-template-columns: 1fr; }
+  .searchForm { grid-template-columns: 24px minmax(0,1fr); }
+  .searchBtn { grid-column: 1 / -1; width: 100%; }
 }
-
-.searchDock {
-  max-width: 980px;
-  margin: 18px auto 0; /* was 26px */
-  width: 100%;
-  padding: 10px 12px 10px; /* slightly tighter */
-  border-radius: 14px;
-  background: rgba(10, 10, 10, 0.50);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.searchForm {
-  display: grid;
-  grid-template-columns: 24px 1fr auto;
-  gap: 10px;
-  align-items: center;
-}
-
-.searchIcon {
-  display: grid;
-  place-items: center;
-  opacity: 0.9;
-}
-
-.searchInput {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-size: 1rem;
-  padding: 10px 6px;
-}
-
-.searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.searchBtn {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.92);
-  color: #0b0b0b;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.searchHint {
-  margin-top: 6px;
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-
-
+@media (prefers-reduced-motion: reduce) { .video { transition: none; } }

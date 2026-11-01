@@ -9,8 +9,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createIsolatedClient, createIsolatedServiceClient } from "@/lib/isolated-supabase";
 import { containsBlockedNegotiationContent } from "@/lib/dlp";
+import { validateNegotiationAmounts } from "@/lib/negotiation-validation.mjs";
 
 const SB_URL     = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SB_ANON    = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -23,13 +24,13 @@ const POLICY_KEY = "protected_communications";
 const POLICY_VER = "2026-05-31";
 
 function makeAnonDb(jwt: string) {
-  return createClient(SB_URL, SB_ANON, {
+  return createIsolatedClient(SB_URL, SB_ANON, {
     global: { headers: { Authorization: `Bearer ${jwt}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 function makeServiceDb() {
-  return createClient(SB_URL, SB_SERVICE, {
+  return createIsolatedServiceClient(SB_URL, SB_SERVICE, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
   const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
   if (!jwt) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
-  const anon = createClient(SB_URL, SB_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+  const anon = createIsolatedClient(SB_URL, SB_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: { user }, error: authErr } = await anon.auth.getUser(jwt);
   if (authErr || !user) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
@@ -50,13 +51,18 @@ export async function POST(req: NextRequest) {
   try { payload = await req.json(); }
   catch { return NextResponse.json({ error: "Invalid request body." }, { status: 400 }); }
 
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
   const requestId   = typeof payload.requestId   === "string" ? payload.requestId : null;
   if (!requestId) return NextResponse.json({ error: "Missing requestId." }, { status: 400 });
 
-  const currency    = typeof payload.currency    === "string" ? payload.currency : "USD";
-  const ratePerHour = typeof payload.ratePerHour === "number" ? payload.ratePerHour : undefined;
-  const minHours    = typeof payload.minHours    === "number" ? payload.minHours   : undefined;
-  const total       = typeof payload.total       === "number" ? payload.total      : undefined;
+  const amounts = validateNegotiationAmounts(payload);
+  if (!amounts.ok) {
+    return NextResponse.json({ error: amounts.error }, { status: 400 });
+  }
+  const { currency, ratePerHour, minHours, total } = amounts;
   const note        = typeof payload.note === "string" ? payload.note.trim() || undefined : undefined;
 
   if (note && containsBlockedNegotiationContent(note)) {

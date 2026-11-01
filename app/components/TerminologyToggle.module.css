@@ -1,0 +1,4 @@
+.toggle button:focus-visible {
+  outline: 3px solid #173826;
+  outline-offset: 2px;
+}

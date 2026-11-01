@@ -109,6 +109,8 @@ export type HostConstraints = {
 
 export type BookingRequest = {
   id: string;
+  // UI hint derived from verified user + RLS-filtered ownership, never authorization.
+  viewerRole?: "filmmaker" | "host";
 
   listingId: string;
   listingSlug: string;

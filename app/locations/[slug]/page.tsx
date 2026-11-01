@@ -4,6 +4,7 @@ import styles from "./LocationDetail.module.css";
 import { listings } from "@/lib/mock/listings";
 import type { Listing } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
+import { listingRateLabels } from "@/lib/listing-rate-display";
 
 export async function generateMetadata({
   params,
@@ -38,7 +39,7 @@ export default async function LocationDetailPage({
     const id = p.slug.slice(5);
     const { data: row } = await supabase
       .from("approved_host_listings_public")
-      .select("id, listing_type, title, description, city, state, country, rate_per_hour, min_hours, capacity, amenities, rules_notes")
+      .select("id, listing_type, title, description, city, state, country, rate_per_hour, rate_per_day, min_hours, capacity, amenities, rules_notes")
       .eq("id", id)
       .maybeSingle();
 
@@ -107,7 +108,11 @@ export default async function LocationDetailPage({
           <aside className={styles.side}>
             <div className={styles.card}>
               <div className={styles.priceRow}>
-                <div className={styles.bigPrice}>${sub.rate_per_hour ?? 0}/hr</div>
+                <div className={styles.bigPrice}>
+                  {listingRateLabels(sub.rate_per_hour, sub.rate_per_day).map((label) => (
+                    <div key={label}>{label}</div>
+                  ))}
+                </div>
                 <div className={styles.smallMeta}>Min {sub.min_hours ?? 1} hrs</div>
               </div>
 
@@ -129,7 +134,7 @@ export default async function LocationDetailPage({
                 Request to Book
               </Link>
               <div className={styles.ctaHint}>
-                Starts a request thread. Negotiate details, then lock an hourly rate.
+                Starts a request thread. Negotiate details, then agree on booking terms.
               </div>
             </div>
           </aside>
@@ -227,7 +232,7 @@ export default async function LocationDetailPage({
               Request to Book
             </Link>
             <div className={styles.ctaHint}>
-              Starts a request thread. Negotiate details, then lock an hourly rate.
+              Starts a request thread. Negotiate details, then agree on booking terms.
             </div>
           </div>
         </aside>

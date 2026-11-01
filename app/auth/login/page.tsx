@@ -1,35 +1,67 @@
 "use client";
 
-import { FormEvent, Suspense, useState } from "react";
+import { FormEvent, Suspense, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { bookingLoginDestination } from "../../lib/booking-login-return";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get("reset") === "success";
+  const destination = bookingLoginDestination(searchParams.get("next"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"error" | "success">("error");
   const [loading, setLoading] = useState(false);
+  const inFlight = useRef(false);
+  const mounted = useRef(false);
+  const navigationScope = useRef(0);
+
+  useLayoutEffect(() => {
+    mounted.current = true;
+    navigationScope.current += 1;
+    return () => {
+      mounted.current = false;
+      navigationScope.current += 1;
+    };
+  }, [destination]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (inFlight.current || !mounted.current) return;
+    inFlight.current = true;
+    const scope = navigationScope.current;
+    let navigating = false;
     setMessage(null);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      setMessage(error.message);
-      setMessageType("error");
-      return;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (!mounted.current || navigationScope.current !== scope) return;
+      if (error) {
+        setMessage(error.message);
+        setMessageType("error");
+        return;
+      }
+      setMessage("Login successful. Redirecting...");
+      setMessageType("success");
+      // Navigate immediately; a delayed callback could override newer navigation.
+      router.push(destination);
+      navigating = true;
+    } catch {
+      if (mounted.current && navigationScope.current === scope) {
+        setMessage("Unable to sign in. Please try again.");
+        setMessageType("error");
+      }
+    } finally {
+      if (!navigating) {
+        inFlight.current = false;
+        if (mounted.current) setLoading(false);
+      }
     }
-    setMessage("Login successful. Redirecting...");
-    setMessageType("success");
-    setTimeout(() => router.push("/me/requests"), 1000);
   };
 
   return (
@@ -69,7 +101,8 @@ function LoginForm() {
       </form>
 
       {message && (
-        <div style={{ marginTop: "1.25rem", color: messageType === "success" ? "#16a34a" : "#e63946" }}>
+        <div role={messageType === "success" ? "status" : "alert"}
+          style={{ marginTop: "1.25rem", color: messageType === "success" ? "#16a34a" : "#e63946" }}>
           {message}
         </div>
       )}

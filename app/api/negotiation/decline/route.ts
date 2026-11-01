@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createIsolatedClient, createIsolatedServiceClient } from "@/lib/isolated-supabase";
 
 const SB_URL     = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SB_ANON    = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -20,13 +20,13 @@ const CLOSED_STATUSES = new Set(["ACCEPTED", "DECLINED"]);
 const CLOSED_THREADS  = new Set(["locked", "declined"]);
 
 function makeAnonDb(jwt: string) {
-  return createClient(SB_URL, SB_ANON, {
+  return createIsolatedClient(SB_URL, SB_ANON, {
     global: { headers: { Authorization: `Bearer ${jwt}` } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 function makeServiceDb() {
-  return createClient(SB_URL, SB_SERVICE, {
+  return createIsolatedServiceClient(SB_URL, SB_SERVICE, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   const jwt = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
   if (!jwt) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 
-  const anon = createClient(SB_URL, SB_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+  const anon = createIsolatedClient(SB_URL, SB_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: { user }, error: authErr } = await anon.auth.getUser(jwt);
   if (authErr || !user) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
 

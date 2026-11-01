@@ -1,8 +1,6 @@
 import { supabase } from "./supabase";
 import type { BookingRequest, RequestMessage } from "./types";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export type HostListingSubmission = {
   address: string | null;
   amenities: string | null;
@@ -42,9 +40,10 @@ export type ApprovedHostListingSubmission = {
   user_id: string | null;
 };
 
-function rowToBookingRequest(row: Record<string, unknown>): BookingRequest {
+function rowToBookingRequest(row: Record<string, unknown>, currentUserId: string): BookingRequest {
   return {
     id: row.id as string,
+    viewerRole: row.user_id === currentUserId ? "filmmaker" : row.host_user_id === currentUserId ? "host" : undefined,
     listingId: (row.listing_id as string) ?? "",
     listingSlug: (row.listing_slug as string) ?? "",
     listingTitle: (row.listing_title as string) ?? "",
@@ -61,44 +60,34 @@ function rowToBookingRequest(row: Record<string, unknown>): BookingRequest {
 }
 
 export async function saveRequestToSupabase(req: BookingRequest): Promise<string> {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!user) throw new Error("Please sign in before saving a request.");
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  if (!session?.access_token) throw new Error("Please sign in before saving a request.");
 
-  const id = UUID_RE.test(req.id) ? req.id : crypto.randomUUID();
-
-  // Resolve host_user_id for host-submitted listings (listing_id = "host_<uuid>").
-  // Platform/mock listings (e.g. "l_001") have no host in the DB — host_user_id stays null.
-  let host_user_id: string | null = null;
-  if (req.listingId.startsWith("host_")) {
-    const submissionId = req.listingId.slice(5); // strip "host_" prefix → raw UUID
-    const { data: sub } = await supabase
-      .from("approved_host_listings_public")
-      .select("id, user_id, title")
-      .eq("id", submissionId)
-      .maybeSingle();
-    host_user_id = (sub?.user_id as string) ?? null;
-  }
-
-  const { error } = await supabase.from("booking_requests").insert({
-    id,
-    listing_id: req.listingId,
-    listing_slug: req.listingSlug,
-    listing_title: req.listingTitle,
-    email: req.email,
-    message: req.message,
-    start_iso: req.startISO,
-    end_iso: req.endISO,
-    status: req.status,
-    thread_status: req.threadStatus,
-    created_iso: req.createdISO,
-    impact: req.impact ?? null,
-    user_id: user.id,
-    host_user_id,
+  const response = await fetch("/api/booking/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    // Only booking intent crosses this boundary. The server owns identity,
+    // listing details, timestamps, and workflow state.
+    body: JSON.stringify({
+      listingId: req.listingId,
+      listingSlug: req.listingSlug,
+      email: req.email,
+      message: req.message,
+      startISO: req.startISO,
+      endISO: req.endISO,
+      impact: req.impact ?? null,
+    }),
   });
 
-  if (error) throw error;
-  return id;
+  const data = await response.json().catch(() => ({})) as { id?: string; error?: string } | null;
+  if (!response.ok || !data || typeof data.id !== "string" || !data.id) {
+    throw new Error(data?.error ?? "Failed to save request.");
+  }
+  return data.id;
 }
 
 export async function getRequestsFromSupabase(): Promise<BookingRequest[]> {
@@ -109,11 +98,11 @@ export async function getRequestsFromSupabase(): Promise<BookingRequest[]> {
   const { data, error } = await supabase
     .from("booking_requests")
     .select("*")
-    .eq("user_id", user.id)
+    .or(`user_id.eq.${user.id},host_user_id.eq.${user.id}`)
     .order("created_iso", { ascending: false });
 
   if (error) throw error;
-  return (data ?? []).map((row) => rowToBookingRequest(row as Record<string, unknown>));
+  return (data ?? []).map((row) => rowToBookingRequest(row as Record<string, unknown>, user.id));
 }
 
 export async function getRequestByIdFromSupabase(id: string): Promise<BookingRequest | null> {
@@ -142,7 +131,7 @@ export async function getRequestByIdFromSupabase(id: string): Promise<BookingReq
 
   if (offersError) throw offersError;
 
-  const request = rowToBookingRequest(data as Record<string, unknown>);
+  const request = rowToBookingRequest(data as Record<string, unknown>, user.id);
   const filmmakerOffer = (offers ?? []).find((offer) => offer.offer_type === "FILMMAKER_OFFER");
   const hostCounter = (offers ?? []).find((offer) => offer.offer_type === "HOST_COUNTER_OFFER");
 
@@ -192,7 +181,7 @@ export async function getMessagesFromSupabase(requestId: string): Promise<Reques
   }));
 }
 
-export async function submitHostListingToSupabase(fields: {
+export type HostListingInput = {
   listingType: string;
   title: string;
   description: string;
@@ -200,14 +189,68 @@ export async function submitHostListingToSupabase(fields: {
   city: string;
   state: string;
   country: string;
-  ratePerHour: number | null;
-  ratePerDay: number | null;
-  minHours: number | null;
-  capacity: number | null;
+  ratePerHour: string | number | null;
+  ratePerDay: string | number | null;
+  minHours: string | number | null;
+  capacity: string | number | null;
   amenities: string;
   rulesNotes: string;
   hostEmail: string;
-}): Promise<void> {
+};
+
+function optionalListingNumber(value: string | number | null, label: string, integer = false): number | null {
+  if (value === null || (typeof value === "string" && value.trim() === "")) return null;
+  if (typeof value !== "string" && typeof value !== "number") {
+    throw new Error(`${label} must be a non-negative number, or left blank.`);
+  }
+  const numericText = typeof value === "string" ? value.trim() : null;
+  const decimal = numericText?.match(/^([+-]?)(\d+(?:\.\d*)?|\.\d+)(?:e([+-]?\d+))?$/i);
+  const digits = decimal?.[2].replace(".", "") ?? "";
+  const isNonzeroText = /[1-9]/.test(digits);
+  const n = Number(value);
+  if ((numericText !== null && !decimal) || !Number.isFinite(n) || n < 0 || (decimal?.[1] === "-" && isNonzeroText)) {
+    throw new Error(`${label} must be a non-negative number, or left blank.`);
+  }
+  if (isNonzeroText && n === 0) {
+    throw new Error(`${label} is too small to save accurately.`);
+  }
+  // Check the raw decimal as well: Number() can round a fraction to an integer.
+  const fractionLength = decimal?.[2].split(".")[1]?.length ?? 0;
+  const trailingZeroes = digits.length - digits.replace(/0+$/, "").length;
+  const fractionalText = isNonzeroText && fractionLength - Number(decimal?.[3] ?? 0) > trailingZeroes;
+  // host_listing_submissions stores these two fields as PostgreSQL integer.
+  if (integer && (fractionalText || !Number.isInteger(n) || n > 2147483647)) {
+    throw new Error(`${label} must be a whole number from 0 to 2147483647, or left blank.`);
+  }
+  return n;
+}
+
+export function normalizeHostListingInput(fields: HostListingInput) {
+  const title = fields.title.trim();
+  const city = fields.city.trim();
+  const country = fields.country.trim();
+  if (!title || !city || !country) {
+    throw new Error("Title, city, and country are required.");
+  }
+  return {
+    ...fields,
+    title, city, country,
+    description: fields.description.trim(),
+    address: fields.address.trim(),
+    state: fields.state.trim(),
+    amenities: fields.amenities.trim(),
+    rulesNotes: fields.rulesNotes.trim(),
+    hostEmail: fields.hostEmail.trim(),
+    ratePerHour: optionalListingNumber(fields.ratePerHour, "Rate / Hour"),
+    ratePerDay: optionalListingNumber(fields.ratePerDay, "Rate / Day"),
+    minHours: optionalListingNumber(fields.minHours, "Min Hours", true),
+    capacity: optionalListingNumber(fields.capacity, "Capacity", true),
+  };
+}
+
+export async function submitHostListingToSupabase(input: HostListingInput): Promise<void> {
+  // Keep invalid input distinct from intentionally blank optional fields.
+  const fields = normalizeHostListingInput(input);
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError) throw authError;
   if (!user) throw new Error("You must be logged in to submit a listing.");

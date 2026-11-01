@@ -2,9 +2,11 @@
   position: sticky;   /* NOT fixed */
   top: 0;
   z-index: 50;
-  background: rgba(0,0,0,0.85);
+  background: rgba(255,255,255,0.97);
+  color: #173826;
+  color-scheme: light;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid #c7d7ca;
 }
 
 .shell{
@@ -19,10 +21,11 @@
 
 .brand{
   display:inline-flex;
+  flex-shrink: 0;
   align-items:center;
   gap:10px;
   text-decoration:none;
-  color: rgba(255,255,255,0.92);
+  color: #173826;
 }
 
 .brandMark{
@@ -31,7 +34,7 @@
   border-radius:10px;
   display:grid;
   place-items:center;
-  background: rgba(255,255,255,0.10);
+  background: #e6f3e6;
   font-weight: 800;
 }
 
@@ -41,27 +44,35 @@
 }
 
 .nav{
+  min-width: 0;
+  max-width: 100%;
   display:flex;
   gap: 14px;
   align-items:center;
+  flex-wrap: wrap;
 }
 
 .navLink{
   font-size:14px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  overflow-wrap: anywhere;
   text-decoration:none;
-  color: rgba(255,255,255,0.78);
+  color: #284e35;
 }
 
-.navLink:hover{ color: rgba(255,255,255,1); }
+.navLink:hover{ color: #173826; }
+.header :is(a, button):focus-visible { outline: 3px solid #173826; outline-offset: 3px; }
 
 .navBtn{
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 8px 0;
 }
 
-@media (max-width: 768px){
+@media (max-width: 1000px){
   .shell{
     align-items:flex-start;
     flex-direction:column;
@@ -70,12 +81,12 @@
   .nav{
     width:100%;
     gap:10px;
-    overflow-x:auto;
+    flex-wrap: wrap;
     padding-bottom:4px;
     scrollbar-width:thin;
   }
 
   .navLink{
-    flex:0 0 auto;
+    flex:0 1 auto;
   }
 }

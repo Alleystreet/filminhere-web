@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import styles from "./RequestDetail.module.css";
 
 import type {
@@ -10,9 +10,7 @@ import type {
   RequestMessage,
   Listing,
   HostConstraints,
-  ImpactChecklist,
 } from "@/lib/types";
-import { getImpactGuidance } from "@/lib/compliance/impactGuidance";
 import {
   getRequestById,
   clearAllMvpData,
@@ -25,6 +23,8 @@ import {
   acceptPolicyInSupabase,
   getSessionAccessToken,
 } from "@/lib/requests";
+import { bookingPriceDisplay } from "@/lib/booking-price-display";
+import { validateNegotiationAmounts } from "@/lib/negotiation-validation.mjs";
 import { containsBlockedNegotiationContent } from "@/lib/dlp";
 import { listings } from "@/lib/mock/listings";
 
@@ -100,43 +100,12 @@ function rateDisplay(currency: string, rate: number) {
   return Number.isFinite(rate) && rate > 0 ? `${currency} ${money(rate)}/hr` : "Rate not set";
 }
 
-function estimatedSubtotalDisplay(currency: string, rate: number, subtotal: number) {
-  return Number.isFinite(rate) && rate > 0
-    ? `${currency} ${money(subtotal)}`
-    : "Not available until rate is set";
-}
-
-function getImpactKeys(impact?: ImpactChecklist) {
-  if (!impact) return [];
-  const keys: string[] = [];
-
-  if (impact.publicSpace) keys.push("STREET_CLOSURE", "SIDEWALK_USE", "PUBLIC_PARK");
-  if (impact.parkingOrTrafficControl) keys.push("TRAFFIC_CONTROL");
-  if (impact.stuntsWeaponsPyroDrones) keys.push("STUNTS", "WEAPONS", "PYRO", "DRONE");
-  if (impact.loudNoiseAfterHours) keys.push("NIGHT_SHOOT", "LOUD_MUSIC", "GENERATORS");
-
-  return keys;
-}
-
-function buildRequirementsSnapshot(impact?: ImpactChecklist, stateCode?: string) {
-  const keys = getImpactKeys(impact);
-  const guidance = getImpactGuidance(keys, stateCode);
-  const base = guidance.suggestions.length
-    ? guidance.suggestions.map((s) => s.label)
-    : ["No special flags detected"];
-  const snapshot = guidance.highImpact ? ["High impact warning", ...base] : base;
-  return Array.from(new Set(snapshot));
-}
-
 export default function RequestDetailPage() {
   const params = useParams() as Record<string, string | string[]>;
   const id = getIdFromParams(params) ?? "";
 
-  const sp = useSearchParams();
-  const as = (sp.get("as") ?? "filmmaker").toLowerCase();
-  const isHostView = as === "host";
-
   const [req, setReq] = useState<BookingRequest | null>(null);
+  const isHostView = req?.viewerRole === "host";
   const [msgs, setMsgs] = useState<RequestMessage[]>([]);
   const [pageError, setPageError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -246,10 +215,11 @@ export default function RequestDetailPage() {
       });
   }, []);
 
+  const listingSlug = req?.listingSlug;
   const listing: Listing | undefined = useMemo(() => {
-    if (!req?.listingSlug) return undefined;
-    return listings.find((l) => l.slug === req.listingSlug);
-  }, [req?.listingSlug]);
+    if (!listingSlug) return undefined;
+    return listings.find((l) => l.slug === listingSlug);
+  }, [listingSlug]);
 
   const listingHref = useMemo(() => {
     const slug = req?.listingSlug;
@@ -258,10 +228,9 @@ export default function RequestDetailPage() {
 
   // ===== State gates =====
   const isFinal = req?.status === "ACCEPTED" || req?.status === "DECLINED";
-  const canNegotiate = Boolean(req && req.status === "PENDING" && !req.confirmed);
+  const canNegotiate = Boolean(req?.viewerRole && req.status === "PENDING" && !req.confirmed);
   const complianceAcknowledged = Boolean(
-    req?.compliance?.acknowledgedISO ||
-    msgs.some((m) => m.body.includes("Compliance acknowledged"))
+    msgs.some((m) => m.sender === "FILMMAKER" && m.body === "✅ Compliance acknowledged.")
   );
 
   // ===== Deal logic =====
@@ -284,6 +253,7 @@ export default function RequestDetailPage() {
   const shootHours = req ? Math.max(0, hoursBetween(req.startISO, req.endISO)) : 0;
   const billableHours = Math.max(shootHours, proposedMinHours || 0);
   const subtotal = billableHours * (proposedRate || 0) + (baseCleaning || 0);
+  const priceDisplay = bookingPriceDisplay(req, baseCurrency, proposedRate, subtotal);
 
   async function send() {
     const body = text.trim();
@@ -327,9 +297,17 @@ export default function RequestDetailPage() {
     const minHoursN = ofMinHours.trim() ? toNum(ofMinHours.trim()) : NaN;
     const totalN = ofTotal.trim() ? toNum(ofTotal.trim()) : NaN;
 
-    if (ofRate.trim() && !(rateN > 0)) return;
-    if (ofMinHours.trim() && !(minHoursN > 0)) return;
-    if (ofTotal.trim() && !(totalN > 0)) return;
+    const amounts = validateNegotiationAmounts({
+      currency,
+      ratePerHour: ofRate.trim() ? rateN : undefined,
+      minHours: ofMinHours.trim() ? minHoursN : undefined,
+      total: ofTotal.trim() ? totalN : undefined,
+    });
+    if (!amounts.ok) {
+      setActionError(amounts.error);
+      setSubmittingOffer(false);
+      return;
+    }
 
     const hasAny = ofRate.trim() || ofMinHours.trim() || ofTotal.trim() || ofNote.trim();
 
@@ -398,9 +376,16 @@ export default function RequestDetailPage() {
     const minHoursN = coMinHours.trim() ? toNum(coMinHours.trim()) : NaN;
     const totalN = coTotal.trim() ? toNum(coTotal.trim()) : NaN;
 
-    if (coRate.trim() && !(rateN > 0)) return;
-    if (coMinHours.trim() && !(minHoursN > 0)) return;
-    if (coTotal.trim() && !(totalN > 0)) return;
+    const amounts = validateNegotiationAmounts({
+      currency,
+      ratePerHour: coRate.trim() ? rateN : undefined,
+      minHours: coMinHours.trim() ? minHoursN : undefined,
+      total: coTotal.trim() ? totalN : undefined,
+    });
+    if (!amounts.ok) {
+      setActionError(amounts.error);
+      return;
+    }
 
     const hasAny = coRate.trim() || coMinHours.trim() || coTotal.trim() || coNote.trim();
 
@@ -533,33 +518,6 @@ export default function RequestDetailPage() {
     if (!complianceAcknowledged) return;
     setActionError(null);
 
-    const requirementsSnapshot = buildRequirementsSnapshot(req.impact, listing?.state);
-    const currency = baseCurrency;
-    const ratePerHour = proposedRate || baseRate || 0;
-    const minHrs = proposedMinHours || baseMin || 0;
-
-    const hrsBilled = Math.max(shootHours, minHrs);
-    const estSubtotal = hrsBilled * ratePerHour + (baseCleaning || 0);
-
-    const nextReq: BookingRequest = {
-      ...req,
-      status: "ACCEPTED",
-      confirmed: {
-        currency,
-        ratePerHour,
-        minHours: minHrs,
-        cleaningFee: baseCleaning || undefined,
-        securityDeposit: baseDeposit || undefined,
-        estimatedHoursBilled: hrsBilled,
-        estimatedSubtotal: estSubtotal,
-        source: proposedSource,
-        confirmedISO: new Date().toISOString(),
-        requirementsSnapshot,
-      },
-    };
-
-    saveRequest(nextReq);
-
     try {
       const token = await getSessionAccessToken();
       if (!token) throw new Error("Please sign in.");
@@ -572,8 +530,12 @@ export default function RequestDetailPage() {
         const data = await res.json().catch(() => ({})) as { error?: string };
         throw new Error(data.error ?? "Failed to accept request.");
       }
+      const fresh = await getRequestByIdFromSupabase(id);
+      if (!fresh) throw new Error("Booking accepted, but updated details could not be loaded. Reload to refresh.");
+      saveRequest(fresh);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to accept request.");
+      return;
     }
 
     reload();
@@ -627,8 +589,6 @@ export default function RequestDetailPage() {
       },
     };
 
-    saveRequest(nextReq);
-
     try {
       const token = await getSessionAccessToken();
       if (!token) throw new Error("Please sign in.");
@@ -641,6 +601,7 @@ export default function RequestDetailPage() {
         const data = await res.json().catch(() => ({})) as { error?: string };
         throw new Error(data.error ?? "Failed to save compliance acknowledgment.");
       }
+      saveRequest(nextReq);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to save compliance acknowledgment.");
     }
@@ -668,8 +629,8 @@ export default function RequestDetailPage() {
   async function copyConfirmationSummary() {
     if (!req) return;
 
-    const complianceMsg = msgs.find((m) => m.body.includes("Compliance acknowledged"));
-    const localComplianceTS = req.compliance?.acknowledgedISO ?? complianceMsg?.createdISO ?? null;
+    const complianceMsg = msgs.find((m) => m.sender === "FILMMAKER" && m.body === "✅ Compliance acknowledged.");
+    const localComplianceTS = complianceMsg?.createdISO ?? null;
     const acceptanceMsg = msgs.find(
       (m) =>
         m.body.includes("Confirmed terms saved") ||
@@ -692,11 +653,12 @@ export default function RequestDetailPage() {
       `Start:                   ${new Date(req.startISO).toLocaleString()}`,
       `End:                     ${new Date(req.endISO).toLocaleString()}`,
       "",
-      `Agreed rate:             ${baseCurrency} ${money(proposedRate)}/hr`,
+      `Agreed rate:             ${rateDisplay(baseCurrency, proposedRate)}`,
       `Minimum booking time:    ${billableHours.toFixed(2)} hrs`,
       `Cleaning fee:            ${baseCleaning ? `${baseCurrency} ${money(baseCleaning)}` : "—"}`,
       `Deposit:                 ${baseDeposit ? `${baseCurrency} ${money(baseDeposit)}` : "—"}`,
-      `Estimated total:         ${baseCurrency} ${money(subtotal)}`,
+      `${priceDisplay.label}:         ${priceDisplay.value}`,
+      priceDisplay.note,
       "",
       `Compliance acknowledged: ${complianceDisplay}`,
       `Accepted on:             ${localAcceptedOnISO ? new Date(localAcceptedOnISO).toLocaleString() : "—"}`,
@@ -772,8 +734,8 @@ export default function RequestDetailPage() {
     threadStatus === "locked" ||
     threadStatus === "declined";
 
-  const complianceMsg = msgs.find((m) => m.body.includes("Compliance acknowledged"));
-  const complianceTimestamp = compliance?.acknowledgedISO ?? complianceMsg?.createdISO ?? null;
+  const complianceMsg = msgs.find((m) => m.sender === "FILMMAKER" && m.body === "✅ Compliance acknowledged.");
+  const complianceTimestamp = complianceMsg?.createdISO ?? null;
 
   const acceptanceMsg = msgs.find(
     (m) =>
@@ -794,10 +756,6 @@ export default function RequestDetailPage() {
       <div className={styles.viewBar}>
         <div className={styles.viewLabel}>
           Viewing as: <span className={styles.viewRole}>{isHostView ? "HOST" : "FILMMAKER"}</span>
-        </div>
-        <div className={styles.viewLinks}>
-          <Link className={styles.smallLink} href={`/me/requests/${id}?as=filmmaker`}>Filmmaker view</Link>
-          <Link className={styles.smallLink} href={`/me/requests/${id}?as=host`}>Host view</Link>
         </div>
       </div>
 
@@ -854,13 +812,15 @@ export default function RequestDetailPage() {
           </div>
 
           <div className={styles.dealTotal}>
-            <div className={styles.dealLabel}>Estimated subtotal</div>
+            <div className={styles.dealLabel}>{priceDisplay.label}</div>
             <div className={styles.dealValBig}>
-              {estimatedSubtotalDisplay(baseCurrency, proposedRate, subtotal)}
+              {priceDisplay.value}
             </div>
           </div>
         </div>
       </div>
+
+      <p className={styles.summaryNote}>{priceDisplay.note}</p>
 
       {/* Confirmed Terms */}
       {confirmed ? (
@@ -906,9 +866,9 @@ export default function RequestDetailPage() {
             </div>
 
             <div className={styles.dealTotal}>
-              <div className={styles.dealLabel}>Confirmed subtotal</div>
+              <div className={styles.dealLabel}>{priceDisplay.explicit ? priceDisplay.label : "Saved hourly estimate"}</div>
               <div className={styles.dealValBig}>
-                {confirmed.currency} {money(confirmed.estimatedSubtotal)}
+                {priceDisplay.explicit ? priceDisplay.value : `${confirmed.currency} ${money(confirmed.estimatedSubtotal)}`}
               </div>
             </div>
           </div>
@@ -1019,8 +979,8 @@ export default function RequestDetailPage() {
             </div>
 
             <div className={styles.dealTotal}>
-              <div className={styles.dealLabel}>Estimated total</div>
-              <div className={styles.dealValBig}>{baseCurrency} {money(subtotal)}</div>
+              <div className={styles.dealLabel}>{priceDisplay.label}</div>
+              <div className={styles.dealValBig}>{priceDisplay.value}</div>
             </div>
           </div>
         </div>
@@ -1073,8 +1033,8 @@ export default function RequestDetailPage() {
               <span>{baseDeposit ? `${baseCurrency} ${money(baseDeposit)}` : "—"}</span>
             </div>
             <div className={styles.summaryField}>
-              <span className={styles.summaryFieldLabel}>Estimated total</span>
-              <span><strong>{baseCurrency} {money(subtotal)}</strong></span>
+              <span className={styles.summaryFieldLabel}>{priceDisplay.label}</span>
+              <span><strong>{priceDisplay.value}</strong></span>
             </div>
 
             <hr className={styles.summaryDivider} />

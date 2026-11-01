@@ -35,6 +35,7 @@ export default function SiteHeader() {
 
         <nav className={styles.nav} aria-label="Primary">
           <Link className={styles.navLink} href="/locations">Explore</Link>
+          <Link className={styles.navLink} href="/resources">Resources</Link>
           <Link className={styles.navLink} href="/host">List a Space</Link>
           <Link className={styles.navLink} href="/me/requests">My Requests</Link>
           <Link className={styles.navLink} href="/learn">Learn</Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +12,8 @@ import { getSavedEmail, saveEmail } from "@/lib/store/requests";
 import { saveRequestToSupabase, getApprovedHostListingSubmissionByIdFromSupabase } from "@/lib/requests";
 import type { ApprovedHostListingSubmission } from "@/lib/requests";
 import { supabase } from "@/lib/supabase";
+import { localDateTimeToISO, validateBookingDates } from "@/api/booking/create/validation.mjs";
+import { bookingLoginHref } from "@/lib/booking-login-return";
 
 type Props = {
   listingSlug?: string;
@@ -47,6 +49,8 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   const [endISO, setEndISO] = useState("");
   const [impact] = useState<ImpactChecklist>({} as ImpactChecklist);
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const [timeZone, setTimeZone] = useState("your device timezone");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [dateError, setDateError] = useState<string | null>(null);
   const [sessionReady, setSessionReady] = useState<boolean | null>(null);
@@ -54,6 +58,10 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSessionReady(!!session);
+      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    }).catch(() => {
+      setSessionReady(false);
+      setSaveError("Unable to check your sign-in. Reload the page and try again.");
     });
   }, []);
 
@@ -82,6 +90,7 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     void Promise.resolve().then(async () => {
       if (cancelled) return;
       setHostLoading(true);
+      setHostSubmission(null);
       setHostError(null);
 
       try {
@@ -112,55 +121,55 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
     : (mockListing?.title ?? effectiveSlug.replace(/-/g, " "));
 
   async function onSubmit() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      router.push("/auth/login");
-      return;
-    }
-
-    if (!email) return;
+    if (savingRef.current) return;
+    setSaveError(null);
     if (!effectiveSlug) {
       router.push("/locations");
       return;
     }
-    if (isHostSlug && !hostSubmission) return;
+    if (isHostSlug && hostSubmission?.id !== effectiveSlug.slice(5)) return;
 
-    const startMs = startISO ? new Date(startISO).getTime() : NaN;
-    const endMs = endISO ? new Date(endISO).getTime() : NaN;
-    if (Number.isFinite(startMs) && Number.isFinite(endMs) && endMs <= startMs) {
-      setDateError("End date/time must be after start date/time.");
+    const normalizedStart = localDateTimeToISO(startISO);
+    const normalizedEnd = localDateTimeToISO(endISO);
+    if (!normalizedStart || !normalizedEnd) {
+      setDateError("Choose a valid start and end time in your device timezone.");
+      return;
+    }
+    const dates = validateBookingDates(normalizedStart, normalizedEnd);
+    if (!dates.ok) {
+      setDateError(dates.error);
       return;
     }
     setDateError(null);
-
-    try {
-      saveEmail?.(email);
-    } catch {}
-
-    const req: BookingRequest = {
-      id: `req_${Date.now()}`,
-      listingId: isHostSlug ? ("host_" + effectiveSlug.slice(5)) : (mockListing?.id ?? effectiveSlug),
-      listingSlug: effectiveSlug,
-      listingTitle: isHostSlug
-        ? (hostSubmission!.title as string)
-        : (mockListing?.title ?? effectiveSlug.replace(/-/g, " ")),
-      email,
-      message,
-      startISO,
-      endISO,
-      impact,
-      status: "PENDING",
-      threadStatus: "draft",
-      createdISO: new Date().toISOString(),
-    };
-
+    savingRef.current = true;
     setSaving(true);
-    setSaveError(null);
+
     try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      if (!session) throw new Error("Please log in to send a request.");
+
+      const req: BookingRequest = {
+        id: "", // The server assigns the durable ID and workflow fields.
+        listingId: isHostSlug ? ("host_" + effectiveSlug.slice(5)) : (mockListing?.id ?? effectiveSlug),
+        listingSlug: effectiveSlug,
+        listingTitle: "",
+        email: email.trim(),
+        message,
+        startISO: dates.startISO,
+        endISO: dates.endISO,
+        impact,
+        status: "PENDING",
+        threadStatus: "draft",
+        createdISO: "",
+      };
       const insertedId = await saveRequestToSupabase(req);
+      try { saveEmail?.(email.trim()); } catch {}
       router.push(`/me/requests/${insertedId}`);
+      // Keep the button locked until navigation completes.
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Failed to save request.");
+      savingRef.current = false;
       setSaving(false);
     }
   }
@@ -187,62 +196,74 @@ export default function NewRequestClient({ listingSlug = "" }: Props) {
         </p>
       )}
 
-      <div className={styles.card}>
-        <label className={styles.label}>Email</label>
+      <form className={styles.card} onSubmit={(event) => { event.preventDefault(); void onSubmit(); }}>
+        <label className={styles.label} htmlFor="booking-email">Email</label>
         <input
           className={styles.input}
+          id="booking-email"
+          type="email"
+          autoComplete="email"
+          required
+          maxLength={254}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@email.com"
         />
 
-        <label className={styles.label}>Start</label>
+        <p id="booking-timezone">Times are shown in {timeZone}.</p>
+        <label className={styles.label} htmlFor="booking-start">Start</label>
         <input
           className={styles.input}
+          id="booking-start"
+          type="datetime-local"
+          required
+          aria-describedby="booking-timezone booking-date-error"
           value={startISO}
           onChange={(e) => { setStartISO(e.target.value); setDateError(null); }}
-          placeholder="2026-02-18T09:00"
         />
 
-        <label className={styles.label}>End</label>
+        <label className={styles.label} htmlFor="booking-end">End</label>
         <input
           className={styles.input}
+          id="booking-end"
+          type="datetime-local"
+          required
+          aria-describedby="booking-timezone booking-date-error"
           value={endISO}
           onChange={(e) => { setEndISO(e.target.value); setDateError(null); }}
-          placeholder="2026-02-18T17:00"
         />
 
         {dateError && (
-          <p style={{ color: "#cb2431", margin: "4px 0 0", fontSize: 14 }}>
+          <p id="booking-date-error" role="alert" style={{ color: "#cb2431", margin: "4px 0 0", fontSize: 14 }}>
             {dateError}
           </p>
         )}
 
-        <label className={styles.label}>Message</label>
+        <label className={styles.label} htmlFor="booking-message">Message</label>
         <textarea
           className={styles.textarea}
+          id="booking-message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Describe the shoot, crew, needs, timing…"
         />
 
         {sessionReady === false && (
-          <p className={styles.error}>Please log in to send a request.</p>
+          <p className={styles.error}>Please <Link href={bookingLoginHref(effectiveSlug)}>log in</Link> to send a request.</p>
         )}
 
-        {saveError && <p className={styles.error}>{saveError}</p>}
+        {saveError && <p className={styles.error} role="alert">{saveError}</p>}
 
         <div className={styles.actions}>
           <button
-            type="button"
+            type="submit"
             className={styles.primary}
-            onClick={onSubmit}
-            disabled={saving || sessionReady === false || (isHostSlug && !hostSubmission)}
+            disabled={saving || sessionReady !== true || !effectiveSlug || (isHostSlug && hostSubmission?.id !== effectiveSlug.slice(5))}
           >
             {saving ? "Saving…" : "Save Request"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

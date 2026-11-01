@@ -1,6 +1,7 @@
 "use client";
 
 import { useTerminology } from "./TerminologyProvider";
+import styles from "./TerminologyToggle.module.css";
 
 export default function TerminologyToggle({ compact = false }: { compact?: boolean }) {
   const { mode, setMode } = useTerminology();
@@ -11,8 +12,8 @@ export default function TerminologyToggle({ compact = false }: { compact?: boole
     gap: 4,
     padding: 3,
     borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.14)",
-    background: "rgba(255,255,255,0.05)",
+    border: "1px solid #b2c5b6",
+    background: "#f3f8f0",
   };
 
   const button = (active: boolean): React.CSSProperties => ({
@@ -20,14 +21,15 @@ export default function TerminologyToggle({ compact = false }: { compact?: boole
     borderRadius: 999,
     padding: compact ? "4px 8px" : "6px 10px",
     fontSize: compact ? 11 : 12,
+    minHeight: 40,
     cursor: "pointer",
-    color: active ? "#fff" : "rgba(255,255,255,0.65)",
-    background: active ? "rgba(46, 160, 67, 0.8)" : "transparent",
+    color: active ? "#fff" : "#284e35",
+    background: active ? "#21643c" : "transparent",
     whiteSpace: "nowrap",
   });
 
   return (
-    <div style={wrap} aria-label="Terminology mode">
+    <div className={styles.toggle} style={wrap} aria-label="Terminology mode">
       <button
         type="button"
         style={button(mode === "plain")}

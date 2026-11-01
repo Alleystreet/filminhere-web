@@ -1,0 +1,104 @@
+[
+  {
+    "version": "20261001023713",
+    "name": "remote_schema",
+    "normalized_statement_md5": "2a1f2b554b36aab36e900f284a5bb197",
+    "statement_length": 333316
+  },
+  {
+    "version": "20261001173502",
+    "name": "reference_catalog_rls",
+    "normalized_statement_md5": "c110f4d3df8cfa07ec6f30500f74a189",
+    "statement_length": 4064
+  },
+  {
+    "version": "20261001175738",
+    "name": "provider_directory_rls",
+    "normalized_statement_md5": "73ec18deefdd96079baae1b86d68419a",
+    "statement_length": 1127
+  },
+  {
+    "version": "20261001175912",
+    "name": "provider_directory_view_privileges",
+    "normalized_statement_md5": "21cf6f0a9258924a4c8d47f3719e898b",
+    "statement_length": 323
+  },
+  {
+    "version": "20261001180412",
+    "name": "project_workspace_rls",
+    "normalized_statement_md5": "d2a9ebd76a3bd7890a0d41e0382888cb",
+    "statement_length": 3671
+  },
+  {
+    "version": "20261001180542",
+    "name": "internal_project_records_rls",
+    "normalized_statement_md5": "1ed9e7fd5dc8606e9d260b141f87f4ad",
+    "statement_length": 852
+  },
+  {
+    "version": "20261001180951",
+    "name": "public_view_function_hardening",
+    "normalized_statement_md5": "d560778e92e14abc034dec51ba6ffc3a",
+    "statement_length": 2373
+  },
+  {
+    "version": "20261001181257",
+    "name": "auth_profile_trigger_reconcile",
+    "normalized_statement_md5": "a0526b125057f5998dc8e296024ff01f",
+    "statement_length": 672
+  },
+  {
+    "version": "20261001181520",
+    "name": "pin_trigger_search_paths",
+    "normalized_statement_md5": "c7a1ff3e5d553d0ac846a95d8dcf7f4e",
+    "statement_length": 1113
+  },
+  {
+    "version": "20261001181707",
+    "name": "user_workflow_grant_hardening",
+    "normalized_statement_md5": "01f4e946c35a7a458c19e04949f37b49",
+    "statement_length": 922
+  },
+  {
+    "version": "20261004071659",
+    "name": "replace_approved_host_public_view_projection",
+    "normalized_statement_md5": "558f364dd315dde16d8709c145254427",
+    "statement_length": 3634
+  },
+  {
+    "version": "20261004072504",
+    "name": "enforce_single_pending_offer_per_type",
+    "normalized_statement_md5": "650138e85a2edb7b4c24e4fdeff63633",
+    "statement_length": 145
+  },
+  {
+    "version": "20261004080448",
+    "name": "booking_schedule_integrity",
+    "normalized_statement_md5": "431f66ec25ff9320bd4cd6337794d2ef",
+    "statement_length": 5058
+  },
+  {
+    "version": "20261004080713",
+    "name": "persist_host_constraints",
+    "normalized_statement_md5": "4c0560cb309d77cacd6b920c8556c8d0",
+    "statement_length": 1971
+  },
+  {
+    "version": "20261004081311",
+    "name": "translation_roots_catalog",
+    "normalized_statement_md5": "7ff36a2e7afa07eaa0f2408a011e69e5",
+    "statement_length": 4269
+  },
+  {
+    "version": "20261004112530",
+    "name": "core_booking_performance_indexes",
+    "normalized_statement_md5": "300b1e00f3b493bf5752f2715da8cea4",
+    "statement_length": 1166
+  },
+  {
+    "version": "20261004112859",
+    "name": "optimize_auth_rls_initplans",
+    "normalized_statement_md5": "5dc5c64e46853c970b728108c5556148",
+    "statement_length": 2852
+  }
+]

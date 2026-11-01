@@ -32,7 +32,8 @@ body {
 }
 
 .appMain {
-  padding-top: var(--site-header-height);
+  /* The sticky header remains in document flow. */
+  padding-top: 0;
 }
 
 a:focus-visible,

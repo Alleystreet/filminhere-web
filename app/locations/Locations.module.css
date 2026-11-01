@@ -127,7 +127,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   align-items: end;
 }
@@ -474,4 +474,9 @@ select.input {
 .emptyLink {
   text-decoration: underline;
   opacity: 0.85;
+}
+
+@media (max-width: 560px) {
+  .row, .row:last-child { grid-template-columns: minmax(0, 1fr); }
+  .grid { grid-template-columns: minmax(0, 1fr); }
 }

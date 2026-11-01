@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import styles from "../Host.module.css";
 import { submitHostListingToSupabase } from "@/lib/requests";
@@ -21,12 +21,8 @@ const field: React.CSSProperties = {
 const lbl: React.CSSProperties = { display: "block", marginBottom: 14 };
 const lblTxt: React.CSSProperties = { display: "block", fontSize: 13, opacity: 0.72, marginBottom: 4 };
 
-function toNum(s: string): number | null {
-  const n = Number(s);
-  return s.trim() !== "" && Number.isFinite(n) && n >= 0 ? n : null;
-}
-
 export default function HostIntakePage() {
+  const submissionInFlight = useRef(false);
   const [listingType, setListingType] = useState("Location");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -45,12 +41,10 @@ export default function HostIntakePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  async function handleSubmit() {
-    if (submitting) return;
-    if (!title.trim() || !city.trim() || !country.trim()) {
-      setError("Title, city, and country are required.");
-      return;
-    }
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (submissionInFlight.current) return;
+    submissionInFlight.current = true;
     setError(null);
     setSubmitting(true);
     try {
@@ -62,10 +56,10 @@ export default function HostIntakePage() {
         city: city.trim(),
         state: state.trim(),
         country: country.trim(),
-        ratePerHour: toNum(ratePerHour),
-        ratePerDay: toNum(ratePerDay),
-        minHours: toNum(minHours),
-        capacity: toNum(capacity),
+        ratePerHour,
+        ratePerDay,
+        minHours,
+        capacity,
         amenities: amenities.trim(),
         rulesNotes: rulesNotes.trim(),
         hostEmail: hostEmail.trim(),
@@ -74,6 +68,7 @@ export default function HostIntakePage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to submit listing.");
     } finally {
+      submissionInFlight.current = false;
       setSubmitting(false);
     }
   }
@@ -106,7 +101,7 @@ export default function HostIntakePage() {
         <p className={styles.sub}>Tell us about your space, vehicle, or service.</p>
       </div>
 
-      <div className={styles.card}>
+      <form className={styles.card} onSubmit={handleSubmit} aria-busy={submitting}>
         <label style={lbl}>
           <span style={lblTxt}>Listing Type</span>
           <select value={listingType} onChange={(e) => setListingType(e.target.value)} style={field}>
@@ -118,6 +113,7 @@ export default function HostIntakePage() {
           <span style={lblTxt}>Title *</span>
           <input
             type="text"
+            required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={field}
@@ -149,7 +145,7 @@ export default function HostIntakePage() {
         <div className={styles.intakeGrid3}>
           <label>
             <span style={lblTxt}>City *</span>
-            <input type="text" value={city} onChange={(e) => setCity(e.target.value)} style={field} placeholder="City" />
+            <input type="text" required value={city} onChange={(e) => setCity(e.target.value)} style={field} placeholder="City" />
           </label>
           <label>
             <span style={lblTxt}>State / Province</span>
@@ -157,7 +153,7 @@ export default function HostIntakePage() {
           </label>
           <label>
             <span style={lblTxt}>Country *</span>
-            <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} style={field} placeholder="Country" />
+            <input type="text" required value={country} onChange={(e) => setCountry(e.target.value)} style={field} placeholder="Country" />
           </label>
         </div>
 
@@ -172,11 +168,11 @@ export default function HostIntakePage() {
           </label>
           <label>
             <span style={lblTxt}>Min Hours</span>
-            <input type="number" min="0" step="1" value={minHours} onChange={(e) => setMinHours(e.target.value)} style={field} placeholder="e.g. 4" />
+            <input type="number" min="0" max="2147483647" step="1" value={minHours} onChange={(e) => setMinHours(e.target.value)} style={field} placeholder="e.g. 4" />
           </label>
           <label>
             <span style={lblTxt}>Capacity</span>
-            <input type="number" min="0" step="1" value={capacity} onChange={(e) => setCapacity(e.target.value)} style={field} placeholder="e.g. 20" />
+            <input type="number" min="0" max="2147483647" step="1" value={capacity} onChange={(e) => setCapacity(e.target.value)} style={field} placeholder="e.g. 20" />
           </label>
         </div>
 
@@ -212,12 +208,11 @@ export default function HostIntakePage() {
         </label>
 
         {error && (
-          <p style={{ color: "#e63946", margin: "0 0 12px", fontSize: 14 }}>{error}</p>
+          <p role="alert" style={{ color: "#e63946", margin: "0 0 12px", fontSize: 14 }}>{error}</p>
         )}
 
         <button
-          type="button"
-          onClick={handleSubmit}
+          type="submit"
           disabled={submitting}
           style={{
             padding: "10px 20px",
@@ -232,7 +227,7 @@ export default function HostIntakePage() {
         >
           {submitting ? "Submitting..." : "Submit Listing"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }

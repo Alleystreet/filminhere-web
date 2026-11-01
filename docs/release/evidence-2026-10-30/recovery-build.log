@@ -1,0 +1,70 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> app@0.1.0 build
+> node scripts/build.mjs
+
+(node:18) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/scratch/7753bd79cdf4/filminhere-web/app/lib/preview-database-policy.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/scratch/7753bd79cdf4/filminhere-web/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.ts took 36ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1047ms
+  Running TypeScript ...
+  Finished TypeScript in 5.4s ...
+  Collecting page data using 8 workers ...
+  Generating static pages using 8 workers (0/33) ...
+  Generating static pages using 8 workers (8/33) 
+  Generating static pages using 8 workers (16/33) 
+  Generating static pages using 8 workers (24/33) 
+✓ Generating static pages using 8 workers (33/33) in 395ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /[...unmatched]
+├ ○ /admin/host-submissions
+├ ƒ /api/admin/host-submissions/update-status
+├ ƒ /api/booking/create
+├ ƒ /api/negotiation/accept
+├ ƒ /api/negotiation/accept-counter
+├ ƒ /api/negotiation/acknowledge-compliance
+├ ƒ /api/negotiation/decline
+├ ƒ /api/negotiation/send-message
+├ ƒ /api/negotiation/submit-counteroffer
+├ ƒ /api/negotiation/submit-offer
+├ ƒ /api/negotiation/update-availability
+├ ○ /auth/forgot-password
+├ ○ /auth/login
+├ ○ /auth/reset-password
+├ ○ /auth/signup
+├ ○ /cookies
+├ ○ /host
+├ ○ /host/intake
+├ ○ /host/my-listings
+├ ○ /learn
+├ ○ /listings
+├ ƒ /listings/[slug]
+├ ƒ /locations
+├ ƒ /locations/[slug]
+├ ○ /me/request
+├ ƒ /me/request/[id]
+├ ○ /me/requests
+├ ƒ /me/requests/[id]
+├ ○ /privacy
+├ ○ /producer
+├ ○ /producer/intake
+├ ƒ /requests/[id]
+├ ○ /requests/confirmed
+├ ƒ /requests/new
+├ ƒ /resources
+├ ƒ /resources/[id]
+└ ○ /terms
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

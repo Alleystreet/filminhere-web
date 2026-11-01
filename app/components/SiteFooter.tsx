@@ -4,12 +4,12 @@ export default function SiteFooter() {
   return (
     <footer
       style={{
-        borderTop: "1px solid rgba(255,255,255,0.08)",
-        background: "rgba(0,0,0,0.6)",
+        borderTop: "1px solid #c7d7ca",
+        background: "#fff",
         padding: "1.5rem 1rem",
-        marginTop: "4rem",
+        marginTop: 0,
         fontSize: 13,
-        color: "rgba(255,255,255,0.55)",
+        color: "#52665a",
       }}
     >
       <div
@@ -25,9 +25,9 @@ export default function SiteFooter() {
       >
         <span>© {new Date().getFullYear()} Film In Here™. All rights reserved.</span>
         <nav style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap" }}>
-          <Link href="/terms"   style={{ color: "rgba(255,255,255,0.55)", textDecoration: "underline" }}>Terms</Link>
-          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "underline" }}>Privacy</Link>
-          <Link href="/cookies" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "underline" }}>Cookies</Link>
+          <Link href="/terms"   style={{ color: "#52665a", textDecoration: "underline" }}>Terms</Link>
+          <Link href="/privacy" style={{ color: "#52665a", textDecoration: "underline" }}>Privacy</Link>
+          <Link href="/cookies" style={{ color: "#52665a", textDecoration: "underline" }}>Cookies</Link>
         </nav>
       </div>
     </footer>

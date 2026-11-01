@@ -1,0 +1,44 @@
+[
+  {
+    "path": "/",
+    "method": "GET",
+    "expected": 200,
+    "actual": 200,
+    "result": "PASS"
+  },
+  {
+    "path": "/host",
+    "method": "GET",
+    "expected": 200,
+    "actual": 200,
+    "result": "PASS"
+  },
+  {
+    "path": "/auth/login",
+    "method": "GET",
+    "expected": 200,
+    "actual": 200,
+    "result": "PASS"
+  },
+  {
+    "path": "/nonexistent-recovery-check",
+    "method": "GET",
+    "expected": 404,
+    "actual": 404,
+    "result": "PASS"
+  },
+  {
+    "path": "/api/booking/create",
+    "method": "POST",
+    "expected": 401,
+    "actual": 401,
+    "result": "PASS"
+  },
+  {
+    "path": "/api/negotiation/send-message",
+    "method": "POST",
+    "expected": 401,
+    "actual": 401,
+    "result": "PASS"
+  }
+]

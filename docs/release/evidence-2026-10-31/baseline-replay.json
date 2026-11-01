@@ -1,0 +1,64 @@
+{
+  "result": "PASS",
+  "baselineStatements": 775,
+  "executedBaselineStatements": 769,
+  "omitted": [
+    {
+      "ordinal": 12,
+      "reason": "pg_graphql"
+    },
+    {
+      "ordinal": 13,
+      "reason": "pg_stat_statements"
+    },
+    {
+      "ordinal": 14,
+      "reason": "pgcrypto"
+    },
+    {
+      "ordinal": 15,
+      "reason": "supabase_vault"
+    },
+    {
+      "ordinal": 16,
+      "reason": "uuid-ossp"
+    },
+    {
+      "ordinal": 488,
+      "reason": "supabase_realtime ownership"
+    }
+  ],
+  "applied": [
+    "20261001173502_reference_catalog_rls.sql",
+    "20261001175738_provider_directory_rls.sql",
+    "20261001175912_provider_directory_view_privileges.sql",
+    "20261001180412_project_workspace_rls.sql",
+    "20261001180542_internal_project_records_rls.sql",
+    "20261001180951_public_view_function_hardening.sql",
+    "20261001181257_auth_profile_trigger_reconcile.sql",
+    "20261001181520_pin_trigger_search_paths.sql",
+    "20261001181707_user_workflow_grant_hardening.sql",
+    "20261004071659_replace_approved_host_public_view_projection.sql",
+    "20261004072504_enforce_single_pending_offer_per_type.sql",
+    "20261004080448_booking_schedule_integrity.sql",
+    "20261004080713_persist_host_constraints.sql",
+    "20261004081311_translation_roots_catalog.sql",
+    "20261004112530_core_booking_performance_indexes.sql",
+    "20261004112859_optimize_auth_rls_initplans.sql",
+    "20261015212000_server_only_booking_creation.sql",
+    "20261015212100_require_filmmaker_compliance.sql"
+  ],
+  "publicTables": 32,
+  "privilege": {
+    "client_insert": false,
+    "server_insert": true
+  },
+  "behavior": {
+    "profileTrigger": "PASS",
+    "overlappingAcceptanceDenied": "PASS",
+    "deniedAcceptanceAtomic": "PASS",
+    "adjacentAcceptanceAllowed": "PASS",
+    "reversedTimeDenied": "PASS"
+  },
+  "limitation": "Supabase services and six platform statements excluded; auth.users/auth.uid are local test substitutes. Not a full Supabase restore."
+}

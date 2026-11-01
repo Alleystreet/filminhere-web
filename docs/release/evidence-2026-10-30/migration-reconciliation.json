@@ -1,0 +1,225 @@
+{
+  "project": "jryjcvcnbrqtgamxpxas",
+  "observedDate": "2026-10-30",
+  "history": [
+    {
+      "version": "20261004112530",
+      "name": "core_booking_performance_indexes",
+      "statements": [
+        "\ncreate index if not exists booking_requests_user_id_idx\n  on public.booking_requests (user_id);\n\ncreate index if not exists booking_messages_request_id_idx\n  on public.booking_messages (request_id);\n\ncreate index if not exists booking_messages_user_id_idx\n  on public.booking_messages (user_id);\n\ncreate index if not exists booking_offers_request_id_idx\n  on public.booking_offers (request_id);\n\ncreate index if not exists booking_offers_user_id_idx\n  on public.booking_offers (user_id);\n\ncreate index if not exists host_listing_submissions_user_id_idx\n  on public.host_listing_submissions (user_id);\n\ncreate index if not exists resource_relationships_primary_department_id_idx\n  on public.resource_relationships (primary_department_id);\n\ncreate index if not exists resource_relationships_primary_listing_type_id_idx\n  on public.resource_relationships (primary_listing_type_id);\n\ncreate index if not exists resource_relationships_suggested_department_id_idx\n  on public.resource_relationships (suggested_department_id);\n\ncreate index if not exists resource_relationships_suggested_listing_type_id_idx\n  on public.resource_relationships (suggested_listing_type_id);\n"
+      ]
+    },
+    {
+      "version": "20261004112859",
+      "name": "optimize_auth_rls_initplans",
+      "statements": [
+        "\nalter policy \"Hosts can read assigned request messages\"\non public.booking_messages\nusing (\n  exists (\n    select 1\n    from public.booking_requests br\n    where br.id = booking_messages.request_id\n      and br.host_user_id = (select auth.uid())\n  )\n);\n\nalter policy \"Users can read messages for own requests\"\non public.booking_messages\nusing (\n  exists (\n    select 1\n    from public.booking_requests br\n    where br.id = booking_messages.request_id\n      and br.user_id = (select auth.uid())\n  )\n);\n\nalter policy \"Hosts can read assigned request offers\"\non public.booking_offers\nusing (\n  exists (\n    select 1\n    from public.booking_requests br\n    where br.id = booking_offers.request_id\n      and br.host_user_id = (select auth.uid())\n  )\n);\n\nalter policy \"Users can read offers for own requests\"\non public.booking_offers\nusing (\n  exists (\n    select 1\n    from public.booking_requests br\n    where br.id = booking_offers.request_id\n      and br.user_id = (select auth.uid())\n  )\n);\n\nalter policy \"Filmmakers can create pending requests\"\non public.booking_requests\nwith check (\n  (select auth.uid()) = user_id\n  and status = 'PENDING'\n  and thread_status = 'draft'\n);\n\nalter policy \"Hosts can view assigned requests\"\non public.booking_requests\nusing ((select auth.uid()) = host_user_id);\n\nalter policy \"Users can read own requests\"\non public.booking_requests\nusing ((select auth.uid()) = user_id);\n\nalter policy \"Admins can view all host listing submissions\"\non public.host_listing_submissions\nusing (\n  exists (\n    select 1\n    from public.profiles p\n    where p.id = (select auth.uid())\n      and p.user_role::text = 'admin'\n  )\n);\n\nalter policy \"Hosts can insert their own listing submissions\"\non public.host_listing_submissions\nwith check (\n  (select auth.uid()) = user_id\n  and status = 'PENDING_REVIEW'\n);\n\nalter policy \"Hosts can view their own listing submissions\"\non public.host_listing_submissions\nusing ((select auth.uid()) = user_id);\n\nalter policy \"Admins can view all policy acceptances\"\non public.policy_acceptances\nusing (\n  exists (\n    select 1\n    from public.profiles p\n    where p.id = (select auth.uid())\n      and p.user_role = 'admin'::public.user_role_enum\n  )\n);\n\nalter policy \"Users can insert their own policy acceptances\"\non public.policy_acceptances\nwith check ((select auth.uid()) = user_id);\n\nalter policy \"Users can view their own policy acceptances\"\non public.policy_acceptances\nusing ((select auth.uid()) = user_id);\n\nalter policy \"Users can insert own profile\"\non public.profiles\nwith check (\n  (select auth.uid()) = id\n  and user_role = 'filmmaker'::public.user_role_enum\n);\n\nalter policy \"Users can update own profile\"\non public.profiles\nusing ((select auth.uid()) = id)\nwith check ((select auth.uid()) = id);\n\nalter policy \"Users can view own profile\"\non public.profiles\nusing ((select auth.uid()) = id);\n"
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "index_name": "booking_messages_request_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX booking_messages_request_id_idx ON public.booking_messages USING btree (request_id)"
+    },
+    {
+      "index_name": "booking_messages_user_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX booking_messages_user_id_idx ON public.booking_messages USING btree (user_id)"
+    },
+    {
+      "index_name": "booking_offers_request_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX booking_offers_request_id_idx ON public.booking_offers USING btree (request_id)"
+    },
+    {
+      "index_name": "booking_offers_user_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX booking_offers_user_id_idx ON public.booking_offers USING btree (user_id)"
+    },
+    {
+      "index_name": "booking_requests_user_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX booking_requests_user_id_idx ON public.booking_requests USING btree (user_id)"
+    },
+    {
+      "index_name": "host_listing_submissions_user_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX host_listing_submissions_user_id_idx ON public.host_listing_submissions USING btree (user_id)"
+    },
+    {
+      "index_name": "resource_relationships_primary_department_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX resource_relationships_primary_department_id_idx ON public.resource_relationships USING btree (primary_department_id)"
+    },
+    {
+      "index_name": "resource_relationships_primary_listing_type_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX resource_relationships_primary_listing_type_id_idx ON public.resource_relationships USING btree (primary_listing_type_id)"
+    },
+    {
+      "index_name": "resource_relationships_suggested_department_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX resource_relationships_suggested_department_id_idx ON public.resource_relationships USING btree (suggested_department_id)"
+    },
+    {
+      "index_name": "resource_relationships_suggested_listing_type_id_idx",
+      "indisvalid": true,
+      "indisready": true,
+      "definition": "CREATE INDEX resource_relationships_suggested_listing_type_id_idx ON public.resource_relationships USING btree (suggested_listing_type_id)"
+    }
+  ],
+  "migrations": [
+    {
+      "version": "20261001023713",
+      "name": "remote_schema"
+    },
+    {
+      "version": "20261001173502",
+      "name": "reference_catalog_rls"
+    },
+    {
+      "version": "20261001175738",
+      "name": "provider_directory_rls"
+    },
+    {
+      "version": "20261001175912",
+      "name": "provider_directory_view_privileges"
+    },
+    {
+      "version": "20261001180412",
+      "name": "project_workspace_rls"
+    },
+    {
+      "version": "20261001180542",
+      "name": "internal_project_records_rls"
+    },
+    {
+      "version": "20261001180951",
+      "name": "public_view_function_hardening"
+    },
+    {
+      "version": "20261001181257",
+      "name": "auth_profile_trigger_reconcile"
+    },
+    {
+      "version": "20261001181520",
+      "name": "pin_trigger_search_paths"
+    },
+    {
+      "version": "20261001181707",
+      "name": "user_workflow_grant_hardening"
+    },
+    {
+      "version": "20261004071659",
+      "name": "replace_approved_host_public_view_projection"
+    },
+    {
+      "version": "20261004072504",
+      "name": "enforce_single_pending_offer_per_type"
+    },
+    {
+      "version": "20261004080448",
+      "name": "booking_schedule_integrity"
+    },
+    {
+      "version": "20261004080713",
+      "name": "persist_host_constraints"
+    },
+    {
+      "version": "20261004081311",
+      "name": "translation_roots_catalog"
+    },
+    {
+      "version": "20261004112530",
+      "name": "core_booking_performance_indexes"
+    },
+    {
+      "version": "20261004112859",
+      "name": "optimize_auth_rls_initplans"
+    }
+  ],
+  "baselineComparison": {
+    "statementCount": 775,
+    "exactStatementMatches": 764,
+    "lineEndingOnlyDifferences": [
+      21,
+      23,
+      25,
+      27,
+      29,
+      31,
+      33,
+      35,
+      37,
+      39,
+      41
+    ],
+    "normalizedFunctionSha256": [
+      {
+        "ordinal": 21,
+        "sha256": "ba22e05c321c362c1520b3c03b1153a61283af9787fc53b9f300685230f91291"
+      },
+      {
+        "ordinal": 23,
+        "sha256": "dee980b646ac953659864cfdf39c6bebf4e11f2153a68e8574ff4cfb6cc2f7a2"
+      },
+      {
+        "ordinal": 25,
+        "sha256": "ca788e4f522e402f57e9353145370696c2683721beebb0a61f4e0a5d21cd9530"
+      },
+      {
+        "ordinal": 27,
+        "sha256": "ec199be237d78ed2aa487a7c43c77371dbfe67476a7fe0ffafdb7237c917431f"
+      },
+      {
+        "ordinal": 29,
+        "sha256": "02ab23785fde9342263a43f58e0f76c19dc5c8880ce06c595882bba2aee60076"
+      },
+      {
+        "ordinal": 31,
+        "sha256": "b8106e8a838aad635f7964bae18ba40dfedd9e56b1e6b295e04c4e226b4ac861"
+      },
+      {
+        "ordinal": 33,
+        "sha256": "fd1343a5f7ab497d6fcc4afa09ce129a8ecf7caa02ec0ddcf8122dcd1bcb1df6"
+      },
+      {
+        "ordinal": 35,
+        "sha256": "0cf41f08a6a948c88e4449719e824bdd273e310574eab3ff02499e5b117fda00"
+      },
+      {
+        "ordinal": 37,
+        "sha256": "9d6d19e6905b105f2b1198c7366171b04c4df47878d30ebd5ddea6ce886a2566"
+      },
+      {
+        "ordinal": 39,
+        "sha256": "4afb69915524976748e87297443cfe329e1c4cbe85f212989af39ea133169b27"
+      },
+      {
+        "ordinal": 41,
+        "sha256": "75e7d435866531f49f1935fee71408beed74039d1730beda385e4b350f60282a"
+      }
+    ],
+    "warning": "Baseline file is an evidence snapshot, not executable fresh-install migration SQL."
+  },
+  "result": {
+    "hostedVersionsRepresented": 17,
+    "nonBaselineHistoryContentMatches": 16,
+    "pendingLocalVersions": [
+      "20261015212000",
+      "20261015212100"
+    ],
+    "validReadyIndexes": 10
+  }
+}

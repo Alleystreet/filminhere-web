@@ -20,6 +20,8 @@ export default function AcceptanceGate({ locationSlug, onInquiry }: Props) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(storageKey);
+      // Hydrate browser-only storage after the server/client initial render agrees.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAck(saved === "true");
     } catch {
       // If storage is blocked, we still allow checkbox to work for this session.

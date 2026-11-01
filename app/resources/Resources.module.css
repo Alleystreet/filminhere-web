@@ -1,0 +1,16 @@
+.wrap { width: 100%; max-width: 1100px; margin: 0 auto; padding: 28px 16px 44px; overflow-wrap: anywhere; }
+.wrap h1 { font-size: 2rem; margin: 0.75rem 0; }
+.wrap h2 { font-size: 1.25rem; margin: 0 0 0.75rem; }
+.wrap p { margin: 0.75rem 0; line-height: 1.6; }
+.wrap a { text-decoration: underline; }
+.note { color: var(--foreground); opacity: 0.8; max-width: 80ch; }
+.filters { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; margin: 1.5rem 0; }
+.filters label { display: grid; gap: 0.5rem; flex: 1 1 180px; }
+.filters input, .filters button { border: 1px solid currentColor; border-radius: 8px; padding: 0.75rem; font: inherit; background: var(--background); color: var(--foreground); }
+.filters input { min-width: 0; width: 100%; }
+.filters button { cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1rem; padding: 0; list-style: none; }
+.card, .notice { border: 1px solid rgba(160,160,160,0.6); border-radius: 12px; padding: 1.25rem; }
+.description { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.fullDescription { white-space: pre-wrap; }
+.pagination { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin: 1.5rem 0; }

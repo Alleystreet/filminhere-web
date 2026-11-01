@@ -26,7 +26,7 @@ export default function AudienceSplit() {
             <p className={styles.cardText}>
               List your property and get requests that respect your rules.
             </p>
-            <Link className={styles.cta} href="/locations">
+            <Link className={styles.cta} href="/host">
               List a space
             </Link>
           </div>

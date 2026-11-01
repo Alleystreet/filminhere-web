@@ -5,8 +5,14 @@ import type { Listing } from "../lib/types";
 import { getApprovedHostListingSubmissionsFromSupabase } from "../lib/requests";
 import type { ApprovedHostListingSubmission } from "../lib/requests";
 import BrowseTermHints from "../components/BrowseTermHints";
+import { listingRateLabels, matchesHourlyPrice } from "../lib/listing-rate-display";
+import { matchesLocationText } from "../lib/location-search";
 
 type SearchParams = Record<string, string | string[] | undefined>;
+type BrowseListing = Omit<Listing, "pricePerHour"> & {
+  pricePerHour: number | null;
+  pricePerDay?: number | null;
+};
 
 function capWord(s: string) {
   if (!s) return s;
@@ -33,7 +39,7 @@ function getQ(sp: SearchParams) {
 }
 
 function toNum(v: string | string[] | undefined) {
-  const s = first(v);
+  const s = first(v)?.trim();
   if (!s) return undefined;
   const n = Number(s);
   return Number.isFinite(n) ? n : undefined;
@@ -41,7 +47,7 @@ function toNum(v: string | string[] | undefined) {
 
 function locationsHref(sp: SearchParams, zip?: string) {
   const params = new URLSearchParams();
-  const preserved = ["q", "city", "type", "min", "max", "cap"] as const;
+  const preserved = ["q", "city", "state", "type", "min", "max", "cap"] as const;
   const cityRaw = (first(sp.city) ?? "").trim();
   const zipFromCity = /^\d{5}$/.test(cityRaw) ? cityRaw : "";
   const zipFromSp = (first(sp.zip) ?? "").trim();
@@ -58,7 +64,7 @@ function locationsHref(sp: SearchParams, zip?: string) {
     }
   }
 
-  const finalZip = (zip ?? zipFromSp ?? zipFromCity).trim();
+  const finalZip = (zip ?? (zipFromSp || zipFromCity)).trim();
   if (finalZip) params.set("zip", finalZip);
   return params.size ? `/locations?${params.toString()}` : "/locations";
 }
@@ -75,7 +81,7 @@ function mapListingType(raw: string | null | undefined): Listing["type"] {
   }
 }
 
-function submissionToListing(row: ApprovedHostListingSubmission): Listing {
+function submissionToListing(row: ApprovedHostListingSubmission): BrowseListing {
   return {
     id: "host_" + row.id,
     slug: "host-" + row.id,
@@ -84,7 +90,8 @@ function submissionToListing(row: ApprovedHostListingSubmission): Listing {
     state: row.state ?? undefined,
     country: row.country ?? undefined,
     type: mapListingType(row.listing_type),
-    pricePerHour: row.rate_per_hour ?? 0,
+    pricePerHour: row.rate_per_hour,
+    pricePerDay: row.rate_per_day,
     minHours: row.min_hours ?? 1,
     capacity: row.capacity ?? 1,
     description: row.description || "No description provided.",
@@ -103,7 +110,7 @@ export default async function LocationsPage({
 }) {
   const sp = await Promise.resolve(searchParams ?? {});
 
-  let hostListings: Listing[] = [];
+  let hostListings: BrowseListing[] = [];
   let hostError: string | null = null;
   try {
     const rows = await getApprovedHostListingSubmissionsFromSupabase();
@@ -112,7 +119,7 @@ export default async function LocationsPage({
     hostError = err instanceof Error ? err.message : "Could not load host listings.";
   }
 
-  const allListings: Listing[] = [...(listings as Listing[]), ...hostListings];
+  const allListings: BrowseListing[] = [...(listings as Listing[]), ...hostListings];
 
   const q = (getQ(sp) ?? "").trim().toLowerCase();
   const cityOrZipRaw = (first(sp.city) ?? "").trim();
@@ -124,6 +131,7 @@ export default async function LocationsPage({
     .trim()
     .toLowerCase();
   const type = (first(sp.type) ?? "").trim().toLowerCase();
+  const state = (first(sp.state) ?? "").trim();
   const uiTypeRaw = (first(sp.type) ?? "any").trim().toLowerCase();
   const uiType = (uiTypeRaw && uiTypeRaw !== "") ? uiTypeRaw : "any";
   const min = toNum(sp.min);
@@ -131,17 +139,12 @@ export default async function LocationsPage({
   const cap = toNum(sp.cap);
 
   const filtered = allListings.filter((l) => {
-    const title = l.title.toLowerCase();
-    const lcity = l.city.toLowerCase();
     const ltype = l.type.toLowerCase();
 
-    if (q && !(`${title} ${lcity} ${ltype}`.includes(q))) return false;
-    if (city && !lcity.includes(city)) return false;
+    if (!matchesLocationText(l, { query: q, city, state, zip })) return false;
     if (type && type !== "any" && ltype !== type) return false;
-    if (min != null && l.pricePerHour < min) return false;
-    if (max != null && l.pricePerHour > max) return false;
+    if (!matchesHourlyPrice(l.pricePerHour, min, max)) return false;
     if (cap != null && l.capacity < cap) return false;
-    if (zip && l.zip !== zip) return false;
 
     return true;
   });
@@ -177,7 +180,7 @@ export default async function LocationsPage({
         <div className={styles.helperGrid}>
           <div><strong>Browse:</strong> These are location options you can choose from.</div>
           <div><strong>Choose:</strong> Click a card to view one location&apos;s details.</div>
-          <div><strong>Request:</strong> On the detail page, &quot;Request to Book&quot; starts a message thread where you can negotiate and lock an hourly rate.</div>
+          <div><strong>Request:</strong> On the detail page, &quot;Request to Book&quot; starts a message thread where you can negotiate and agree on booking terms.</div>
         </div>
       </div>
 
@@ -201,6 +204,11 @@ export default async function LocationsPage({
               placeholder="e.g., Brooklyn or 11211"
               className={styles.input}
             />
+          </label>
+
+          <label className={styles.label}>
+            State / Province
+            <input name="state" defaultValue={state} placeholder="e.g., IL or Illinois" className={styles.input} />
           </label>
 
           <label className={styles.label}>
@@ -260,7 +268,7 @@ export default async function LocationsPage({
       <div className={styles.zipBar}>
         <div className={styles.zipRow}>
           <Link
-            href={locationsHref(sp)}
+            href={locationsHref(sp, "")}
             className={[styles.pill, !zip ? styles.pillActive : ""].filter(Boolean).join(" ")}
             aria-current={!zip ? "true" : undefined}
           >
@@ -311,7 +319,11 @@ export default async function LocationsPage({
                 <div className={styles.cardBody}>
                   <div className={styles.titleRow}>
                     <h3 className={styles.title}>{l.title}</h3>
-                    <span className={styles.price}>${l.pricePerHour}/hr</span>
+                    <span className={styles.price}>
+                      {listingRateLabels(l.pricePerHour, l.pricePerDay).map((label) => (
+                        <span key={label} style={{ display: "block" }}>{label}</span>
+                      ))}
+                    </span>
                   </div>
                   <div className={styles.line}>
                     <span className={styles.pill}>{l.type}</span>

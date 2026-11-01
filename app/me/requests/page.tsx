@@ -77,7 +77,7 @@ export default function MyRequestsPage() {
       <div className={styles.infoCard}>
         <div className={styles.listingLabel}>How to use this page</div>
         <div className={styles.infoBody}>
-          <div>Click any request to open the message thread and negotiate.</div>
+          <div>Requests you sent and requests for your listings appear here. Open a thread to review and negotiate.</div>
           <div className={styles.infoGuide}>
             <strong>Status guide:</strong> Draft = started | Sent = sent to host | In Discussion = offer in play | Rate Locked = rate locked | Declined = closed
           </div>
@@ -98,7 +98,7 @@ export default function MyRequestsPage() {
         </div>
       ) : !items.length ? (
         <div className={styles.empty}>
-          No requests yet. <Link href="/locations">Browse locations</Link> and send a request.
+          No sent or received requests yet. <Link href="/locations">Browse locations</Link> and send a request.
         </div>
       ) : (
         <div className={styles.list}>
