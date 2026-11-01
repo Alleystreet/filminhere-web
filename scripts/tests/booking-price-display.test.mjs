@@ -55,7 +55,7 @@ function pageHarness(request, options = {}) {
   const dependencies = {
     react: { ...React, useEffect() {}, useMemo: (f) => f(), useState(initial) {
       const index = stateIndex++;
-      const value = index === 0 ? request : index === 1 ? [{ id: "acknowledgment", createdISO: "2026-10-16T12:00:00Z", sender: "FILMMAKER", body: "✅ Compliance acknowledged." }] : index === 16 ? true : initial;
+      const value = index === 0 ? request : index === 1 ? options.messages ?? [{ id: "acknowledgment", createdISO: "2026-10-16T12:00:00Z", sender: "FILMMAKER", body: "✅ Compliance acknowledged." }] : index === 16 ? true : initial;
       return [value, (next) => events.push(["state", index, next])];
     } },
     "react/jsx-runtime": jsxRuntime,
@@ -148,4 +148,14 @@ test("approved host pricing supplies the detail estimate without a sample listin
   const page = pageHarness({ ...booking, status: "PENDING", offer: undefined, listingPricing: { ratePerHour: 100, minHours: 2 } }, { noRate: true });
   assert.match(page.html, /USD 100\.00\/hr/);
   assert.match(page.html, /USD 200\.00/);
+});
+
+
+test("only a pending filmmaker sees the compliance acknowledgment action", () => {
+  for (const viewerRole of ["host", undefined]) {
+    const page = pageHarness({ ...booking, status: "PENDING", viewerRole }, { messages: [] });
+    assert.equal(button(page.tree, "Acknowledge Compliance"), undefined);
+  }
+  const filmmaker = pageHarness({ ...booking, status: "PENDING", viewerRole: "filmmaker" }, { messages: [] });
+  assert.ok(button(filmmaker.tree, "Acknowledge Compliance"));
 });

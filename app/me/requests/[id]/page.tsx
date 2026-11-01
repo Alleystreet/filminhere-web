@@ -577,6 +577,7 @@ export default function RequestDetailPage() {
 
   async function acknowledgeCompliance() {
     if (!req || !id) return;
+    if (req.viewerRole !== "filmmaker") return;
     if (!canNegotiate || isLocked) return;
     setActionError(null);
 
@@ -1398,7 +1399,7 @@ export default function RequestDetailPage() {
 
           {compliance?.summary ? <div className={styles.guidanceNote}>{compliance.summary}</div> : null}
 
-          {!complianceAcknowledged && canNegotiate && !isLocked ? (
+          {req.viewerRole === "filmmaker" && !complianceAcknowledged && canNegotiate && !isLocked ? (
             <div className={styles.counterCard}>
               <p className={styles.guidanceNote}>
                 You must acknowledge compliance before this request can be accepted.

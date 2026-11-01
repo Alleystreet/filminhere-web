@@ -22,6 +22,18 @@ const dependencies = (db) => ({
 });
 const createRoute = (db) => loadTS("app/api/booking/create/route.ts", dependencies(db)).POST;
 
+test("compliance endpoint rejects host and allows only the request filmmaker", async () => {
+  for (const userId of ["host", "filmmaker"]) {
+    const db = makeDB({ user: { id: userId }, tables: {
+      booking_requests: [{ id: "booking", user_id: "filmmaker", status: "PENDING", thread_status: "draft" }],
+    } });
+    const route = loadTS("app/api/negotiation/acknowledge-compliance/route.ts", dependencies(db)).POST;
+    const result = await route(request({ requestId: "booking" }));
+    assert.equal(result.status, userId === "host" ? 403 : 200);
+    assert.equal(db.inserts.length, userId === "host" ? 0 : 1);
+  }
+});
+
 test("booking route authenticates before listing reads or writes", async () => {
   for (const [user, token] of [[{ id: "filmmaker" }, ""], [null, "invalid-token"]]) {
     const db = makeDB({ user });
