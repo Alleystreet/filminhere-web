@@ -5,9 +5,27 @@
 - **Date:** November 5, 2026 (America/New_York).
 - **Owner:** Sean Whitaker / Alleystreet.
 - **Mode/lane:** EDIT; existing FilmInHere build. No new commercial commitment.
-- **Approver:** Sean authorized inspection and safeguarded Preview work. Protected access changes and exact-run reviewer approval remain pending; no Production approval.
+- **Approver:** Sean authorized inspection and safeguarded Preview work. Protected access changes were explicitly approved and saved; Sean confirmed both private credential installations. Exact-run reviewer approval remains required; no Production approval.
 
 Release decision: BLOCKED
+
+## November 5 credential-save and deployment checkpoint
+
+- Both narrow access rules are saved and verified; GitHub reviewer Alleystreet
+  and Vercel Authentication remain enabled.
+- Sean confirmed both Preview-default-key installations. GitHub save timestamp:
+  05:58:18 EST; Vercel branch-scoped save timestamp: 05:58:34 EST.
+  Secret values remain private; runtime validity is not yet established.
+- Fresh Preview: `dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG`, source
+  `17f57e98b17079ddcfdbd1d5ad81f438b4886309`.
+- Workflow and guard are repinned together to
+  `https://filminhere-preview-fnbtfrrr8-alleystreets-projects.vercel.app`.
+- The test-password hardening and its 20 offline regression cases are preserved.
+- Protected live test remains NOT RUN until the exact protected run is approved.
+  No merge, Production change, broad access, or disabled reviewer rule.
+
+The earlier checkpoint entries below are historical evidence. Completed access
+and credential prerequisites are superseded by this checkpoint and the runbook.
 
 ## November 5 GitGuardian follow-up
 

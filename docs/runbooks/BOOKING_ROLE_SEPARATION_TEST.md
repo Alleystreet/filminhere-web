@@ -15,18 +15,18 @@ live authorization, database writes, or cleanup after an actual integration run.
 
 | Item | Current evidence |
 |---|---|
-| Pull request | #3, open and draft; inspected head `575d34a57566f91fef30e0472169c7a15bf723f7` |
-| Application deployment | `dpl_2uwGrJKgxWyEXd5rPBSHSV13UD6k`, READY, Preview, same source commit |
-| Pinned application URL | `https://filminhere-preview-1tcvedk7h-alleystreets-projects.vercel.app` |
+| Pull request | #3, open and draft; inspected head `17f57e98b17079ddcfdbd1d5ad81f438b4886309` |
+| Application deployment | `dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG`, READY, Preview, same source commit |
+| Pinned application URL | `https://filminhere-preview-fnbtfrrr8-alleystreets-projects.vercel.app` |
 | Supabase test branch | `preview-test`, `jryjcvcnbrqtgamxpxas`, ACTIVE_HEALTHY |
 | Vercel public configuration | Branch-scoped URL and publishable key matched the Preview project on November 5 |
-| Vercel privileged configuration | Branch-scoped sensitive `SUPABASE_SECRET_KEY` exists; issuing project is unverified |
+| Vercel privileged configuration | Sean confirmed installing the default secret from `preview-test`; Vercel save verified at 2026-11-05 10:58:34 UTC (05:58:34 EST); live validity pending |
 | GitHub environment | `preview-test`; required reviewer `Alleystreet`; administrator bypass unchecked; self-review prevention unchecked |
-| Allowed GitHub branch | Only `fix/staging-database-isolation-20261018`; booking branch still needs approval and addition |
-| GitHub secrets | Three expected names exist, last updated October 22; stored values cannot be read back |
+| Allowed GitHub branch | `fix/server-side-booking-create` and existing `fix/staging-database-isolation-20261018`; reviewer retained |
+| GitHub secrets | Three expected names exist; Sean confirmed installing the Preview default secret; `TEST_SUPABASE_SECRET_KEY` save verified at 2026-11-05 10:58:18 UTC (05:58:18 EST); values remain unreadable |
 | Booking opt-in | Repository variable `RUN_BOOKING_ROLE_ACCEPTANCE` absent, so live job disabled |
 | Other test opt-in | `RUN_PREVIEW_SERVICE_ACCEPTANCE=disabled`; independent and unchanged |
-| Vercel trusted external source | Only the staging-isolation branch's workflow; booking workflow is absent |
+| Vercel trusted external source | Booking rule saved with exact issuer, audience, repository, reference, workflow, environment and subject claims; Preview only; existing source retained |
 | Baseline synthetic data | Read-only Preview query returned zero matching bookings, listings, users, and profiles |
 
 GitHub configuration:
@@ -35,49 +35,41 @@ https://github.com/Alleystreet/filminhere-web/settings/environments/23133735395/
 Vercel protection configuration:
 https://vercel.com/alleystreets-projects/filminhere-preview/settings/deployment-protection
 
-## Exact remaining configuration
+## Completed access and credential setup
 
-1. Obtain action-time authorization for the narrow security access changes.
-   Add only `fix/server-side-booking-create` to GitHub environment `preview-test`.
-   Retain the existing branch, required reviewer, and disabled administrator bypass.
-2. Add a separate Vercel Trusted Source; retain the existing source and authentication.
-   The source must accept only these OpenID Connect (OIDC) claims:
+Sean authorized the two access-rule saves in this conversation. Both were saved
+and read back without broadening the existing rules or removing authentication.
 
-   | Claim/control | Required value |
-   |---|---|
-   | Issuer | `https://token.actions.githubusercontent.com` |
-   | Audience | `https://github.com/Alleystreet` |
-   | Repository | `Alleystreet/filminhere-web` |
-   | Reference | `refs/heads/fix/server-side-booking-create` |
-   | Workflow | `Booking Role Separation` |
-   | GitHub environment | `preview-test` |
-   | Vercel target environment | `preview` only |
+| Claim/control | Saved booking-rule value |
+|---|---|
+| Issuer | `https://token.actions.githubusercontent.com` |
+| Audience | `https://github.com/Alleystreet` |
+| Repository | `Alleystreet/filminhere-web` |
+| Reference | `refs/heads/fix/server-side-booking-create` |
+| Workflow | `Booking Role Separation` |
+| GitHub environment | `preview-test` |
+| Subject | `repo:Alleystreet/filminhere-web:environment:preview-test` |
+| Vercel target | `preview` only |
 
-   Configure every listed claim. If the guided form cannot express the workflow
-   restriction, use the provider's explicit claim configuration. Do not widen to
-   all repositories, all branches, Production, public access, or long-lived bypass.
-3. Establish privileged-key provenance privately. For each backend, use an active
-   secret issued by Supabase project `jryjcvcnbrqtgamxpxas`. Keep a non-secret
-   record of the source project, key identifier, destination scope and installation
-   time. The `sb_secret_` prefix alone does not establish provenance.
-   If existing provenance cannot be established, install a known Preview key into
-   the following existing destinations using their private settings, never chat:
+Sean subsequently confirmed "saved both" after installing the existing default
+secret from Supabase project `jryjcvcnbrqtgamxpxas` into GitHub environment
+`preview-test` / `TEST_SUPABASE_SECRET_KEY` and Vercel Preview, branch
+`fix/server-side-booking-create` / `SUPABASE_SECRET_KEY`. Both destination update
+timestamps were independently checked. This records owner-attested provenance,
+not a readback of secret values or a passed authentication test. No secret values
+were requested in chat, read back, or stored in this document.
 
-   | Destination | Setting | Required scope |
-   |---|---|---|
-   | GitHub | `TEST_SUPABASE_SECRET_KEY` | Environment `preview-test` only |
-   | Vercel | `SUPABASE_SECRET_KEY` | Preview; branch `fix/server-side-booking-create` only |
+The refreshed application deployment above was created after these saves from
+reviewed source `17f57e98b17079ddcfdbd1d5ad81f438b4886309`. The workflow and target
+guard must both use its immutable URL. Later test/documentation-only commits do
+not change that pinned application source.
 
-   GitHub must also contain `TEST_SUPABASE_URL=https://jryjcvcnbrqtgamxpxas.supabase.co`
-   and a matching public `TEST_SUPABASE_PUBLISHABLE_KEY`. Existing GitHub names
-   alone do not establish their saved values. No repository-wide secrets are needed.
-   A Vercel environment-variable change requires a new Preview deployment to take
-   effect. Verify its source, Preview target and READY state, then update the guard,
-   workflow URL, deployment evidence and this runbook together before running.
-4. Confirm the exact tested application deployment remains accessible and that
+## Remaining execution steps
+
+1. Confirm the exact tested application deployment remains accessible and that
    any intervening code commits change only tests/documentation. For an application
    change, review and repin a new immutable deployment; never use a moving alias.
-5. Set only `RUN_BOOKING_ROLE_ACCEPTANCE=approved` for one reviewed execution,
+2. Set only `RUN_BOOKING_ROLE_ACCEPTANCE=approved` for one reviewed execution,
    start or rerun the corrected workflow, and have the required human reviewer
    approve its exact commit/environment. Restore this opt-in to `disabled`
    after completion or failure. Do not enable the separate service-acceptance flag.
@@ -162,7 +154,7 @@ node --test scripts/test-booking-preflight.mjs
 node scripts/test-booking-validation.mjs
 ```
 
-The 19 preflight cases include workflow/guard consistency, wrong environments,
+The 20 preflight cases include workflow/guard consistency, wrong environments,
 public/secret role swaps, rejection before any network call, and closed in-memory
 runner simulations for protected-page rejection, invalid authentication, wrong
 identity attribution, and cleanup leaks. These simulations make **zero network

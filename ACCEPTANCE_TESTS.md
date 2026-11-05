@@ -24,11 +24,11 @@ Replace each evidence placeholder. Every critical item must be checked before re
 
 - [x] Read current workflow/runbook and verified exact Preview deployment/source.
 - [x] Preview public URL and publishable key match independently.
-- [x] Corrected offline guard tests: 19/19 pass; booking date regression passes.
+- [x] Corrected offline guard tests: 20/20 pass; booking date regression passes.
 - [x] Preview baseline: zero matching synthetic booking/listing/auth-user/profile rows.
-- [ ] [CRITICAL] Booking branch allowed in protected GitHub environment; required reviewer retained.
-- [ ] [CRITICAL] Preview-only Vercel Trusted Source matches all booking workflow claims.
-- [ ] [CRITICAL] Both privileged-key destinations have documented Preview provenance.
+- [x] [CRITICAL] Booking branch allowed in protected GitHub environment; required reviewer retained.
+- [x] [CRITICAL] Preview-only Vercel Trusted Source matches all booking workflow claims.
+- [x] [CRITICAL] Both privileged-key destinations have documented Preview provenance (owner attestation plus saved destination metadata; live authentication pending).
 - [ ] [CRITICAL] Protected live test, artifact review, independent cleanup and opt-in reset pass.
 
 The wider release gates above remain unchecked; this checkpoint is not a Production release.
