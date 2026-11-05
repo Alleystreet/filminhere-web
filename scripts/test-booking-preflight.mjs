@@ -80,6 +80,17 @@ test("protected job retains its reviewer environment and independent opt-in", ()
 // control flow and cleanup handling, never live application/database behavior.
 async function simulateRunner(mode, entry) {
   const users = new Map();
+  const generatedPasswords = [];
+  const output = [];
+  for (const method of ["log", "warn", "error"]) {
+    const original = console[method];
+    console[method] = (...args) => {
+      let line = args.join(" ");
+      output.push(line);
+      for (const value of generatedPasswords) line = line.replaceAll(value, "[REDACTED]");
+      original(line);
+    };
+  }
   const profiles = new Set();
   let listing = null;
   let booking = null;
@@ -119,6 +130,8 @@ async function simulateRunner(mode, entry) {
     if (url.origin !== process.env.TEST_SUPABASE_URL) throw Error("Unexpected network destination");
     if (url.pathname === "/auth/v1/token") {
       if (options.headers.apikey !== process.env.TEST_SUPABASE_PUBLISHABLE_KEY) throw Error("Wrong public key role");
+      if (payload.password !== users.get("filmmaker")?.password) throw Error("Sign-in did not reuse the generated filmmaker credential");
+      if (mode === "sign-in-error-echo") return json({ password: payload.password }, 400);
       return json({ access_token: "synthetic-session-token", user: { id: "filmmaker" } });
     }
     if (url.pathname === "/auth/v1/logout") {
@@ -130,7 +143,13 @@ async function simulateRunner(mode, entry) {
     if (options.headers.Authorization) throw Error("Modern secret key must use apikey, not a user-token header");
     if (url.pathname === "/auth/v1/admin/users" && method === "POST") {
       const id = payload.user_metadata.user_role;
-      users.set(id, { id }); profiles.add(id); fixtureWrites++;
+      const candidate = payload.password;
+      if (typeof candidate !== "string" || candidate.length < 32 ||
+          !/[a-z]/.test(candidate) || !/[A-Z]/.test(candidate) || !/[0-9]/.test(candidate) ||
+          !/[^a-zA-Z0-9]/.test(candidate) || generatedPasswords.includes(candidate))
+        throw Error("Invalid or reused generated test credential (value suppressed)");
+      generatedPasswords.push(candidate);
+      users.set(id, { id, password: candidate }); profiles.add(id); fixtureWrites++;
       return json({ id });
     }
     if (url.pathname.startsWith("/auth/v1/admin/users/")) {
@@ -163,11 +182,13 @@ async function simulateRunner(mode, entry) {
   try { await import(entry); }
   catch { process.exitCode = 1; }
   console.log("SIMULATION_SUMMARY " + JSON.stringify({ fixtureWrites, users: users.size,
-    profiles: profiles.size, bookings: Number(Boolean(booking)), listings: Number(Boolean(listing)), revoked }));
+    profiles: profiles.size, bookings: Number(Boolean(booking)), listings: Number(Boolean(listing)), revoked,
+    generatedPasswordCount: generatedPasswords.length,
+    passwordLeak: generatedPasswords.some(value => output.some(line => line.includes(value))) }));
 }
 
 for (const [mode, expectedStatus] of [
-  ["success", 0], ["protection-html", 1], ["invalid-auth-accepted", 1],
+  ["success", 0], ["protection-html", 1], ["invalid-auth-accepted", 1], ["sign-in-error-echo", 1],
   ["booking-rejected", 1], ["swapped-identity", 1], ["user-cleanup-leak", 1], ["profile-cleanup-leak", 1],
 ]) {
   test(`offline runner lifecycle: ${mode}`, () => {
@@ -180,12 +201,15 @@ for (const [mode, expectedStatus] of [
     });
     assert.equal(child.status, expectedStatus, child.stderr || child.stdout);
     const summary = JSON.parse(child.stdout.split("SIMULATION_SUMMARY ")[1]);
+    assert.equal(summary.passwordLeak, false, "generated test credential appeared in runner output");
     assert.equal(summary.bookings, 0); assert.equal(summary.listings, 0);
     if (["protection-html", "invalid-auth-accepted"].includes(mode)) {
+      assert.equal(summary.generatedPasswordCount, 0);
       assert.equal(summary.fixtureWrites, 0);
       assert.doesNotMatch(child.stdout, /PASS: Synthetic/);
     } else {
-      assert.ok(summary.revoked);
+      assert.equal(summary.generatedPasswordCount, 2);
+      assert.equal(summary.revoked, mode !== "sign-in-error-echo");
       assert.equal(summary.users, mode === "user-cleanup-leak" ? 2 : 0);
       assert.equal(summary.profiles, mode === "profile-cleanup-leak" ? 2 : 0);
     }

@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { verifyTarget, requestOidc } from "./booking-acceptance-guard.mjs";
 
 verifyTarget(process.env);
@@ -46,8 +47,9 @@ if (forbiddenBaseHost && actualBaseHost === forbiddenBaseHost) {
 const runId = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 const filmmakerEmail = `filminhere-filmmaker-${runId}@example.com`;
 const hostEmail = `filminhere-host-${runId}@example.com`;
-const filmmakerPassword = `F1h!${crypto.randomUUID()}Aa`;
-const hostPassword = `H0s!${crypto.randomUUID()}Bb`;
+// Independent runtime-only credentials: 32 random bytes each, plus policy characters.
+const filmmakerPassword = randomBytes(32).toString("base64url") + "!Aa1";
+const hostPassword = randomBytes(32).toString("base64url") + "!Aa1";
 
 let filmmakerUserId = null;
 let hostUserId = null;

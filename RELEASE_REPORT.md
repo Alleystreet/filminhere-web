@@ -9,6 +9,21 @@
 
 Release decision: BLOCKED
 
+## November 5 GitGuardian follow-up
+
+Incidents 39190803 and 39190804 were traced to runtime-generated temporary
+password expressions, not hardcoded usable credentials. The original
+`crypto.randomUUID()` source was already cryptographically secure. The scoped
+correction explicitly uses independent 32-byte `node:crypto` draws for passwords
+and extends the existing offline lifecycle checks, including reflected-password
+error-body suppression. All 20 offline checks, guard self-test, date regression,
+syntax and diff checks pass on Node.js v24.22.1. Protected live acceptance remains
+NOT RUN; existing workflow/reviewer/target/opt-in controls remain unchanged.
+The false-positive classification, lifecycle limits, historical logging caveat,
+scanner status and remaining verification are recorded in
+[the incident assessment](docs/security/GITGUARDIAN_2026-11-05.md).
+GitGuardian dashboard disposition and subsequent scan confirmation remain pending.
+
 ## Changes
 
 - Replaced the obsolete test target with the verified October 27 immutable Preview deployment in both workflow and guard.
