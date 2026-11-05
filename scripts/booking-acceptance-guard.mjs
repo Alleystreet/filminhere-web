@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 
 export const PREVIEW_DB = "https://jryjcvcnbrqtgamxpxas.supabase.co";
-export const PREVIEW_APP = "https://filminhere-preview-fnbtfrrr8-alleystreets-projects.vercel.app";
+export const PREVIEW_APP = "https://filminhere-preview-48nhr47ox-alleystreets-projects.vercel.app";
 const REPO = "Alleystreet/filminhere-web";
 const BRANCH = "refs/heads/fix/server-side-booking-create";
 const WORKFLOW = "Booking Role Separation";

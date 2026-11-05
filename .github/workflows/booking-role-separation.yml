@@ -43,7 +43,7 @@ jobs:
       id-token: write
     env:
       CI_BOOKING_TEST_GATE: "yes"
-      TEST_BASE_URL: https://filminhere-preview-fnbtfrrr8-alleystreets-projects.vercel.app
+      TEST_BASE_URL: https://filminhere-preview-48nhr47ox-alleystreets-projects.vercel.app
       TEST_EXPECTED_SUPABASE_HOST: jryjcvcnbrqtgamxpxas.supabase.co
       TEST_FORBIDDEN_BASE_HOST: filminhere-preview.vercel.app
       TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
@@ -66,8 +66,8 @@ jobs:
             echo "Environment: preview-test"
             echo "Commit: $GITHUB_SHA"
             echo "Run: $GITHUB_RUN_ID"
-            echo "Application deployment: dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG"
-            echo "Application source: 17f57e98b17079ddcfdbd1d5ad81f438b4886309"
+            echo "Application deployment: dpl_jS7kNsEFVKnRGyGjFsT2sWjbr1k8"
+            echo "Application source: 8a67f20924469b40fed0804ca8cc95dfd2cb50d8"
             node scripts/test-booking-role-separation.mjs
           } 2>&1 | tee test-results/booking-role-separation.txt
       - name: Upload sanitized role separation evidence

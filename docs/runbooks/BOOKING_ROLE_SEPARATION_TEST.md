@@ -1,5 +1,24 @@
 # FilmInHere protected booking role-separation runbook
 
+## Current application update — retest preparation
+
+New pinned target:
+`https://filminhere-preview-48nhr47ox-alleystreets-projects.vercel.app`, deployment
+`dpl_jS7kNsEFVKnRGyGjFsT2sWjbr1k8`, application source
+`8a67f20924469b40fed0804ca8cc95dfd2cb50d8` (Next.js 16.4.5 and corrected booking
+input/error handling). Vercel reports READY. GitHub Verify #155 and Booking
+Validation #18 passed. The workflow/guard are prepared together for this target.
+
+Current-version live acceptance is NOT RUN. Browser control stopped responding
+before the booking opt-in could be changed. No new protected run was queued.
+Do not treat historical run #6 below as verification of this application update.
+After browser access returns, enable only the booking opt-in for this reviewed
+execution, push the prepared target commit, and require exact-run human review.
+Keep the separate service-test opt-in disabled. Restore the booking opt-in after
+completion/failure and independently repeat the cleanup query.
+
+The earlier target references below are retained as historical run #6 evidence.
+
 ## Scope and decision — November 5, 2026
 
 Owner: Sean Whitaker / Alleystreet. Mode: EDIT. Lane: existing FilmInHere build.

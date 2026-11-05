@@ -30,6 +30,18 @@ base. They still need full review. This continuation does not apply migrations.
 The historical live result below has not been rerun against the changed handler
 and Next.js version. Both live-test opt-ins remain disabled.
 
+## Latest Preview check and protected retest preparation
+
+- Application source: `8a67f20924469b40fed0804ca8cc95dfd2cb50d8`.
+- Vercel Preview: `dpl_jS7kNsEFVKnRGyGjFsT2sWjbr1k8`, READY.
+- [Verify #155](https://github.com/Alleystreet/filminhere-web/actions/runs/42021724571): PASS.
+- [Booking Validation #18](https://github.com/Alleystreet/filminhere-web/actions/runs/42021724577): PASS.
+- Current protected live acceptance: NOT RUN. Target changes prepared, but browser
+  control stopped responding before the opt-in update or qualifying push. No new
+  run was queued and no test credentials or database fixtures were used.
+- Resume by enabling only the booking opt-in, pushing the reviewed target update,
+  and obtaining the required human review of that exact run. Reset after execution.
+
 ## Verified live result
 
 [Booking Role Separation #6](https://github.com/Alleystreet/filminhere-web/actions/runs/42016027749)
