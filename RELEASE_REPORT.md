@@ -1,95 +1,125 @@
-# FilmInHere protected booking-test prerequisite checkpoint
+# FilmInHere protected booking acceptance closeout
 
-- **Project/change:** PR #3 test configuration, guards, cleanup verification and runbook.
-- **Environment:** Preview only; Supabase jryjcvcnbrqtgamxpxas.
+- **Project/change:** Pull request #3, server-authorized booking creation and protected Preview test.
+- **Environment:** Preview only; Supabase `jryjcvcnbrqtgamxpxas`.
 - **Date:** November 5, 2026 (America/New_York).
 - **Owner:** Sean Whitaker / Alleystreet.
 - **Mode/lane:** EDIT; existing FilmInHere build. No new commercial commitment.
-- **Approver:** Sean authorized inspection and safeguarded Preview work. Protected access changes were explicitly approved and saved; Sean confirmed both private credential installations. Exact-run reviewer approval remains required; no Production approval.
+- **Approver:** Sean approved the access rules and credential installation, then approved exact run #6 in GitHub as required reviewer Alleystreet. No merge or Production approval.
 
 Release decision: BLOCKED
 
-## November 5 credential-save and deployment checkpoint
+**Protected booking acceptance: PASS.** The narrow live-test gate is complete.
+Wider application release gates in `ACCEPTANCE_TESTS.md` remain open; the pull
+request remains draft and unmerged. The delivery preflight reports 11 blockers:
+10 wider critical gates plus the explicit blocked release decision. No booking
+checkpoint gate remains open.
 
-- Both narrow access rules are saved and verified; GitHub reviewer Alleystreet
-  and Vercel Authentication remain enabled.
-- Sean confirmed both Preview-default-key installations. GitHub save timestamp:
-  05:58:18 EST; Vercel branch-scoped save timestamp: 05:58:34 EST.
-  Secret values remain private; runtime validity is not yet established.
-- Fresh Preview: `dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG`, source
-  `17f57e98b17079ddcfdbd1d5ad81f438b4886309`.
-- Workflow and guard are repinned together to
-  `https://filminhere-preview-fnbtfrrr8-alleystreets-projects.vercel.app`.
-- The test-password hardening and its 20 offline regression cases are preserved.
-- Protected live test remains NOT RUN until the exact protected run is approved.
-  No merge, Production change, broad access, or disabled reviewer rule.
+## Verified live result
 
-The earlier checkpoint entries below are historical evidence. Completed access
-and credential prerequisites are superseded by this checkpoint and the runbook.
+[Booking Role Separation #6](https://github.com/Alleystreet/filminhere-web/actions/runs/42016027749)
+completed successfully on November 5, 2026. The live checks completed at approximately
+11:12:56 UTC / 06:12:56 EST after the protected environment review.
 
-## November 5 GitGuardian follow-up
+| Evidence | Verified result |
+|---|---|
+| Workflow source | `03ad2e180851017e20fd1d719418f44d024c22a1` |
+| Pinned application source | `17f57e98b17079ddcfdbd1d5ad81f438b4886309` |
+| Pinned application deployment | `dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG`, READY Preview |
+| Offline checks | Guard self-test, 20/20 preflight cases and booking date regression PASS |
+| Protected application access | Actual Preview route reached before synthetic writes |
+| Authentication | Missing and invalid filmmaker authentication rejected |
+| Identity attribution | Stored filmmaker and host matched their actual, distinct identities |
+| Server-controlled fields | Forged identity/status/listing fields ignored; canonical listing and PENDING/draft retained |
+| Runner cleanup | Synthetic booking, listing, users and profiles absent on readback |
+| Independent database check | Zero matching bookings, listings, auth users and profiles |
+| Booking opt-in after test | `RUN_BOOKING_ROLE_ACCEPTANCE=disabled`, read back in GitHub |
+| Other test opt-in | `RUN_PREVIEW_SERVICE_ACCEPTANCE=disabled`, unchanged |
 
-Incidents 39190803 and 39190804 were traced to runtime-generated temporary
-password expressions, not hardcoded usable credentials. The original
-`crypto.randomUUID()` source was already cryptographically secure. The scoped
-correction explicitly uses independent 32-byte `node:crypto` draws for passwords
-and extends the existing offline lifecycle checks, including reflected-password
-error-body suppression. All 20 offline checks, guard self-test, date regression,
-syntax and diff checks pass on Node.js v24.22.1. Protected live acceptance remains
-NOT RUN; existing workflow/reviewer/target/opt-in controls remain unchanged.
-The false-positive classification, lifecycle limits, historical logging caveat,
-scanner status and remaining verification are recorded in
-[the incident assessment](docs/security/GITGUARDIAN_2026-11-05.md).
-GitGuardian dashboard disposition and subsequent scan confirmation remain pending.
+Authentication means identifying the signed-in user; authorization means deciding
+what that user may do. Here, the server used the authenticated filmmaker and
+trusted listing ownership to assign booking fields instead of accepting browser
+claims. This verifies the tested booking path, not all application permissions.
 
-## Changes
-
-- Replaced the obsolete test target with the verified October 27 immutable Preview deployment in both workflow and guard.
-- Added the missing expected Supabase host and explicit Production-alias exclusion to the workflow, validating both before requesting an identity token.
-- Reject public/privileged key swaps and wrong legacy key project/role claims without logging credentials.
-- Use modern Supabase secret keys in the apikey header; retain bearer compatibility only for legacy keys.
-- Add missing/invalid-authentication checks, forged-slug verification, bounded requests and redirect rejection for privileged calls.
-- Cleanup now revokes synthetic refresh sessions and reads back deleted users and profiles as well as bookings/listings. A cleanup leak fails the job.
-- Added 19 offline configuration/lifecycle regression cases and corrected stale runbook instructions.
-- Added missing delivery-standard documents and release checklist. Unverified release gates remain unchecked.
-- Application behavior/source, Production settings and the independent service-test opt-in were not changed.
-
-## Evidence
+## Retained evidence
 
 Evidence:
 
-- Application deployment [dpl_2uwGrJKgxWyEXd5rPBSHSV13UD6k](https://vercel.com/alleystreets-projects/filminhere-preview/2uwGrJKgxWyEXd5rPBSHSV13UD6k): READY, Preview; source 575d34a57566f91fef30e0472169c7a15bf723f7.
-- [Verify #145](https://github.com/Alleystreet/filminhere-web/actions/runs/40547623134): success, rechecked job status.
-- [Booking Validation #13](https://github.com/Alleystreet/filminhere-web/actions/runs/40547623184): success, rechecked job status.
-- [Earlier role-test run](https://github.com/Alleystreet/filminhere-web/actions/runs/39854491105): offline job passed; protected job skipped.
-- Current local Node.js v24.22.1: guard self-test PASS; 19/19 preflight/lifecycle tests PASS; booking date regression PASS; JavaScript syntax and workflow YAML parsing PASS.
-- Delivery preflight: BLOCKED as expected, with 14 unchecked critical gates and the explicit blocked release decision; zero secret-scan findings in this scoped checkout.
-- Closed in-memory lifecycle tests make no network requests. They prove test-runner behavior only.
-- Read-only Preview inspection confirmed expected identity columns and zero matching synthetic bookings, listings, auth users and profiles. Initial database read failed transiently; subsequent reads succeeded. No database mutation occurred.
-- Vercel branch-specific public URL and publishable key independently match Supabase preview-test. Privileged key is stored as sensitive; its source remains unverified.
-- GitHub environment has the three expected secret names and required reviewer Alleystreet, but allows only the staging-isolation branch. No repository-level secrets. Booking opt-in is absent; service-acceptance opt-in remains disabled.
-- Vercel Authentication remains enabled; only the staging-isolation external Trusted Source is configured.
+The [sanitized artifact](https://github.com/Alleystreet/filminhere-web/actions/runs/42016027749/artifacts/13410535027)
+was downloaded and inspected; its digest matched GitHub metadata.
 
-**Protected live results: NOT RUN.** Filmmaker/host separation, live authorization enforcement, expected inserted row and post-run cleanup remain unverified by live execution.
+- Artifact: `booking-role-separation-evidence-42016027749`
+- Artifact identifier: `13410535027`
+- Archive SHA-256: `e3087675692926167f2339f6ff2709fce72b504ec588408be53b3f8eac2462c0`
+- Retained through December 5, 2026 under the 30-day evidence policy.
+- Contains source/deployment references and four PASS lines, with no keys, tokens,
+  generated passwords, response bodies or synthetic record identifiers.
 
-## Remaining requirements and owner
+The independent Preview-only aggregate query in
+[the runbook](docs/runbooks/BOOKING_ROLE_SEPARATION_TEST.md) returned:
 
-Sean / Alleystreet owns the approvals and private configuration below. The exact values, source/destination mappings and execution sequence are in [the runbook](docs/runbooks/BOOKING_ROLE_SEPARATION_TEST.md).
+| Object | Matching synthetic rows after run |
+|---|---:|
+| booking_requests | 0 |
+| host_listing_submissions | 0 |
+| auth.users | 0 |
+| profiles | 0 |
 
-1. Authorize and add only fix/server-side-booking-create to GitHub preview-test, preserving reviewer protection and existing branch.
-2. Authorize and add a separate Preview-only Vercel GitHub Trusted Source restricted to repository, booking branch, workflow, audience and environment.
-3. Establish Preview provenance for GitHub TEST_SUPABASE_SECRET_KEY and branch-scoped Vercel SUPABASE_SECRET_KEY. If provenance cannot be established, privately install known Preview-issued keys in those exact destinations. Never paste them into chat. Rebuild/repin Preview if the Vercel environment changes.
-4. Enable only the booking opt-in for one reviewed corrected run, obtain the environment reviewer approval, inspect the live artifact, independently verify zero leftovers, then disable the opt-in even if the run fails.
-5. Keep the pull request draft until live integration, latest build and diff review gates pass. Production release remains separately approved.
+This covers the workflow's naming pattern. It is not a claim that all possible
+test data or all database content was inspected.
 
-## Known warnings
+## Completed safeguards and prerequisites
 
-Known warnings: October 27 installation reported 12 dependency audit findings (1 low, 2 moderate, 8 high, 1 critical). Advisory identities/reachability and remediation are outside this prerequisite-only change and remain release work for Sean/Alleystreet before release. Whole-app authorization, accessibility, recovery, ownership/support and financial scope gates are not established by this test. No noncritical risk acceptance or due date is invented.
+Both approved access rules were saved while retaining GitHub's required reviewer
+and Vercel Authentication. The booking Trusted Source restricts issuer, audience,
+repository, branch, workflow, environment and subject to the intended Preview run.
+No Production access was added.
 
-## Rollback and recovery
+Sean confirmed installing the existing Preview default secret into GitHub
+`preview-test / TEST_SUPABASE_SECRET_KEY` and branch-scoped Vercel Preview
+`SUPABASE_SECRET_KEY`. Destination saves were verified at 05:58:18 and 05:58:34
+EST respectively. The fresh deployment was built afterward. The successful live
+run now verifies that both stored credentials worked for this scoped operation;
+no secret values were read back or recorded.
 
-Rollback: Keep RUN_BOOKING_ROLE_ACCEPTANCE absent or disabled. If this test-only change must be undone, use a reviewed forward revert on the booking branch; do not reset main or merge. Stop after any cleanup failure and inspect only this workflow's synthetic Preview fixtures using the runbook query before retrying. No Production recovery is part of this task.
+Temporary passwords use independent 32-byte cryptographic random draws.
+Cleanup revokes synthetic refresh sessions and checks removal of test rows and
+users. Access tokens can remain cryptographically valid until expiry; the run
+does not claim immediate cryptographic invalidation.
 
-## Ownership and operations
+## Remaining release work and warnings
 
-Repository: Alleystreet/filminhere-web. Vercel project: filminhere-preview in Alleystreet's projects. Reuse the existing Supabase preview-test branch; no additional project, subscription or metered product is introduced. Privileged keys remain in platform secret storage. Evidence retention is 30 days. Repository owners monitor workflow failures; broader support, backup/export and recurring-cost handoff remain release requirements.
+Known warnings:
+
+- Keep pull request #3 draft. Confirm latest-head build/checks and complete the
+  full application diff review before any merge decision.
+- Wider security, privacy, accessibility, ownership, recovery, critical-journey,
+  operations and financial-scope release gates remain unchecked.
+- The October 27 dependency audit reported 12 findings (1 low, 2 moderate,
+  8 high, 1 critical). Current advisory identity, reachability and remediation
+  remain separate release work; this test does not resolve them.
+- The workflow succeeded with GitHub warnings that older action declarations
+  targeting Node.js 20 were run on Node.js 24, plus an Ubuntu runner migration
+  notice. Track action/runtime maintenance separately.
+- GitGuardian incidents 39190803 and 39190804 concern generated test-password
+  expressions. The [incident assessment](docs/security/GITGUARDIAN_2026-11-05.md)
+  records the false-positive classification for hardcoded exposure.
+  Dashboard disposition and subsequent scan confirmation remain pending.
+- This test does not prove full Row-Level Security (RLS), hosts-cannot-book policy,
+  self-booking restrictions, negotiation authorization, payments or whole-app safety.
+- No noncritical risk acceptance or due date is invented.
+
+## Rollback, recovery and operations
+
+The booking opt-in is disabled. Any future live run needs reviewed source, the
+same scoped target checks and exact-run environment approval. Preserve the
+independent service-test opt-in. If a future cleanup fails, stop and inspect only
+matching synthetic Preview fixtures using the runbook query; do not delete
+unrelated data.
+
+Repository: Alleystreet/filminhere-web. Vercel: filminhere-preview in Alleystreet's
+projects. Supabase: existing preview-test branch. No new project, subscription,
+payment commitment, main-branch merge or Production change was made. Privileged
+keys remain in platform secret storage. Repository owners monitor workflow
+failures; broader support, backup/export and recurring-cost handoff remain
+release requirements.

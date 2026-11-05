@@ -28,7 +28,7 @@ Replace each evidence placeholder. Every critical item must be checked before re
 - [x] Preview baseline: zero matching synthetic booking/listing/auth-user/profile rows.
 - [x] [CRITICAL] Booking branch allowed in protected GitHub environment; required reviewer retained.
 - [x] [CRITICAL] Preview-only Vercel Trusted Source matches all booking workflow claims.
-- [x] [CRITICAL] Both privileged-key destinations have documented Preview provenance (owner attestation plus saved destination metadata; live authentication pending).
-- [ ] [CRITICAL] Protected live test, artifact review, independent cleanup and opt-in reset pass.
+- [x] [CRITICAL] Both privileged-key destinations have documented Preview provenance (owner attestation, saved destination metadata and successful scoped live authentication in run #6).
+- [x] [CRITICAL] Protected live test, artifact review, independent cleanup and opt-in reset pass. Evidence: [run #6](https://github.com/Alleystreet/filminhere-web/actions/runs/42016027749), workflow source `03ad2e180851017e20fd1d719418f44d024c22a1`; artifact `13410535027` inspected with matching digest; zero matching rows in all four independent checks; `RUN_BOOKING_ROLE_ACCEPTANCE=disabled` read back.
 
 The wider release gates above remain unchecked; this checkpoint is not a Production release.

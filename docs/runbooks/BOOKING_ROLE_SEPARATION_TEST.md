@@ -8,26 +8,28 @@ host to distinct booking fields, ignores forged system fields, and removes test 
 No merge, Production release, Production credentials, payments, negotiation, or
 application authorization redesign is authorized by this work.
 
-**Protected live test: NOT RUN. Release: BLOCKED.** Offline tests do not establish
-live authorization, database writes, or cleanup after an actual integration run.
+**Protected live test: PASS. Release: BLOCKED.** [Run #6](https://github.com/Alleystreet/filminhere-web/actions/runs/42016027749)
+passed after required reviewer approval. Its sanitized artifact was inspected and
+independent Preview queries confirmed zero matching synthetic records. The booking
+opt-in was restored to `disabled`. Wider application release gates remain open.
 
 ## Verified configuration
 
 | Item | Current evidence |
 |---|---|
-| Pull request | #3, open and draft; inspected head `17f57e98b17079ddcfdbd1d5ad81f438b4886309` |
-| Application deployment | `dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG`, READY, Preview, same source commit |
+| Pull request | #3, open and draft; tested workflow source `03ad2e180851017e20fd1d719418f44d024c22a1` |
+| Application deployment | `dpl_9Zu7AgYiRGb1ikicnbbKtwn721fG`, READY, Preview, application source `17f57e98b17079ddcfdbd1d5ad81f438b4886309` |
 | Pinned application URL | `https://filminhere-preview-fnbtfrrr8-alleystreets-projects.vercel.app` |
 | Supabase test branch | `preview-test`, `jryjcvcnbrqtgamxpxas`, ACTIVE_HEALTHY |
 | Vercel public configuration | Branch-scoped URL and publishable key matched the Preview project on November 5 |
-| Vercel privileged configuration | Sean confirmed installing the default secret from `preview-test`; Vercel save verified at 2026-11-05 10:58:34 UTC (05:58:34 EST); live validity pending |
+| Vercel privileged configuration | Sean confirmed installing the default secret from `preview-test`; Vercel save verified at 2026-11-05 10:58:34 UTC (05:58:34 EST); scoped live validity passed in run #6 |
 | GitHub environment | `preview-test`; required reviewer `Alleystreet`; administrator bypass unchecked; self-review prevention unchecked |
 | Allowed GitHub branch | `fix/server-side-booking-create` and existing `fix/staging-database-isolation-20261018`; reviewer retained |
 | GitHub secrets | Three expected names exist; Sean confirmed installing the Preview default secret; `TEST_SUPABASE_SECRET_KEY` save verified at 2026-11-05 10:58:18 UTC (05:58:18 EST); values remain unreadable |
-| Booking opt-in | Repository variable `RUN_BOOKING_ROLE_ACCEPTANCE` absent, so live job disabled |
+| Booking opt-in | Repository variable `RUN_BOOKING_ROLE_ACCEPTANCE=disabled` after run #6; read back |
 | Other test opt-in | `RUN_PREVIEW_SERVICE_ACCEPTANCE=disabled`; independent and unchanged |
 | Vercel trusted external source | Booking rule saved with exact issuer, audience, repository, reference, workflow, environment and subject claims; Preview only; existing source retained |
-| Baseline synthetic data | Read-only Preview query returned zero matching bookings, listings, users, and profiles |
+| Baseline and post-run synthetic data | Independent read-only Preview queries returned zero matching bookings, listings, users, and profiles before and after run #6 |
 
 GitHub configuration:
 https://github.com/Alleystreet/filminhere-web/settings/environments/23133735395/edit
@@ -56,7 +58,8 @@ secret from Supabase project `jryjcvcnbrqtgamxpxas` into GitHub environment
 `preview-test` / `TEST_SUPABASE_SECRET_KEY` and Vercel Preview, branch
 `fix/server-side-booking-create` / `SUPABASE_SECRET_KEY`. Both destination update
 timestamps were independently checked. This records owner-attested provenance,
-not a readback of secret values or a passed authentication test. No secret values
+not a readback of secret values. Run #6 subsequently passed the scoped live
+authentication and booking checks. No secret values
 were requested in chat, read back, or stored in this document.
 
 The refreshed application deployment above was created after these saves from
@@ -64,7 +67,19 @@ reviewed source `17f57e98b17079ddcfdbd1d5ad81f438b4886309`. The workflow and tar
 guard must both use its immutable URL. Later test/documentation-only commits do
 not change that pinned application source.
 
-## Remaining execution steps
+## Completed run and future execution
+
+Run #6 used workflow source `03ad2e180851017e20fd1d719418f44d024c22a1` and the
+pinned application source above. Live checks completed at approximately
+11:12:56 UTC / 06:12:56 EST on November 5, 2026. Artifact `13410535027` was
+inspected and its archive SHA-256 matched
+`e3087675692926167f2339f6ff2709fce72b504ec588408be53b3f8eac2462c0`.
+It expires December 5, 2026. All four checks passed: protected application reach,
+missing/invalid authentication rejection, true identity attribution with forged
+fields ignored, and cleanup readback. The independent query below returned four
+zero counts. Both repository acceptance opt-ins are now `disabled`.
+
+For a separately authorized future execution:
 
 1. Confirm the exact tested application deployment remains accessible and that
    any intervening code commits change only tests/documentation. For an application
@@ -76,9 +91,10 @@ not change that pinned application source.
 
 The workflow is **push-triggered**, with exact branch/path filters. It has no
 manual URL input or `workflow_dispatch` trigger. Setting a variable alone does
-not start it. After publishing a corrected test commit with the opt-in disabled,
-re-run that corrected run only after prerequisites pass; an old run retains its
-old source revision. Do not rerun October 22's obsolete target.
+not start it. Enable the booking opt-in only for a reviewed execution before the qualifying
+push, or rerun an eligible failed/cancelled protected job after prerequisites pass.
+A skipped job is not itself runnable through the job-rerun endpoint. An old run
+retains its old source revision. Do not rerun October 22's obsolete target.
 
 ## Non-secret safety settings in the workflow
 
