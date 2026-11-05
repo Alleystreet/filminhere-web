@@ -57,7 +57,11 @@ export async function POST(req: NextRequest) {
 
   let payload: Record<string, unknown>;
   try {
-    payload = await req.json();
+    const parsed: unknown = await req.json();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    }
+    payload = parsed as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
@@ -120,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     if (submissionErr) {
       return NextResponse.json(
-        { error: submissionErr.message },
+        { error: "Unable to load listing. Please try again." },
         { status: 500 },
       );
     }
@@ -174,7 +178,10 @@ export async function POST(req: NextRequest) {
   });
 
   if (insertErr) {
-    return NextResponse.json({ error: insertErr.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Unable to create booking request. Please try again." },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json({ id });

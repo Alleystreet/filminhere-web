@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "verify": "powershell -ExecutionPolicy Bypass -File scripts/verify.ps1",
-    "test:booking-validation": "node scripts/test-booking-validation.mjs"
+    "test:booking-validation": "node scripts/test-booking-validation.mjs",
+    "test:booking-route": "node --experimental-vm-modules --test scripts/test-booking-route.mjs",
+    "test": "npm run test:booking-validation && npm run test:booking-route && node scripts/booking-acceptance-guard.mjs --self-test && node --test scripts/test-booking-preflight.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",

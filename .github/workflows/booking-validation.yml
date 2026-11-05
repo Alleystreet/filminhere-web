@@ -5,6 +5,7 @@ on:
     paths:
       - "app/api/booking/create/**"
       - "scripts/test-booking-validation.mjs"
+      - "scripts/test-booking-route.mjs"
       - "package.json"
       - ".github/workflows/booking-validation.yml"
   workflow_dispatch:
@@ -14,7 +15,7 @@ permissions:
 
 jobs:
   booking-validation:
-    name: Booking date regression tests
+    name: Booking date and request regression tests
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -23,7 +24,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Run booking validation tests
         run: npm run test:booking-validation
+
+      - name: Run isolated booking handler tests
+        run: npm run test:booking-route
