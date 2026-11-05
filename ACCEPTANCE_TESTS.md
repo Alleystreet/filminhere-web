@@ -32,3 +32,18 @@ Replace each evidence placeholder. Every critical item must be checked before re
 - [x] [CRITICAL] Protected live test, artifact review, independent cleanup and opt-in reset pass. Evidence: [run #6](https://github.com/Alleystreet/filminhere-web/actions/runs/42016027749), workflow source `03ad2e180851017e20fd1d719418f44d024c22a1`; artifact `13410535027` inspected with matching digest; zero matching rows in all four independent checks; `RUN_BOOKING_ROLE_ACCEPTANCE=disabled` read back.
 
 The wider release gates above remain unchecked; this checkpoint is not a Production release.
+
+## November 5 continuation — handler and dependency correction
+
+- [x] Malformed JSON and error-disclosure defects reproduced against the actual handler.
+- [x] Corrected handler suite: 14/14 PASS; existing 20 safety cases, dates and guard self-test PASS.
+- [x] Lint: zero errors and warnings on the corrected dependency tree.
+- [x] Full Next.js 16.4.5 build and TypeScript checks pass locally.
+- [x] Runtime dependency audit: zero reported vulnerabilities.
+- [ ] Remaining eight moderate development-tool advisory entries resolved or explicitly reviewed by owner.
+- [ ] New immutable Preview and protected live acceptance for the changed application source.
+- [ ] Updated acknowledgment storage/hydration behavior and remaining user journeys verified interactively.
+- [ ] Full 93-file baseline scope review completed, including earlier negotiation/database changes.
+
+Evidence and limits: [review record](docs/release/PR3_REVIEW_2026-11-05.md). The earlier
+run #6 checkpoint remains historical evidence for its recorded source only.

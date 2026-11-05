@@ -1,8 +1,6 @@
 import { supabase } from "./supabase";
 import type { BookingRequest, RequestMessage } from "./types";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export type HostListingSubmission = {
   address: string | null;
   amenities: string | null;

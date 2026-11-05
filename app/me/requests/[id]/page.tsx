@@ -246,10 +246,11 @@ export default function RequestDetailPage() {
       });
   }, []);
 
+  const listingSlug = req?.listingSlug;
   const listing: Listing | undefined = useMemo(() => {
-    if (!req?.listingSlug) return undefined;
-    return listings.find((l) => l.slug === req.listingSlug);
-  }, [req?.listingSlug]);
+    if (!listingSlug) return undefined;
+    return listings.find((l) => l.slug === listingSlug);
+  }, [listingSlug]);
 
   const listingHref = useMemo(() => {
     const slug = req?.listingSlug;

@@ -9,11 +9,26 @@
 
 Release decision: BLOCKED
 
-**Protected booking acceptance: PASS.** The narrow live-test gate is complete.
+**Historical protected booking acceptance: PASS at application source 17f57e9.** The original live-test gate is complete. New application changes require fresh live acceptance.
 Wider application release gates in `ACCEPTANCE_TESTS.md` remain open; the pull
 request remains draft and unmerged. The delivery preflight reports 11 blockers:
 10 wider critical gates plus the explicit blocked release decision. No booking
 checkpoint gate remains open.
+
+## Current continuation: handler validation and security dependencies
+
+The [November 5 review](docs/release/PR3_REVIEW_2026-11-05.md) records the exact
+93-file baseline scope, reproduced handler defects, dependency correction and
+limits. Malformed JSON roots now return HTTP 400 before privileged database
+access; database error details are withheld from the browser. Fourteen handler
+cases and the 20 existing preflight/lifecycle cases pass. Lint is clean and the full Next.js 16.4.5 build
+(including TypeScript checks) passes.
+
+The previous claim that the entire pull request contained no negotiation or
+schema work was too narrow: those earlier changes appear against GitHub's reported
+base. They still need full review. This continuation does not apply migrations.
+The historical live result below has not been rerun against the changed handler
+and Next.js version. Both live-test opt-ins remain disabled.
 
 ## Verified live result
 
@@ -95,9 +110,10 @@ Known warnings:
   full application diff review before any merge decision.
 - Wider security, privacy, accessibility, ownership, recovery, critical-journey,
   operations and financial-scope release gates remain unchecked.
-- The October 27 dependency audit reported 12 findings (1 low, 2 moderate,
-  8 high, 1 critical). Current advisory identity, reachability and remediation
-  remain separate release work; this test does not resolve them.
+- November 5 dependency remediation pins Next.js and eslint-config-next to 16.4.5.
+  Full audit now reports 8 moderate development-tool entries and zero critical/high
+  findings; runtime-only audit reports zero vulnerabilities. The remaining entries
+  share minimatch advisory GHSA-g3hv-75wg-m249. No waiver or forced downgrade.
 - The workflow succeeded with GitHub warnings that older action declarations
   targeting Node.js 20 were run on Node.js 24, plus an Ubuntu runner migration
   notice. Track action/runtime maintenance separately.
