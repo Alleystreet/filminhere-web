@@ -1,204 +1,201 @@
-# FilmInHere Booking Role-Separation Test Runbook
+# FilmInHere protected booking role-separation runbook
 
-## Purpose
+## Scope and decision — November 5, 2026
 
-Prove that a booking created by a filmmaker is stored with two distinct, correct identities:
+Owner: Sean Whitaker / Alleystreet. Mode: EDIT. Lane: existing FilmInHere build.
+Goal: prove the server assigns the signed-in filmmaker and the approved listing's
+host to distinct booking fields, ignores forged system fields, and removes test data.
+No merge, Production release, Production credentials, payments, negotiation, or
+application authorization redesign is authorized by this work.
 
-- `booking_requests.user_id` = the authenticated filmmaker.
-- `booking_requests.host_user_id` = the owner of the approved host listing.
+**Protected live test: NOT RUN. Release: BLOCKED.** Offline tests do not establish
+live authorization, database writes, or cleanup after an actual integration run.
 
-This verifies an authorization boundary in the server-side booking-create flow without using Production.
+## Verified configuration
 
-## Safe environment
+| Item | Current evidence |
+|---|---|
+| Pull request | #3, open and draft; inspected head `575d34a57566f91fef30e0472169c7a15bf723f7` |
+| Application deployment | `dpl_2uwGrJKgxWyEXd5rPBSHSV13UD6k`, READY, Preview, same source commit |
+| Pinned application URL | `https://filminhere-preview-1tcvedk7h-alleystreets-projects.vercel.app` |
+| Supabase test branch | `preview-test`, `jryjcvcnbrqtgamxpxas`, ACTIVE_HEALTHY |
+| Vercel public configuration | Branch-scoped URL and publishable key matched the Preview project on November 5 |
+| Vercel privileged configuration | Branch-scoped sensitive `SUPABASE_SECRET_KEY` exists; issuing project is unverified |
+| GitHub environment | `preview-test`; required reviewer `Alleystreet`; administrator bypass unchecked; self-review prevention unchecked |
+| Allowed GitHub branch | Only `fix/staging-database-isolation-20261018`; booking branch still needs approval and addition |
+| GitHub secrets | Three expected names exist, last updated October 22; stored values cannot be read back |
+| Booking opt-in | Repository variable `RUN_BOOKING_ROLE_ACCEPTANCE` absent, so live job disabled |
+| Other test opt-in | `RUN_PREVIEW_SERVICE_ACCEPTANCE=disabled`; independent and unchanged |
+| Vercel trusted external source | Only the staging-isolation branch's workflow; booking workflow is absent |
+| Baseline synthetic data | Read-only Preview query returned zero matching bookings, listings, users, and profiles |
 
-The test is allowed to run only against:
+GitHub configuration:
+https://github.com/Alleystreet/filminhere-web/settings/environments/23133735395/edit
 
-- Vercel Preview for branch `fix/server-side-booking-create`.
-- Supabase branch `preview-test`.
-- Supabase host `jryjcvcnbrqtgamxpxas.supabase.co`.
+Vercel protection configuration:
+https://vercel.com/alleystreets-projects/filminhere-preview/settings/deployment-protection
 
-The script refuses to run if the supplied Supabase host does not match the expected test host. It also refuses the Vercel Production alias `filminhere-preview.vercel.app`.
+## Exact remaining configuration
 
-Reuse this single test environment. Do not create another Supabase project or branch for each test.
+1. Obtain action-time authorization for the narrow security access changes.
+   Add only `fix/server-side-booking-create` to GitHub environment `preview-test`.
+   Retain the existing branch, required reviewer, and disabled administrator bypass.
+2. Add a separate Vercel Trusted Source; retain the existing source and authentication.
+   The source must accept only these OpenID Connect (OIDC) claims:
 
-## Required GitHub Environment
+   | Claim/control | Required value |
+   |---|---|
+   | Issuer | `https://token.actions.githubusercontent.com` |
+   | Audience | `https://github.com/Alleystreet` |
+   | Repository | `Alleystreet/filminhere-web` |
+   | Reference | `refs/heads/fix/server-side-booking-create` |
+   | Workflow | `Booking Role Separation` |
+   | GitHub environment | `preview-test` |
+   | Vercel target environment | `preview` only |
 
-GitHub Environment: `preview-test`
+   Configure every listed claim. If the guided form cannot express the workflow
+   restriction, use the provider's explicit claim configuration. Do not widen to
+   all repositories, all branches, Production, public access, or long-lived bypass.
+3. Establish privileged-key provenance privately. For each backend, use an active
+   secret issued by Supabase project `jryjcvcnbrqtgamxpxas`. Keep a non-secret
+   record of the source project, key identifier, destination scope and installation
+   time. The `sb_secret_` prefix alone does not establish provenance.
+   If existing provenance cannot be established, install a known Preview key into
+   the following existing destinations using their private settings, never chat:
 
-Secrets:
+   | Destination | Setting | Required scope |
+   |---|---|---|
+   | GitHub | `TEST_SUPABASE_SECRET_KEY` | Environment `preview-test` only |
+   | Vercel | `SUPABASE_SECRET_KEY` | Preview; branch `fix/server-side-booking-create` only |
 
-- `TEST_SUPABASE_URL`
-- `TEST_SUPABASE_PUBLISHABLE_KEY`
-- `TEST_SUPABASE_SECRET_KEY`
+   GitHub must also contain `TEST_SUPABASE_URL=https://jryjcvcnbrqtgamxpxas.supabase.co`
+   and a matching public `TEST_SUPABASE_PUBLISHABLE_KEY`. Existing GitHub names
+   alone do not establish their saved values. No repository-wide secrets are needed.
+   A Vercel environment-variable change requires a new Preview deployment to take
+   effect. Verify its source, Preview target and READY state, then update the guard,
+   workflow URL, deployment evidence and this runbook together before running.
+4. Confirm the exact tested application deployment remains accessible and that
+   any intervening code commits change only tests/documentation. For an application
+   change, review and repin a new immutable deployment; never use a moving alias.
+5. Set only `RUN_BOOKING_ROLE_ACCEPTANCE=approved` for one reviewed execution,
+   start or rerun the corrected workflow, and have the required human reviewer
+   approve its exact commit/environment. Restore this opt-in to `disabled`
+   after completion or failure. Do not enable the separate service-acceptance flag.
 
-The current Vercel Preview URL is passed as a manual workflow input so a stale deployment URL is not stored as a secret.
+The workflow is **push-triggered**, with exact branch/path filters. It has no
+manual URL input or `workflow_dispatch` trigger. Setting a variable alone does
+not start it. After publishing a corrected test commit with the opt-in disabled,
+re-run that corrected run only after prerequisites pass; an old run retains its
+old source revision. Do not rerun October 22's obsolete target.
 
-## Automated flow
+## Non-secret safety settings in the workflow
 
-1. Create a temporary confirmed filmmaker test user in Supabase Auth.
-2. Create a different temporary confirmed host test user.
-3. Refuse to continue if the two user IDs are equal.
-4. Create a temporary approved host listing owned by the host.
-5. Sign in as the filmmaker using the public/publishable Auth path.
-6. Call the real Vercel Preview `/api/booking/create` route with the filmmaker's JSON Web Token (JWT).
-7. Read the created booking row through the test database credential.
-8. Verify:
-   - filmmaker identity is correct;
-   - host identity is correct;
-   - filmmaker and host IDs differ;
-   - canonical host listing ID is correct;
-   - server-controlled state is `PENDING`;
-   - server-controlled thread state is `draft`.
-9. Delete the temporary booking, listing, filmmaker user, and host user.
-10. Preserve the workflow output as a GitHub Actions artifact.
+| Setting | Required value |
+|---|---|
+| `TEST_BASE_URL` | Exact pinned application URL above |
+| `TEST_EXPECTED_SUPABASE_HOST` | `jryjcvcnbrqtgamxpxas.supabase.co` |
+| `TEST_FORBIDDEN_BASE_HOST` | `filminhere-preview.vercel.app` |
+| `CI_BOOKING_TEST_GATE` | `yes`, inside the protected job only |
 
-No real email inbox or new human email account is required.
+All target, repository, branch, workflow, key-role, and host guards execute before
+requesting an identity token. Legacy JSON Web Token (JWT) key claims must contain
+the correct project and role; decoding these claims does not verify their signature.
 
-## Why this test matters
+## Test behavior and acceptance
 
-Authentication answers: **Who is the user?**
+1. Request a short-lived GitHub identity token; verify claims locally and let
+   Vercel independently verify its signature and Trusted Source policy.
+2. Reach the actual Preview booking route. Missing and invalid filmmaker
+   authentication must both return application JSON HTTP 401 before fixture writes.
+3. Create two temporary confirmed users with generated passwords and synthetic
+   `example.com` addresses. These do not require inboxes or send invitations.
+4. Create one approved listing owned by the host. Sign in as the distinct filmmaker
+   through the public Supabase authentication interface.
+5. Call `/api/booking/create` with that filmmaker's session and forged `user_id`,
+   `host_user_id`, `status`, `thread_status`, and listing slug.
+6. Read the stored row using the private test credential. Require filmmaker and
+   host to match their actual identities, differ from each other, use the canonical
+   listing ID/slug, and have `PENDING` / `draft` states.
+7. In `finally`, revoke the synthetic filmmaker's refresh sessions, delete the
+   scoped booking/listing/users, and read back absence of booking, listing, users
+   and their profiles. Any cleanup error fails the job. Access tokens themselves
+   can remain cryptographically valid until expiry; never print or retain them.
+8. Independently repeat the Preview-only aggregate query below. Require zero
+   leftovers and review the retained sanitized artifact before calling live
+   acceptance PASS.
 
-Authorization answers: **What is that user allowed to do or access?**
+The role labels in synthetic user metadata are descriptive. This test proves
+identity attribution and server-controlled fields. It does not establish a
+role-policy prohibition on hosts booking, full Row-Level Security (RLS) coverage,
+self-booking restrictions, negotiation authorization, payments, or whole-app safety.
 
-The filmmaker authenticates with a Supabase session/JWT. The server then resolves the host from trusted listing data rather than accepting a host identity supplied by the browser.
+## Independent cleanup evidence
 
-That protects the trust boundary between untrusted client input and privileged server/database actions.
+Run only in `jryjcvcnbrqtgamxpxas`, before and after live execution:
 
-## Credentials
+```sql
+select 'booking_requests' as object, count(*) as synthetic_count
+from public.booking_requests
+where email ~ '^filminhere-filmmaker-[0-9]+-[0-9a-f]{8}@example\.com$'
+union all
+select 'host_listing_submissions', count(*) from public.host_listing_submissions
+where host_email ~ '^filminhere-host-[0-9]+-[0-9a-f]{8}@example\.com$'
+union all
+select 'auth.users', count(*) from auth.users
+where email ~ '^filminhere-(filmmaker|host)-[0-9]+-[0-9a-f]{8}@example\.com$'
+union all
+select 'profiles', count(*) from public.profiles
+where email ~ '^filminhere-(filmmaker|host)-[0-9]+-[0-9a-f]{8}@example\.com$';
+```
 
-### Publishable key
+This query covers this workflow's naming pattern, not all possible test data.
+If a write succeeds but its response is lost, an unknown fixture can remain despite
+`finally`; the independent check is mandatory. Stop, inspect only the matching
+Preview fixtures, and recover them deliberately before retrying. Do not run broad
+deletions or delete unrelated data.
 
-Used by the test filmmaker to authenticate through the same public Supabase Auth interface used by the application.
+## Offline verification and retained evidence
 
-### Secret key
+```sh
+node scripts/booking-acceptance-guard.mjs --self-test
+node --test scripts/test-booking-preflight.mjs
+node scripts/test-booking-validation.mjs
+```
 
-Used only inside the protected GitHub `preview-test` Environment to create temporary test fixtures, inspect the resulting row, and clean up.
+The 19 preflight cases include workflow/guard consistency, wrong environments,
+public/secret role swaps, rejection before any network call, and closed in-memory
+runner simulations for protected-page rejection, invalid authentication, wrong
+identity attribution, and cleanup leaks. These simulations make **zero network
+requests** and are not evidence of live authorization.
 
-It must never be placed in browser code, committed to Git, printed to logs, or pasted into chat.
+The protected job uploads `booking-role-separation-evidence-<run-id>`, retained
+for 30 days. It records workflow commit, run number, application deployment/source
+and sanitized results. It must not contain keys, passwords, tokens, response bodies,
+or synthetic user/record identifiers. Distinguish workflow source from pinned
+application source.
 
-## Evidence
+Historical evidence: [Verify #145](https://github.com/Alleystreet/filminhere-web/actions/runs/40547623134)
+and [Booking Validation #13](https://github.com/Alleystreet/filminhere-web/actions/runs/40547623184)
+passed. [October 22 offline run](https://github.com/Alleystreet/filminhere-web/actions/runs/39854491105)
+passed its offline job and **skipped** its protected job.
 
-Each workflow run uploads:
+## Learning through this build
 
-`booking-role-separation-evidence-<run-id>`
+Authentication identifies the signed-in filmmaker. Authorization controls which
+identity and booking fields the server will accept. Both live in application
+security and Identity and Access Management (IAM).
 
-The artifact contains:
+The publishable Application Programming Interface (API) key identifies the public
+application; it does not grant administrator access. The private secret bypasses
+Row-Level Security (RLS), so it belongs only in controlled server/test environments.
+Modern keys use the `apikey` header; user sessions use `Authorization: Bearer`.
+OpenID Connect (OIDC) lets GitHub prove the workflow's identity to Vercel using
+a short-lived token, without storing another long-lived bypass secret.
 
-- environment name;
-- commit SHA;
-- GitHub run ID;
-- PASS/FAIL output;
-- temporary test record IDs when available.
+## Official references
 
-It intentionally does not contain passwords or Supabase secret values.
+- [Supabase keys](https://supabase.com/docs/guides/getting-started/api-keys)
+- [Supabase sign-out semantics](https://supabase.com/docs/reference/javascript/auth-signout)
+- [Vercel Trusted Sources](https://vercel.com/docs/deployment-protection/methods-to-bypass-deployment-protection/trusted-sources)
+- [GitHub rerun behavior](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs)
 
-## Failure and recovery
-
-The script uses a `finally` cleanup path. If a verification fails after fixtures are created, cleanup still attempts to delete temporary booking/listing/user records.
-
-If cleanup itself reports a warning, inspect `preview-test` manually before running the test again. Do not repair Production as part of a Preview-test cleanup.
-
-## Manual equivalent
-
-To reproduce the logic manually:
-
-1. create two distinct non-production users;
-2. make one the approved listing owner;
-3. sign in as the other user;
-4. create a booking through the Preview application;
-5. inspect `booking_requests.user_id`;
-6. inspect `booking_requests.host_user_id`;
-7. confirm the IDs differ and map to the intended roles;
-8. confirm `PENDING` / `draft`;
-9. remove test data.
-
-The automation removes repetition; this runbook preserves how to reproduce and audit the test without the automation.
-
-## Technical Mastery map
-
-Relevant concepts:
-
-- authentication vs. authorization;
-- JSON Web Token (JWT);
-- least privilege;
-- trust boundaries;
-- server-side validation;
-- PostgreSQL record verification;
-- Supabase Auth;
-- secrets management;
-- GitHub Actions;
-- integration testing;
-- cleanup / rollback;
-- evidence preservation.
-
-Certification-objective mapping should be added only after verifying the current official objective numbers for the certification being studied.
-
-## Restricted acceptance update — 2026-10-22
-
-The role-separation workflow now has **two separate jobs**:
-
-- **Offline preflight:** automatically runs on reviewed changes to the booking test
-  script, guard or workflow within the exact `fix/server-side-booking-create`
-  branch. It validates database identity, pinned Vercel Preview deployment,
-  repository/branch/workflow identity, OIDC claims and invalid-configuration
-  rejection. It needs **no credentials, reviewers or database writes**.
-- **Authenticated integration:** runs only when the separate repository variable
-  `RUN_BOOKING_ROLE_ACCEPTANCE` is exactly `approved`, and the protected
-  `preview-test` GitHub Environment permits and approves the exact PR #3 branch.
-  The environment secrets remain encrypted and restricted. This is independent
-  of the previously disabled `RUN_PREVIEW_SERVICE_ACCEPTANCE` for PR #22.
-
-### Owner-managed protections — prerequisites to integration
-
-1. In GitHub Settings → Environments → `preview-test`, explicitly **allow**
-   `fix/server-side-booking-create` in the protected deployment-branch list
-   while keeping both existing reviewer protection and the original PR #22 branch.
-2. In Vercel → project `filminhere-preview` → Deployment Protection →
-   Trusted Sources, configure a **Preview-only** GitHub Actions OIDC source for
-   repository `Alleystreet/filminhere-web`, exact workflow
-   `Booking Role Separation`, exact PR #3 branch and audience
-   `https://github.com/Alleystreet`. Leave Vercel Authentication enabled;
-   do not use a long-lived bypass secret or enable public access.
-3. Validate that Vercel's scoped Preview `SUPABASE_SECRET_KEY` belongs to
-   `preview-test` and is never a Production privileged key. The branch-scoped
-   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-   were independently checked against the Preview branch on October 22, 2026.
-   Privileged key provenance is still a separate release/test prerequisite.
-4. Only then set repository variable `RUN_BOOKING_ROLE_ACCEPTANCE=approved`
-   and inspect the new workflow run. Explicitly approve only the exact
-   `preview-test` environment/branch/commit; this is not authorization for
-   Production release or merge. Disable that variable after success.
-5. Keep [PR #3](https://github.com/Alleystreet/filminhere-web/pull/3) draft
-   until integration, artifact review, Preview build, cleanup and diff gates pass.
-
-### Fail-closed identities, proof, and cleanup
-
-The privileged workflow accepts **only** database URL
-`https://jryjcvcnbrqtgamxpxas.supabase.co` and pinned Vercel Preview
-`https://filminhere-preview-35xxhsfio-alleystreets-projects.vercel.app`
-from deployed source commit `d3f9647039adbfbe6ff30d450a39dfccac565902`.
-Never substitute an alias or a Production deployment. A new application change
-requires a newly reviewed exact Preview deployment and corresponding test target.
-
-The test requests a GitHub OIDC identity token, verifies its audience, repository,
-branch, workflow and `preview-test` environment claims, and sends it to the
-Vercel Trusted Sources request header. Its **first** HTTP request must reach
-the actual application and return JSON HTTP 401 without a filmmaker JWT.
-Otherwise no synthetic users or database rows are created.
-
-After authorization succeeds, the synthetic filmmaker's booking request includes
-deliberately forged `user_id`, `host_user_id`, `status` and
-`thread_status`. The server must replace these with the actual filmmaker
-identity, real approved-listing host identity, `PENDING` and `draft`.
-
-The test never logs synthetic IDs, tokens, secrets, passwords or request response
-bodies. A unique synthetic host-listing ID is allocated before insertion so
-cleanup can target it even if insert acknowledgement fails. Booking cleanup is
-scoped to that listing **and the unique synthetic filmmaker email**.
-Any cleanup failure makes the job fail; readback must show no synthetic
-booking or listing. Independent Preview-only aggregate cleanup verification
-must precede a PASS conclusion.
-
-**Current scope:** the offline gate passing does **not** establish live
-integration. This protected booking test has not yet been approved or run.
-No Production merge, deployment or database operation is permitted by this plan.

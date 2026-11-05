@@ -8,6 +8,7 @@ on:
       - ".github/workflows/booking-role-separation.yml"
       - "scripts/booking-acceptance-guard.mjs"
       - "scripts/test-booking-role-separation.mjs"
+      - "scripts/test-booking-preflight.mjs"
 
 permissions:
   contents: read
@@ -24,6 +25,7 @@ jobs:
         with:
           node-version: "24"
       - run: node scripts/booking-acceptance-guard.mjs --self-test
+      - run: node --test scripts/test-booking-preflight.mjs
       - run: node scripts/test-booking-validation.mjs
 
   authenticated:
@@ -41,7 +43,9 @@ jobs:
       id-token: write
     env:
       CI_BOOKING_TEST_GATE: "yes"
-      TEST_BASE_URL: https://filminhere-preview-35xxhsfio-alleystreets-projects.vercel.app
+      TEST_BASE_URL: https://filminhere-preview-1tcvedk7h-alleystreets-projects.vercel.app
+      TEST_EXPECTED_SUPABASE_HOST: jryjcvcnbrqtgamxpxas.supabase.co
+      TEST_FORBIDDEN_BASE_HOST: filminhere-preview.vercel.app
       TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
       TEST_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_PUBLISHABLE_KEY }}
       TEST_SUPABASE_SECRET_KEY: ${{ secrets.TEST_SUPABASE_SECRET_KEY }}
@@ -62,6 +66,8 @@ jobs:
             echo "Environment: preview-test"
             echo "Commit: $GITHUB_SHA"
             echo "Run: $GITHUB_RUN_ID"
+            echo "Application deployment: dpl_2uwGrJKgxWyEXd5rPBSHSV13UD6k"
+            echo "Application source: 575d34a57566f91fef30e0472169c7a15bf723f7"
             node scripts/test-booking-role-separation.mjs
           } 2>&1 | tee test-results/booking-role-separation.txt
       - name: Upload sanitized role separation evidence
@@ -72,3 +78,4 @@ jobs:
           path: test-results/booking-role-separation.txt
           if-no-files-found: error
           retention-days: 30
+

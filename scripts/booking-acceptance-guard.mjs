@@ -2,11 +2,26 @@
 import assert from "node:assert/strict";
 
 export const PREVIEW_DB = "https://jryjcvcnbrqtgamxpxas.supabase.co";
-export const PREVIEW_APP = "https://filminhere-preview-35xxhsfio-alleystreets-projects.vercel.app";
+export const PREVIEW_APP = "https://filminhere-preview-1tcvedk7h-alleystreets-projects.vercel.app";
 const REPO = "Alleystreet/filminhere-web";
 const BRANCH = "refs/heads/fix/server-side-booking-create";
 const WORKFLOW = "Booking Role Separation";
 const AUDIENCE = "https://github.com/Alleystreet";
+
+function verifyCredential(key, kind) {
+  const prefix = kind === "public" ? "sb_publishable_" : "sb_secret_";
+  if (key.startsWith(prefix) && key.length > prefix.length) return;
+  // Legacy JSON Web Tokens can be rejected by role/project before any network call.
+  // Decoding is not signature verification or proof of current key provenance.
+  let claims;
+  try {
+    if (key.split(".").length !== 3) throw Error();
+    claims = JSON.parse(Buffer.from(key.split(".")[1], "base64url").toString("utf8"));
+  } catch { throw Error("Wrong " + kind + " credential format."); }
+  if (claims.ref !== "jryjcvcnbrqtgamxpxas" ||
+      claims.role !== (kind === "public" ? "anon" : "service_role"))
+    throw Error("Wrong " + kind + " credential role or project.");
+}
 
 export function verifyTarget(e) {
   assert.equal(e.CI_BOOKING_TEST_GATE, "yes", "Owner test gate disabled.");
@@ -15,12 +30,14 @@ export function verifyTarget(e) {
   assert.equal(e.GITHUB_WORKFLOW, WORKFLOW, "Unexpected workflow.");
   assert.equal(e.TEST_SUPABASE_URL, PREVIEW_DB, "Supabase Preview identity mismatch.");
   assert.equal(e.TEST_BASE_URL, PREVIEW_APP, "Vercel Preview identity mismatch.");
+  assert.equal(e.TEST_EXPECTED_SUPABASE_HOST, "jryjcvcnbrqtgamxpxas.supabase.co", "Missing or wrong Preview host guard.");
+  assert.equal(e.TEST_FORBIDDEN_BASE_HOST, "filminhere-preview.vercel.app", "Missing or wrong Production exclusion.");
   for (const key of ["TEST_SUPABASE_PUBLISHABLE_KEY", "TEST_SUPABASE_SECRET_KEY"]) {
-    if (!e[key] || typeof e[key] !== "string") throw Error("Missing protected credential: " + key);
+    if (typeof e[key] !== "string" || !e[key].trim()) throw Error("Missing protected credential: " + key);
   }
   if (e.TEST_SUPABASE_PUBLISHABLE_KEY === e.TEST_SUPABASE_SECRET_KEY) throw Error("Credential roles overlap.");
-  if (!e.TEST_SUPABASE_SECRET_KEY.startsWith("sb_secret_") &&
-      e.TEST_SUPABASE_SECRET_KEY.split(".").length !== 3) throw Error("Wrong secret key format.");
+  verifyCredential(e.TEST_SUPABASE_PUBLISHABLE_KEY, "public");
+  verifyCredential(e.TEST_SUPABASE_SECRET_KEY, "secret");
 }
 
 export function verifyClaims(jwt) {
@@ -58,6 +75,8 @@ if (process.argv.includes("--self-test")) {
   const valid = { CI_BOOKING_TEST_GATE:"yes", GITHUB_REPOSITORY:REPO,
     GITHUB_REF:BRANCH,GITHUB_WORKFLOW:WORKFLOW,
     TEST_SUPABASE_URL:PREVIEW_DB,TEST_BASE_URL:PREVIEW_APP,
+    TEST_EXPECTED_SUPABASE_HOST:"jryjcvcnbrqtgamxpxas.supabase.co",
+    TEST_FORBIDDEN_BASE_HOST:"filminhere-preview.vercel.app",
     TEST_SUPABASE_PUBLISHABLE_KEY:"sb_publishable_synthetic",
     TEST_SUPABASE_SECRET_KEY:"sb_secret_synthetic" };
   assert.doesNotThrow(() => verifyTarget(valid));
@@ -67,6 +86,9 @@ if (process.argv.includes("--self-test")) {
     { TEST_SUPABASE_URL:"https://gunrmcuvgbipadmelxob.supabase.co" },
     { TEST_BASE_URL:"https://filminhere-preview.vercel.app" },
     { TEST_BASE_URL:PREVIEW_APP + "/" },
+    { TEST_EXPECTED_SUPABASE_HOST:"" }, { TEST_FORBIDDEN_BASE_HOST:"" },
+    { TEST_SUPABASE_PUBLISHABLE_KEY:"sb_secret_synthetic" },
+    { TEST_SUPABASE_SECRET_KEY:"sb_publishable_synthetic" },
     { TEST_SUPABASE_SECRET_KEY:"" }, { TEST_SUPABASE_SECRET_KEY:"bad" }
   ]) assert.throws(() => verifyTarget({ ...valid,...bad }));
   const enc = value => Buffer.from(JSON.stringify(value)).toString("base64url");
@@ -79,3 +101,4 @@ if (process.argv.includes("--self-test")) {
   assert.throws(() => verifyClaims("malformed"));
   console.log("PASS: Offline target, repo, branch, credentials and OIDC claim checks; zero network.");
 }
+

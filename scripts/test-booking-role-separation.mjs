@@ -53,6 +53,7 @@ let filmmakerUserId = null;
 let hostUserId = null;
 let hostListingId = null;
 let requestId = null;
+let filmmakerAccessToken = null;
 
 async function parseResponse(response, label) {
   const text = await response.text();
@@ -78,9 +79,11 @@ async function parseResponse(response, label) {
 async function adminAuth(path, options = {}) {
   return fetch(`${supabaseUrl}/auth/v1/admin${path}`, {
     ...options,
+    redirect: "error",
+    signal: AbortSignal.timeout(15000),
     headers: {
       apikey: secretKey,
-      Authorization: `Bearer ${secretKey}`,
+      ...(secretKey.startsWith("sb_secret_") ? {} : { Authorization: `Bearer ${secretKey}` }),
       "Content-Type": "application/json",
       ...(options.headers ?? {}),
     },
@@ -90,9 +93,11 @@ async function adminAuth(path, options = {}) {
 async function rest(path, options = {}) {
   return fetch(`${supabaseUrl}/rest/v1/${path}`, {
     ...options,
+    redirect: "error",
+    signal: AbortSignal.timeout(15000),
     headers: {
       apikey: secretKey,
-      Authorization: `Bearer ${secretKey}`,
+      ...(secretKey.startsWith("sb_secret_") ? {} : { Authorization: `Bearer ${secretKey}` }),
       "Content-Type": "application/json",
       ...(options.headers ?? {}),
     },
@@ -126,6 +131,8 @@ async function signIn(email, password) {
     `${supabaseUrl}/auth/v1/token?grant_type=password`,
     {
       method: "POST",
+      redirect: "error",
+      signal: AbortSignal.timeout(15000),
       headers: {
         apikey: publishableKey,
         "Content-Type": "application/json",
@@ -150,6 +157,16 @@ async function cleanup() {
     } catch (error) {
       failures.push(`${label}: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  if (filmmakerAccessToken) {
+    await attempt("revoke synthetic filmmaker session", async () => {
+      const response = await fetch(`${supabaseUrl}/auth/v1/logout?scope=global`, {
+        method: "POST", redirect: "error", signal: AbortSignal.timeout(15000),
+        headers: { apikey: publishableKey, Authorization: `Bearer ${filmmakerAccessToken}` },
+      });
+      if (!response.ok) throw Error(`HTTP ${response.status}`);
+    });
   }
 
   if (hostListingId) {
@@ -212,10 +229,23 @@ async function cleanup() {
       if (!Array.isArray(rows) || rows.length) throw Error("Listing not fully cleaned.");
     });
   }
+  for (const userId of [filmmakerUserId, hostUserId].filter(Boolean)) {
+    await attempt("verify synthetic user deletion", async () => {
+      const response = await adminAuth(`/users/${encodeURIComponent(userId)}`);
+      if (response.status !== 404) throw Error("Synthetic user absence not established.");
+    });
+    await attempt("verify synthetic profile cleanup", async () => {
+      const response = await rest(`profiles?id=eq.${encodeURIComponent(userId)}&select=id`);
+      const rows = await parseResponse(response, "Check profile cleanup");
+      if (!Array.isArray(rows) || rows.length) throw Error("Profile not fully cleaned.");
+    });
+  }
   if (failures.length) {
     failures.forEach(label => console.error("FAIL: " + label));
     process.exitCode = 1;
-  } else console.log("PASS: Synthetic booking/listing cleanup readback and user deletion.");
+  } else if (filmmakerUserId || hostUserId || hostListingId) {
+    console.log("PASS: Synthetic booking, listing, user and profile cleanup readback.");
+  } else console.log("INFO: No acknowledged synthetic fixtures to clean up; independent readback still required.");
 }
 
 try {
@@ -231,6 +261,17 @@ try {
   const appResponse = await noAuth.json();
   if (appResponse?.error !== "Unauthorized.") throw Error("Unexpected unauthenticated Preview route response.");
   console.log("PASS: Vercel protected Preview application reached before synthetic writes.");
+
+  const invalidAuth = await fetch(`${baseUrl}/api/booking/create`, {
+    method: "POST", redirect: "manual", signal: AbortSignal.timeout(15000),
+    headers: { "Content-Type": "application/json", Authorization: "Bearer deliberately-invalid-test-token",
+      "x-vercel-trusted-oidc-idp-token": vercelToken },
+    body: JSON.stringify({}),
+  });
+  if (invalidAuth.status !== 401 || !invalidAuth.headers.get("content-type")?.includes("application/json") ||
+      (await invalidAuth.json())?.error !== "Unauthorized.")
+    throw Error("Invalid authentication was not rejected; refuse test fixture writes.");
+  console.log("PASS: Missing and invalid filmmaker authentication rejected.");
 
   filmmakerUserId = await createTestUser(
     filmmakerEmail,
@@ -283,7 +324,7 @@ try {
   const listings = await parseResponse(listingResponse, "Create approved host listing");
   if (!Array.isArray(listings) || listings.length !== 1 || !listings[0]?.id) {
     throw new Error(
-      `Expected one created host listing, got ${JSON.stringify(listings)}`,
+      "Expected exactly one created host listing (body suppressed).",
     );
   }
 
@@ -291,15 +332,16 @@ try {
 
   if (listings[0].user_id !== hostUserId) {
     throw new Error(
-      `Host listing identity mismatch: expected ${hostUserId}, got ${listings[0].user_id}`,
+      "Host listing identity mismatch (identifiers suppressed).",
     );
   }
 
   const auth = await signIn(filmmakerEmail, filmmakerPassword);
+  filmmakerAccessToken = auth.access_token;
 
   if (auth.user.id !== filmmakerUserId) {
     throw new Error(
-      `Filmmaker sign-in identity mismatch: expected ${filmmakerUserId}, got ${auth.user.id}`,
+      "Filmmaker sign-in identity mismatch (identifiers suppressed).",
     );
   }
 
@@ -316,7 +358,7 @@ try {
     },
     body: JSON.stringify({
       listingId: `host_${hostListingId}`,
-      listingSlug: `host-${hostListingId}`,
+      listingSlug: "forged-client-listing-slug",
       email: filmmakerEmail,
       message: "Automated role-separation integration test",
       startISO,
@@ -338,7 +380,7 @@ try {
   }
 
   const rowResponse = await rest(
-    `booking_requests?id=eq.${encodeURIComponent(requestId)}&select=id,user_id,host_user_id,listing_id,status,thread_status`,
+    `booking_requests?id=eq.${encodeURIComponent(requestId)}&select=id,user_id,host_user_id,listing_id,listing_slug,status,thread_status`,
     { method: "GET" },
   );
 
@@ -346,7 +388,7 @@ try {
 
   if (!Array.isArray(rows) || rows.length !== 1) {
     throw new Error(
-      `Expected exactly one booking row, got ${JSON.stringify(rows)}`,
+      "Expected exactly one booking row (body suppressed).",
     );
   }
 
@@ -354,13 +396,13 @@ try {
 
   if (row.user_id !== filmmakerUserId) {
     throw new Error(
-      `Wrong filmmaker identity: expected ${filmmakerUserId}, got ${row.user_id}`,
+      "Wrong filmmaker identity (identifiers suppressed).",
     );
   }
 
   if (row.host_user_id !== hostUserId) {
     throw new Error(
-      `Wrong host identity: expected ${hostUserId}, got ${row.host_user_id}`,
+      "Wrong host identity (identifiers suppressed).",
     );
   }
 
@@ -368,15 +410,15 @@ try {
     throw new Error("Role separation failed: filmmaker and host IDs are identical.");
   }
 
-  if (row.listing_id !== `host_${hostListingId}`) {
+  if (row.listing_id !== `host_${hostListingId}` || row.listing_slug !== `host-${hostListingId}`) {
     throw new Error(
-      `Wrong listing id: expected host_${hostListingId}, got ${row.listing_id}`,
+      "Wrong canonical listing identity (identifiers suppressed).",
     );
   }
 
   if (row.status !== "PENDING" || row.thread_status !== "draft") {
     throw new Error(
-      `Unexpected server-controlled status fields: ${JSON.stringify(row)}`,
+      "Unexpected server-controlled status fields (body suppressed).",
     );
   }
 
@@ -384,3 +426,4 @@ try {
 } finally {
   await cleanup();
 }
+
