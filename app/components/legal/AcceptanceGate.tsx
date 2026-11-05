@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { PLATFORM_BOUNDARIES } from "./boundaries";
 
 type Props = {
@@ -8,28 +8,29 @@ type Props = {
   onInquiry: () => void;
 };
 
+function subscribeToStorage(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  return () => window.removeEventListener("storage", onChange);
+}
+
 export default function AcceptanceGate({ locationSlug, onInquiry }: Props) {
-  const storageKey = useMemo(
-    () => `fih_ack_v1:${locationSlug}`, // slug-scoped so you can choose later if it should be global
-    [locationSlug]
+  const storageKey = `fih_ack_v1:${locationSlug}`;
+  const storedAck = useSyncExternalStore(
+    subscribeToStorage,
+    () => {
+      try { return localStorage.getItem(storageKey) === "true"; }
+      catch { return false; }
+    },
+    () => null,
   );
-
-  const [ack, setAck] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      setAck(saved === "true");
-    } catch {
-      // If storage is blocked, we still allow checkbox to work for this session.
-    } finally {
-      setReady(true);
-    }
-  }, [storageKey]);
+  // A local choice also works when browser storage is unavailable. Keep it
+  // scoped to this listing so navigation cannot reuse another listing's choice.
+  const [localAck, setLocalAck] = useState<{ key: string; value: boolean } | null>(null);
+  const ready = storedAck !== null;
+  const ack = localAck?.key === storageKey ? localAck.value : storedAck === true;
 
   function toggle(next: boolean) {
-    setAck(next);
+    setLocalAck({ key: storageKey, value: next });
     try {
       localStorage.setItem(storageKey, String(next));
     } catch {

@@ -41,7 +41,16 @@ export default function AdminHostSubmissionsPage() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    getAdminHostListingSubmissionsFromSupabase()
+      .then((rows) => { if (!cancelled) setSubmissions(rows); })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
 
   async function handleAction(id: string, status: "APPROVED" | "REJECTED") {
     setUpdating(id);

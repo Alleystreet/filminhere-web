@@ -12,6 +12,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_rXhfIlSYyhUyO8P_6qutqA_xL7v-9SL
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
       - name: Run verify script
         run: |
           chmod +x scripts/verify.sh
